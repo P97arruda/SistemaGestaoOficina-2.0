@@ -1,8 +1,264 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Início";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<style>
+    .home-hero {
+        background: linear-gradient(135deg, #f3f7fb 0%, #e7f1fc 100%);
+        border-radius: 20px;
+        padding: 65px 55px;
+        margin-top: 30px;
+    }
+
+    .home-label {
+        color: #1769d2;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+    }
+
+    .home-title {
+        color: #18212b;
+        font-size: 3.2rem;
+        font-weight: 800;
+        line-height: 1.15;
+    }
+
+    .home-description {
+        color: #5a6875;
+        font-size: 1.1rem;
+        max-width: 550px;
+        line-height: 1.7;
+    }
+
+    .home-logo-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .home-logo {
+        width: 100%;
+        max-width: 370px;
+        height: auto;
+        border-radius: 50%;
+    }
+
+    .service-card {
+        height: 100%;
+        padding: 30px;
+        border: 1px solid #e3e8ed;
+        border-radius: 15px;
+        background: white;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        }
+
+    .service-number {
+        color: #1769d2;
+        font-weight: 800;
+        font-size: 1.5rem;
+    }
+
+    .info-section {
+        background: #18212b;
+        color: white;
+        border-radius: 20px;
+        padding: 45px;
+        margin-bottom: 50px;
+    }
+
+        .info-section p {
+            color: #c9d1d9;
+        }
+
+    .info-icon {
+        font-size: 2rem;
+        margin-bottom: 15px;
+    }
+
+    @@media (max-width: 768px) {
+        .home-hero {
+            padding: 40px 25px;
+            text-align: center;
+        }
+
+        .home-title {
+            font-size: 2.3rem;
+        }
+
+        .home-description {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .home-logo {
+            max-width: 260px;
+            margin-top: 30px;
+        }
+    }
+</style>
+
+<section class="home-hero">
+    <div class="row align-items-center">
+
+        <div class="col-lg-7">
+            <span class="home-label">Bem-vindo à OficinaCET107</span>
+
+            <h1 class="home-title mt-3">
+                Cuidamos do seu veículo com atenção e confiança.
+            </h1>
+
+            <p class="home-description mt-4">
+                Manutenção, diagnóstico e reparação automóvel.
+                Acompanhe o seu veículo e conte com uma equipa preparada
+                para cuidar de cada detalhe.
+            </p>
+
+            <div class="mt-4">
+                <a href="#servicos" class="btn btn-primary btn-lg me-2">
+                    Conhecer serviços
+                </a>
+
+                <a href="#oficina" class="btn btn-outline-dark btn-lg">
+                    Sobre a oficina
+                </a>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="home-logo-container">
+                <img src="~/images/ImagenCET107.png"
+                     alt="OficinaCET107"
+                     class="home-logo" />
+            </div>
+        </div>
+
+    </div>
+</section>
+
+
+<section id="servicos" class="py-5">
+
+    <div class="text-center mb-5">
+        <span class="home-label">O que fazemos</span>
+
+        <h2 class="mt-2 fw-bold">
+            Serviços da oficina
+        </h2>
+
+        <p class="text-muted">
+            Tudo o que o seu veículo precisa num só lugar.
+        </p>
+    </div>
+
+    <div class="row">
+
+        <div class="col-md-4 mb-4">
+            <div class="service-card">
+
+                <span class="service-number">01</span>
+
+                <h4 class="mt-3">
+                    Manutenção
+                </h4>
+
+                <p class="text-muted mb-0">
+                    Revisões e manutenção preventiva para manter
+                    o seu veículo em boas condições.
+                </p>
+
+            </div>
+        </div>
+
+
+        <div class="col-md-4 mb-4">
+            <div class="service-card">
+
+                <span class="service-number">02</span>
+
+                <h4 class="mt-3">
+                    Diagnóstico
+                </h4>
+
+                <p class="text-muted mb-0">
+                    Avaliação do veículo para identificar problemas
+                    e determinar o serviço necessário.
+                </p>
+
+            </div>
+        </div>
+
+
+        <div class="col-md-4 mb-4">
+            <div class="service-card">
+
+                <span class="service-number">03</span>
+
+                <h4 class="mt-3">
+                    Reparações
+                </h4>
+
+                <p class="text-muted mb-0">
+                    Reparação e acompanhamento das intervenções
+                    realizadas no seu veículo.
+                </p>
+
+            </div>
+        </div>
+
+    </div>
+
+</section>
+
+
+<section id="oficina" class="info-section">
+
+    <div class="row text-center">
+
+        <div class="col-md-4 mb-4 mb-md-0">
+
+            <div class="info-icon">🔧</div>
+
+            <h5>Mecânicos especializados</h5>
+
+            <p class="mb-0">
+                Profissionais preparados para cuidar do seu veículo.
+            </p>
+
+        </div>
+
+
+        <div class="col-md-4 mb-4 mb-md-0">
+
+            <div class="info-icon">📅</div>
+
+            <h5>Marcações organizadas</h5>
+
+            <p class="mb-0">
+                Gestão simples das suas marcações e serviços.
+            </p>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="info-icon">🚘</div>
+
+            <h5>Histórico do veículo</h5>
+
+            <p class="mb-0">
+                Consulte as intervenções realizadas no seu automóvel.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
