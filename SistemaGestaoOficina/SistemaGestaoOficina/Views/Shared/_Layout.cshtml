@@ -282,32 +282,48 @@
                         <!-- SE ESTIVER LOGADO -->
                        
                         @if (User.Identity != null && User.Identity.IsAuthenticated)
-{
-    <li class="nav-item user-info">
-        <span class="nav-link">
-            Olá, @User.Identity.Name
-        </span>
-    </li>
+                            {
+                                <li class="nav-item user-info">
+                                <span class="nav-link">
 
-    <li class="nav-item ms-lg-2">
-        <a class="login-button"
-           asp-controller="Account"
-           asp-action="Logout">
-            Logout
-        </a>
-    </li>
-}
+                                Olá, @User.Identity.Name
 
-@if (User.Identity == null || !User.Identity.IsAuthenticated)
-{
-    <li class="nav-item ms-lg-3">
-        <a class="login-button"
-           asp-controller="Account"
-           asp-action="Login">
-            Login
-        </a>
-    </li>
-}
+                                @if (User.IsInRole("Admin"))
+                                    {
+                                        <span class="badge bg-danger ms-2">Admin</span>
+                                    }
+                                @if (User.IsInRole("Funcionario"))
+                                    {
+                                        <span class="badge bg-warning text-dark ms-2">Funcionário</span>
+                                    }
+                                @if (User.IsInRole("Cliente"))
+                                    {
+                                        <span class="badge bg-success ms-2">Cliente</span>
+                                    }
+
+
+                                </span>
+                                 </li>
+
+                                <li class="nav-item ms-lg-2">
+                                 <a class="login-button"
+                                 asp-controller="Account"
+                                 asp-action="Logout">
+                                 Logout
+                                 </a>
+                                </li>
+                                }
+
+                                @if (User.Identity == null || !User.Identity.IsAuthenticated)
+                                {
+                                <li class="nav-item ms-lg-3">
+                                <a class="login-button"
+                                asp-controller="Account"
+                                asp-action="Login">
+                                Login
+                                </a>
+                                </li>
+                                }
 
                     </ul>
 

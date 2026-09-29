@@ -124,14 +124,18 @@ namespace SistemaGestaoOficina.Helpers
             return await _userManager.UpdateAsync(user);
         }
 
-        public async Task<SignInResult> ValidatePasswordAsync(
-            User user,
-            string password)
+        public async Task<SignInResult> ValidatePasswordAsync(User user, string password)
         {
             return await _signInManager.CheckPasswordSignInAsync(
                 user,
                 password,
                 false);
+        }
+
+        public async Task<User?> GetUserByPhoneNumberAsync(string phoneNumber)
+        {
+            return await _context.Users
+                .FirstOrDefaultAsync(u => u.PhoneNumber == phoneNumber);
         }
     }
 }

@@ -93,8 +93,9 @@ namespace SistemaGestaoOficina.Controllers
 
                     if (result.Succeeded)
                     {
-                        var token =
-                            await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+                        await _userHelper.AddUserToRoleAsync(user, "Cliente");
+
+                        var token = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
 
                         var link = Url.Action(
                             "ConfirmEmail",
@@ -168,6 +169,55 @@ namespace SistemaGestaoOficina.Controllers
             return View();
         }
 
+
+        public IActionResult ResetPassword(string userName, string token)
+        {
+            var model = new ResetPasswordViewModel
+            {
+                UserName = userName,
+                Token = token
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            var user = await _userHelper.GetUserByEmailAsync(model.UserName);
+
+            if (user != null)
+            {
+                var result = await _userHelper.ResetPasswordAsync(
+                    user,
+                    model.Token,
+                    model.Password);
+
+                if (result.Succeeded)
+                {
+                    if (!user.EmailConfirmed)
+                    {
+                        var confirmationToken =
+                            await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+
+                        await _userHelper.ConfirmEmailAsync(
+                            user,
+                            confirmationToken);
+                    }
+
+                    TempData["SuccessMessage"] =
+                        "Password definida com sucesso. Já pode entrar na sua conta.";
+
+                    return RedirectToAction("Login", "Account");
+                }
+
+                ViewBag.Message = "Erro ao definir a password.";
+                return View(model);
+            }
+
+            ViewBag.Message = "Utilizador não encontrado.";
+            return View(model);
+        }
 
     }
 }

@@ -30,6 +30,7 @@ builder.Services.AddIdentity<User, IdentityRole>(cfg =>
  .AddDefaultTokenProviders()
 .AddEntityFrameworkStores<DataContext>();
 
+builder.Services.AddTransient<SeedDb>();
 
 builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
 
@@ -60,5 +61,11 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+using (var scope = app.Services.CreateScope())
+{
+    var seeder = scope.ServiceProvider.GetRequiredService<SeedDb>();
+    await seeder.SeedAsync();
+}
 
 app.Run();
