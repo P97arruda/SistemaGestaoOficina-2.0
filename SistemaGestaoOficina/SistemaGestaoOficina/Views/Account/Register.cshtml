@@ -1,0 +1,82 @@
+﻿@model SistemaGestaoOficina.Models.RegisterNewUserViewModel
+
+@{
+    ViewData["Title"] = "Criar Conta";
+}
+
+<h2>Criar Conta</h2>
+
+<div class="row">
+    <div class="col-md-4 offset-md-4">
+
+        <form method="post">
+
+            <div asp-validation-summary="ModelOnly"></div>
+
+            <div class="form-group">
+                <label asp-for="FirstName">Nome</label>
+                <input asp-for="FirstName" class="form-control" />
+                <span asp-validation-for="FirstName" class="text-warning"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="LastName">Apelido</label>
+                <input asp-for="LastName" class="form-control" />
+                <span asp-validation-for="LastName" class="text-warning"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Username">Email</label>
+                <input asp-for="Username" class="form-control" />
+                <span asp-validation-for="Username" class="text-warning"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="PhoneNumber">Contacto</label>
+                <input asp-for="PhoneNumber" class="form-control" />
+                <span asp-validation-for="PhoneNumber" class="text-warning"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Password">Password</label>
+                <input asp-for="Password"
+                       class="form-control"
+                       type="password" />
+                <span asp-validation-for="Password" class="text-warning"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Confirm">Confirmar Password</label>
+                <input asp-for="Confirm"
+                       class="form-control"
+                       type="password" />
+                <span asp-validation-for="Confirm" class="text-warning"></span>
+            </div>
+
+            <div class="form-group mt-3">
+                <input type="submit"
+                       value="Criar Conta"
+                       class="btn btn-primary" />
+
+                <a asp-action="Login"
+                   class="btn btn-secondary">
+                    Voltar ao Login
+                </a>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<div class="text-success">
+    <p>
+        @ViewBag.Message
+    </p>
+</div>
+
+@section Scripts
+{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
