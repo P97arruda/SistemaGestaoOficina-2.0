@@ -2,16 +2,281 @@
     ViewData["Title"] = "Administração";
 }
 
-<div class="container mt-4">
-    <h2>Área de Administração</h2>
+<div class="container py-4">
 
-    <p>Bem-vindo à área de administração da OficinaCET107.</p>
+    <!-- Cabeçalho -->
+    <div class="mb-4">
+        <h2 class="fw-bold mb-1">
+            Área de Administração
+        </h2>
 
-    <hr />
+        <p class="text-muted mb-0">
+            Gestão administrativa da OficinaCET107.
+        </p>
+    </div>
 
-    <h4>Gestão de Utilizadores</h4>
 
-    <p>
-        Nesta área poderá gerir as contas dos clientes e funcionários.
-    </p>
+    <!-- Gestão de Utilizadores -->
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-body p-4">
+
+            <div class="mb-4">
+
+                <h4 class="fw-bold mb-1">
+                    Gestão de Utilizadores
+                </h4>
+
+                <p class="text-muted mb-0">
+                    Criação e consulta das contas de clientes e funcionários.
+                </p>
+
+            </div>
+
+
+            <div class="row g-3">
+
+                <!-- Criar Utilizador -->
+                <div class="col-md-4">
+
+                    <div class="border rounded p-4 h-100">
+
+                        <h5 class="fw-bold">
+                            Criar Utilizador
+                        </h5>
+
+                        <p class="text-muted">
+                            Criar uma nova conta para um cliente
+                            ou funcionário.
+                        </p>
+
+                        <a asp-controller="Admin"
+                           asp-action="CreateUser"
+                           class="btn btn-primary">
+
+                            + Criar Utilizador
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Clientes -->
+                <div class="col-md-4">
+
+                    <div class="border rounded p-4 h-100">
+
+                        <h5 class="fw-bold">
+                            Clientes
+                        </h5>
+
+                        <p class="text-muted">
+                            Consultar as contas dos clientes
+                            registados na oficina.
+                        </p>
+
+                        <a asp-controller="Admin"
+                           asp-action="Clientes"
+                           class="btn btn-outline-primary">
+
+                            Ver Clientes
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Funcionários -->
+                <div class="col-md-4">
+
+                    <div class="border rounded p-4 h-100">
+
+                        <h5 class="fw-bold">
+                            Funcionários
+                        </h5>
+
+                        <p class="text-muted">
+                            Consultar as contas dos funcionários
+                            registados na oficina.
+                        </p>
+
+                        <a asp-controller="Admin"
+                           asp-action="Funcionarios"
+                           class="btn btn-outline-primary">
+
+                            Ver Funcionários
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Gestão da Oficina -->
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-body p-4">
+
+            <div class="mb-4">
+
+                <h4 class="fw-bold mb-1">
+                    Gestão da Oficina
+                </h4>
+
+                <p class="text-muted mb-0">
+                    Gestão dos mecânicos, funcionários
+                    e tipos de reparações.
+                </p>
+
+            </div>
+
+
+            <div class="row g-3">
+
+                <!-- Mecânicos e Funcionários -->
+                <div class="col-md-6">
+
+                    <div class="border rounded p-4 h-100">
+
+                        <h5 class="fw-bold">
+                            Mecânicos e Funcionários
+                        </h5>
+
+                        <p class="text-muted">
+                            Criar, consultar, editar e remover
+                            mecânicos e funcionários da oficina.
+                        </p>
+
+                        <button class="btn btn-outline-secondary"
+                                disabled>
+
+                            Gerir Mecânicos e Funcionários
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Tipos de Reparações -->
+                <div class="col-md-6">
+
+                    <div class="border rounded p-4 h-100">
+
+                        <h5 class="fw-bold">
+                            Tipos de Reparações
+                        </h5>
+
+                        <p class="text-muted">
+                            Criar e gerir os tipos de reparações
+                            disponibilizados pela oficina.
+                        </p>
+
+                        <button class="btn btn-outline-secondary"
+                                disabled>
+
+                            Gerir Tipos de Reparações
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Conta do Administrador -->
+    <div class="card shadow-sm border-0">
+
+        <div class="card-body p-4">
+
+            <div class="mb-4">
+
+                <h4 class="fw-bold mb-1">
+                    Minha Conta
+                </h4>
+
+                <p class="text-muted mb-0">
+                    Gestão dos dados da conta do administrador.
+                </p>
+
+            </div>
+
+
+            <div class="row g-3">
+
+                <!-- Perfil -->
+                <div class="col-md-6">
+
+                    <div class="border rounded p-4 h-100">
+
+                        <h5 class="fw-bold">
+                            Perfil
+                        </h5>
+
+                        <p class="text-muted">
+                            Consultar e modificar os dados
+                            do seu perfil.
+                        </p>
+
+                        <button class="btn btn-outline-secondary"
+                                disabled>
+
+                            Modificar Perfil
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Password -->
+                <div class="col-md-6">
+
+                    <div class="border rounded p-4 h-100">
+
+                        <h5 class="fw-bold">
+                            Password
+                        </h5>
+
+                        <p class="text-muted">
+                            Alterar ou recuperar a password
+                            da sua conta.
+                        </p>
+
+                        <button class="btn btn-outline-secondary"
+                                disabled>
+
+                            Alterar Password
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </div>

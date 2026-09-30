@@ -17,7 +17,9 @@ namespace SistemaGestaoOficina.Data.Entities
         [MaxLength(30)]
         public string Estado { get; set; }
 
-        public Cliente Cliente { get; set; }
+        public string UserId { get; set; }
+
+        public User User { get; set; }
 
         public Veiculo Veiculo { get; set; }
 

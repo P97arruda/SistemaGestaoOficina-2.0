@@ -10,7 +10,6 @@ namespace SistemaGestaoOficina.Data.Entities
         [MaxLength(15)]
         public string Marca { get; set; }
 
-
         [Required]
         [MaxLength(20)]
         public string Modelo { get; set; }
@@ -27,8 +26,10 @@ namespace SistemaGestaoOficina.Data.Entities
         [MaxLength(30)]
         public string Combustivel { get; set; }
 
-        public Cliente Cliente { get; set; }
+        public string UserId { get; set; }
 
-        public ICollection<Marcacao> Marcacaos { get; set;}
+        public User User { get; set; }
+
+        public ICollection<Marcacao> Marcacaos { get; set; }
     }
 }

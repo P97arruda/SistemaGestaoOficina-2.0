@@ -11,8 +11,6 @@
     <link rel="stylesheet" href="~/SistemaGestaoOficina.styles.css" asp-append-version="true" />
 
     <style>
-
-        /* PÁGINA */
         html {
             height: 100%;
         }
@@ -28,23 +26,11 @@
             flex: 1;
         }
 
-
-        /* NAVBAR */
         .oficina-navbar {
             background: #111820;
             min-height: 76px;
             border-bottom: 3px solid #1683ff;
             padding: 10px 0;
-        }
-
-
-        /* LOGO */
-        .navbar-logo {
-            width: 52px;
-            height: 52px;
-            object-fit: cover;
-            border-radius: 50%;
-            transition: 0.2s;
         }
 
         .oficina-brand {
@@ -59,8 +45,6 @@
             color: #1683ff;
         }
 
-
-        /* LINKS DO MENU */
         .oficina-navbar .nav-link {
             color: #d6dce2 !important;
             font-weight: 500;
@@ -73,8 +57,6 @@
             color: #1683ff !important;
         }
 
-
-        /* UTILIZADOR LOGADO */
         .user-info .nav-link {
             color: white !important;
             cursor: default;
@@ -85,8 +67,6 @@
             color: white !important;
         }
 
-
-        /* BOTÃO LOGIN / LOGOUT */
         .login-button {
             display: inline-block;
             background: #1683ff;
@@ -104,8 +84,6 @@
             transform: translateY(-1px);
         }
 
-
-        /* RODAPÉ */
         .oficina-footer {
             background: #111820;
             color: #aeb7c0;
@@ -118,17 +96,9 @@
             color: white;
         }
 
-
-        /* TABLET E TELEMÓVEL */
         @@media (max-width: 991px) {
-
             .oficina-navbar {
                 padding: 8px 0;
-            }
-
-            .navbar-logo {
-                width: 44px;
-                height: 44px;
             }
 
             .oficina-brand {
@@ -150,10 +120,6 @@
                 border-bottom: 1px solid #27313b;
             }
 
-            .user-info .nav-link {
-                border-bottom: 1px solid #27313b;
-            }
-
             .login-button {
                 display: block;
                 width: 100%;
@@ -162,15 +128,7 @@
             }
         }
 
-
-        /* TELEMÓVEIS PEQUENOS */
         @@media (max-width: 576px) {
-
-            .navbar-logo {
-                width: 40px;
-                height: 40px;
-            }
-
             .oficina-brand {
                 font-size: 1rem;
             }
@@ -180,36 +138,21 @@
                 padding: 20px 10px;
             }
         }
-
     </style>
 </head>
 
 <body>
 
-    <!-- NAVBAR -->
     <header>
-
         <nav class="navbar navbar-expand-lg navbar-dark oficina-navbar">
-
             <div class="container">
 
-                <!-- LOGO -->
-                <a class="navbar-brand oficina-brand d-flex align-items-center"
+                <a class="navbar-brand oficina-brand"
                    asp-controller="Home"
                    asp-action="Index">
-
-                    <img src="~/images/ImagenCET107.png"
-                         alt="OficinaCET107"
-                         class="navbar-logo" />
-
-                    <span class="ms-2">
-                        Oficina<span class="brand-blue">CET107</span>
-                    </span>
-
+                    Oficina<span class="brand-blue">CET107</span>
                 </a>
 
-
-                <!-- BOTÃO MENU MOBILE -->
                 <button class="navbar-toggler"
                         type="button"
                         data-bs-toggle="collapse"
@@ -217,164 +160,109 @@
                         aria-controls="navbarOficina"
                         aria-expanded="false"
                         aria-label="Abrir menu">
-
                     <span class="navbar-toggler-icon"></span>
-
                 </button>
 
-
-                <!-- MENU -->
-                <div class="collapse navbar-collapse"
-                     id="navbarOficina">
-
+                <div class="collapse navbar-collapse" id="navbarOficina">
                     <ul class="navbar-nav ms-auto align-items-lg-center">
 
-
-                        <!-- HOME -->
                         <li class="nav-item">
-
                             <a class="nav-link"
                                asp-controller="Home"
                                asp-action="Index">
-
                                 Home
-
                             </a>
-
                         </li>
 
-
-                        <!-- SERVIÇOS -->
                         <li class="nav-item">
-
                             <a class="nav-link"
                                asp-controller="Home"
                                asp-action="Index"
                                asp-fragment="servicos">
-
                                 Serviços
-
                             </a>
-
                         </li>
 
-
-                        <!-- MECÂNICOS -->
                         <li class="nav-item">
-
                             <a class="nav-link" href="#">
                                 Mecânicos
                             </a>
-
                         </li>
 
-
-                        <!-- HORÁRIOS -->
                         <li class="nav-item">
-
                             <a class="nav-link" href="#">
                                 Horários
                             </a>
-
                         </li>
 
-
-                        <!-- SE ESTIVER LOGADO -->
-                       
                         @if (User.Identity != null && User.Identity.IsAuthenticated)
-                            {
-                                <li class="nav-item user-info">
+                        {
+                            <li class="nav-item user-info">
                                 <span class="nav-link">
+                                    Olá, @User.Identity.Name
 
-                                Olá, @User.Identity.Name
-
-                                @if (User.IsInRole("Admin"))
+                                    @if (User.IsInRole("Admin"))
                                     {
                                         <span class="badge bg-danger ms-2">Admin</span>
                                     }
-                                @if (User.IsInRole("Funcionario"))
+
+                                    @if (User.IsInRole("Funcionario"))
                                     {
                                         <span class="badge bg-warning text-dark ms-2">Funcionário</span>
                                     }
-                                @if (User.IsInRole("Cliente"))
+
+                                    @if (User.IsInRole("Cliente"))
                                     {
                                         <span class="badge bg-success ms-2">Cliente</span>
                                     }
-
-
                                 </span>
-                                 </li>
+                            </li>
 
-                                <li class="nav-item ms-lg-2">
-                                 <a class="login-button"
-                                 asp-controller="Account"
-                                 asp-action="Logout">
-                                 Logout
-                                 </a>
-                                </li>
-                                }
-
-                                @if (User.Identity == null || !User.Identity.IsAuthenticated)
-                                {
-                                <li class="nav-item ms-lg-3">
+                            <li class="nav-item ms-lg-2">
                                 <a class="login-button"
-                                asp-controller="Account"
-                                asp-action="Login">
-                                Login
+                                   asp-controller="Account"
+                                   asp-action="Logout">
+                                    Logout
                                 </a>
-                                </li>
-                                }
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item ms-lg-3">
+                                <a class="login-button"
+                                   asp-controller="Account"
+                                   asp-action="Login">
+                                    Login
+                                </a>
+                            </li>
+                        }
 
                     </ul>
-
                 </div>
 
             </div>
-
         </nav>
-
     </header>
 
-
-    <!-- CONTEÚDO DAS VIEWS -->
     <div class="page-content">
-
         <div class="container">
-
             <main role="main" class="pb-3">
-
                 @RenderBody()
-
             </main>
-
         </div>
-
     </div>
 
-
-    <!-- RODAPÉ -->
     <footer class="oficina-footer">
-
         <div class="container text-center">
-
             <strong>OficinaCET107 3.0</strong>
-
             <span class="mx-2">|</span>
-
             &copy; 2026 - Todos os direitos reservados
-
         </div>
-
     </footer>
 
-
-    <!-- SCRIPTS -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script src="~/js/site.js"
-            asp-append-version="true"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
 

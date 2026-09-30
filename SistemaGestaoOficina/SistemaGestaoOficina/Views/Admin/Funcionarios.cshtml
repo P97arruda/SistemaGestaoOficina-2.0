@@ -1,0 +1,98 @@
+﻿@model IEnumerable<SistemaGestaoOficina.Data.Entities.User>
+
+@{
+    ViewData["Title"] = "Funcionários";
+}
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2 class="fw-bold mb-1">Funcionários</h2>
+
+            <p class="text-muted mb-0">
+                Consulte os funcionários registados na OficinaCET107.
+            </p>
+        </div>
+
+        <a asp-controller="Admin"
+           asp-action="CreateUser"
+           class="btn btn-primary">
+            + Criar Funcionário
+        </a>
+
+    </div>
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-body p-4">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Email</th>
+                            <th>Contacto</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var funcionario in Model)
+                        {
+                            <tr>
+                                <td>@funcionario.FullName</td>
+                                <td>@funcionario.Email</td>
+                                <td>@funcionario.PhoneNumber</td>
+
+                                <td>
+                                    <a asp-controller="Admin"
+                                       asp-action="EditUser"
+                                       asp-route-id="@funcionario.Id"
+                                       class="btn btn-sm btn-warning">
+                                        Editar
+                                    </a>
+
+                                    <form asp-controller="Admin"
+                                          asp-action="DeleteUser"
+                                          asp-route-id="@funcionario.Id"
+                                          method="post"
+                                          class="d-inline"
+                                          onsubmit="return confirm('Tem a certeza de que deseja apagar este funcionário?');">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <button type="submit"
+                                                class="btn btn-sm btn-danger">
+                                            Apagar
+                                        </button>
+
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="mt-3">
+        <a asp-controller="Admin"
+           asp-action="Index"
+           class="btn btn-secondary">
+            Voltar
+        </a>
+    </div>
+
+</div>

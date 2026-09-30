@@ -1,0 +1,187 @@
+﻿@model SistemaGestaoOficina.Models.EditUserViewModel
+
+@{
+    ViewData["Title"] = "Editar Utilizador";
+}
+
+<div class="container py-4">
+
+    <div class="mb-4">
+        <h2 class="fw-bold mb-1">
+            Editar Utilizador
+        </h2>
+
+        <p class="text-muted mb-0">
+            Altere os dados da conta do utilizador.
+        </p>
+    </div>
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-body p-4">
+
+            <div class="row">
+                <div class="col-md-6">
+
+                    <form asp-controller="Admin"
+                          asp-action="EditUser"
+                          method="post">
+
+                        <div asp-validation-summary="ModelOnly"
+                             class="text-danger mb-3">
+                        </div>
+
+                        <!-- Id -->
+                        <input asp-for="Id" type="hidden" />
+
+                        <!-- Role -->
+                        <input asp-for="Role" type="hidden" />
+
+
+                        <!-- Tipo de Utilizador -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Tipo de Utilizador
+                            </label>
+
+                            <input value="@Model.Role"
+                                   class="form-control"
+                                   readonly />
+
+                        </div>
+
+
+                        <!-- NIF apenas para Cliente -->
+                        @if (Model.Role == "Cliente")
+                        {
+                            <div class="mb-3">
+
+                                <label asp-for="NIF"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="NIF"
+                                       class="form-control" />
+
+                                <span asp-validation-for="NIF"
+                                      class="text-danger">
+                                </span>
+
+                            </div>
+                        }
+
+
+                        <!-- Nome -->
+                        <div class="mb-3">
+
+                            <label asp-for="FirstName"
+                                   class="form-label">
+                            </label>
+
+                            <input asp-for="FirstName"
+                                   class="form-control" />
+
+                            <span asp-validation-for="FirstName"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <!-- Apelido -->
+                        <div class="mb-3">
+
+                            <label asp-for="LastName"
+                                   class="form-label">
+                            </label>
+
+                            <input asp-for="LastName"
+                                   class="form-control" />
+
+                            <span asp-validation-for="LastName"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <!-- Email -->
+                        <div class="mb-3">
+
+                            <label asp-for="Email"
+                                   class="form-label">
+                            </label>
+
+                            <input asp-for="Email"
+                                   class="form-control" />
+
+                            <span asp-validation-for="Email"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <!-- Contacto -->
+                        <div class="mb-3">
+
+                            <label asp-for="PhoneNumber"
+                                   class="form-label">
+                            </label>
+
+                            <input asp-for="PhoneNumber"
+                                   class="form-control" />
+
+                            <span asp-validation-for="PhoneNumber"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <button type="submit"
+                                class="btn btn-primary">
+
+                            Guardar Alterações
+
+                        </button>
+
+                        @if (Model.Role == "Cliente")
+                        {
+                            <a asp-controller="Admin"
+                               asp-action="Clientes"
+                               class="btn btn-secondary">
+
+                                Voltar
+
+                            </a>
+                        }
+                        else
+                        {
+                            <a asp-controller="Admin"
+                               asp-action="Funcionarios"
+                               class="btn btn-secondary">
+
+                                Voltar
+
+                            </a>
+                        }
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts
+{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

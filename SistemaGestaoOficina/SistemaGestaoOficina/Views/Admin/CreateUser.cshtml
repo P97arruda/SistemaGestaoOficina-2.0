@@ -37,6 +37,25 @@
                      class="text-danger"></div>
 
                 <div class="mb-3">
+                    <label asp-for="Role" class="form-label"></label>
+
+                    <select asp-for="Role"
+                            class="form-select"
+                            id="roleSelect">
+
+                        <option value="">Selecione...</option>
+                        <option value="Cliente">Cliente</option>
+                        <option value="Funcionario">Funcionário</option>
+
+                    </select>
+
+                    <span asp-validation-for="Role"
+                          class="text-danger"></span>
+                </div>
+
+
+
+                <div class="mb-3">
                     <label asp-for="FirstName" class="form-label"></label>
                     <input asp-for="FirstName" class="form-control" />
                     <span asp-validation-for="FirstName"
@@ -64,16 +83,18 @@
                           class="text-danger"></span>
                 </div>
 
-                <div class="mb-3">
-                    <label asp-for="Role" class="form-label"></label>
+                
 
-                    <select asp-for="Role" class="form-select">
-                        <option value="">Selecione...</option>
-                        <option value="Cliente">Cliente</option>
-                        <option value="Funcionario">Funcionário</option>
-                    </select>
+                <div class="mb-3"
+                     id="nifField"
+                     style="display: none;">
 
-                    <span asp-validation-for="Role"
+                    <label asp-for="NIF" class="form-label"></label>
+
+                    <input asp-for="NIF"
+                           class="form-control" />
+
+                    <span asp-validation-for="NIF"
                           class="text-danger"></span>
                 </div>
 
@@ -96,15 +117,37 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
+    <script>
+        const roleSelect = document.getElementById("roleSelect");
+        const nifField = document.getElementById("nifField");
+
+        function updateNifField() {
+
+            if (roleSelect.value === "Cliente") {
+                nifField.style.display = "block";
+            }
+            else {
+                nifField.style.display = "none";
+            }
+        }
+
+        roleSelect.addEventListener("change", updateNifField);
+
+        updateNifField();
+    </script>
+
     @if (ViewBag.Message != null)
     {
         <script>
             setTimeout(function () {
-                const alert = document.getElementById("successAlert");
+
+                const alert =
+                    document.getElementById("successAlert");
 
                 if (alert) {
                     alert.remove();
                 }
+
             }, 4000);
         </script>
     }

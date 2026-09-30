@@ -7,11 +7,17 @@ namespace SistemaGestaoOficina.Data.Entities
     {
         [Required]
         [MaxLength(50)]
-        public string FirstName { get; set; }
+        [Display(Name = "Nome")]
+        public string FirstName { get; set; } = string.Empty;
 
         [Required]
         [MaxLength(50)]
-        public string LastName { get; set; }
+        [Display(Name = "Apelido")]
+        public string LastName { get; set; } = string.Empty;
+
+        [MaxLength(9, ErrorMessage = "O campo {0} pode conter no máximo {1} caracteres.")]
+        [Display(Name = "NIF")]
+        public string? NIF { get; set; }
 
         [Display(Name = "Nome")]
         public string FullName => $"{FirstName} {LastName}";

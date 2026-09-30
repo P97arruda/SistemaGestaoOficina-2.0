@@ -24,6 +24,8 @@ namespace SistemaGestaoOficina.Helpers
 
         Task<bool> IsUserInRoleAsync(User user, string roleName);
 
+        Task<IList<User>> GetUsersInRoleAsync(string roleName);
+
         Task<SignInResult> ValidatePasswordAsync(User user, string password);
 
         Task<string> GenerateEmailConfirmationTokenAsync(User user);
@@ -37,5 +39,9 @@ namespace SistemaGestaoOficina.Helpers
         Task<IdentityResult> ResetPasswordAsync(User user, string token, string password);
 
         Task<User?> GetUserByPhoneNumberAsync(string phoneNumber);
+
+        Task<IdentityResult> DeleteUserAsync(User user);
+
+        IQueryable<User> GetUsers();
     }
 }

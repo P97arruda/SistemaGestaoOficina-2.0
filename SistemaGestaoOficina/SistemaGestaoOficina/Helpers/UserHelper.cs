@@ -137,5 +137,20 @@ namespace SistemaGestaoOficina.Helpers
             return await _context.Users
                 .FirstOrDefaultAsync(u => u.PhoneNumber == phoneNumber);
         }
+
+        public async Task<IList<User>> GetUsersInRoleAsync(string roleName)
+        {
+            return await _userManager.GetUsersInRoleAsync(roleName);
+        }
+
+        public async Task<IdentityResult> DeleteUserAsync(User user)
+        {
+            return await _userManager.DeleteAsync(user);
+        }
+
+        public IQueryable<User> GetUsers()
+        {
+            return _context.Users;
+        }
     }
 }
