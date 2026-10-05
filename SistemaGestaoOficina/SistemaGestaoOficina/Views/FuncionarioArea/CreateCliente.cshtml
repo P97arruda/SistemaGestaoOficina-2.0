@@ -1,18 +1,18 @@
-﻿@model SistemaGestaoOficina.Models.EditUserViewModel
+﻿@model SistemaGestaoOficina.Models.CreateUserViewModel
 
 @{
-    ViewData["Title"] = "Editar Funcionário";
+    ViewData["Title"] = "Criar Cliente";
 }
 
 <div class="container py-4">
 
     <div class="mb-4">
         <h2 class="fw-bold mb-1">
-            Editar Funcionário
+            Criar Cliente
         </h2>
 
         <p class="text-muted mb-0">
-            Altere os dados da conta do funcionário.
+            Registe um novo cliente na OficinaCET107.
         </p>
     </div>
 
@@ -23,32 +23,12 @@
             <div class="row">
                 <div class="col-md-6">
 
-                    <form asp-controller="Admin"
-                          asp-action="EditUser"
+                    <form asp-controller="FuncionarioArea"
+                          asp-action="CreateCliente"
                           method="post">
 
                         <div asp-validation-summary="ModelOnly"
                              class="text-danger mb-3">
-                        </div>
-
-                        <!-- Id -->
-                        <input asp-for="Id" type="hidden" />
-
-                        <!-- Role -->
-                        <input asp-for="Role" type="hidden" />
-
-
-                        <!-- Tipo de Utilizador -->
-                        <div class="mb-3">
-
-                            <label class="form-label">
-                                Tipo de Utilizador
-                            </label>
-
-                            <input value="Funcionário"
-                                   class="form-control"
-                                   readonly />
-
                         </div>
 
 
@@ -80,6 +60,23 @@
                                    class="form-control" />
 
                             <span asp-validation-for="LastName"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <!-- NIF -->
+                        <div class="mb-3">
+
+                            <label asp-for="NIF"
+                                   class="form-label">
+                            </label>
+
+                            <input asp-for="NIF"
+                                   class="form-control" />
+
+                            <span asp-validation-for="NIF"
                                   class="text-danger">
                             </span>
 
@@ -122,17 +119,13 @@
 
                         <button type="submit"
                                 class="btn btn-primary">
-
-                            Guardar Alterações
-
+                            Criar Cliente
                         </button>
 
-                        <a asp-controller="Admin"
-                           asp-action="Funcionarios"
+                        <a asp-controller="FuncionarioArea"
+                           asp-action="Clientes"
                            class="btn btn-secondary">
-
                             Voltar
-
                         </a>
 
                     </form>

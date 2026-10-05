@@ -230,7 +230,6 @@ namespace SistemaGestaoOficina.Controllers
                 return View(model);
             }
 
-
             var user = await _userHelper.GetUserByIdAsync(model.Id);
 
             if (user == null)
@@ -238,6 +237,11 @@ namespace SistemaGestaoOficina.Controllers
                 return NotFound();
             }
 
+            // O Admin só pode editar Funcionários
+            if (!await _userHelper.IsUserInRoleAsync(user, "Funcionario"))
+            {
+                return Forbid();
+            }
 
             // Verificar se o email pertence a outro utilizador
             var userByEmail =
@@ -252,7 +256,6 @@ namespace SistemaGestaoOficina.Controllers
                 return View(model);
             }
 
-
             // Verificar se o contacto pertence a outro utilizador
             var userByPhone =
                 await _userHelper.GetUserByPhoneNumberAsync(model.PhoneNumber);
@@ -266,58 +269,24 @@ namespace SistemaGestaoOficina.Controllers
                 return View(model);
             }
 
-
-            // Se informou NIF, verificar se pertence a outro utilizador
-            if (!string.IsNullOrWhiteSpace(model.NIF))
-            {
-                var userByNif = _userHelper
-                    .GetUsers()
-                    .FirstOrDefault(u =>
-                        u.NIF == model.NIF &&
-                        u.Id != user.Id);
-
-                if (userByNif != null)
-                {
-                    ModelState.AddModelError(
-                        nameof(model.NIF),
-                        "Já existe um utilizador com este NIF.");
-
-                    return View(model);
-                }
-            }
-
-
-            // Atualizar dados do User
+            // Atualizar dados do Funcionário
             user.FirstName = model.FirstName;
             user.LastName = model.LastName;
             user.Email = model.Email;
             user.UserName = model.Email;
             user.PhoneNumber = model.PhoneNumber;
 
-            user.NIF = model.Role == "Cliente"
-                ? model.NIF
-                : null;
-
-
             var result = await _userHelper.UpdateUserAsync(user);
-
 
             if (!result.Succeeded)
             {
                 ModelState.AddModelError(
                     string.Empty,
                     result.Errors.FirstOrDefault()?.Description
-                    ?? "Erro ao atualizar o utilizador.");
+                    ?? "Erro ao atualizar o funcionário.");
 
                 return View(model);
             }
-
-
-            if (model.Role == "Cliente")
-            {
-                return RedirectToAction(nameof(Clientes));
-            }
-
 
             return RedirectToAction(nameof(Funcionarios));
         }
@@ -332,7 +301,6 @@ namespace SistemaGestaoOficina.Controllers
                 return NotFound();
             }
 
-
             var user = await _userHelper.GetUserByIdAsync(id);
 
             if (user == null)
@@ -340,33 +308,27 @@ namespace SistemaGestaoOficina.Controllers
                 return NotFound();
             }
 
+            // O Admin só pode apagar Funcionários
+            if (!await _userHelper.IsUserInRoleAsync(user, "Funcionario"))
+            {
+                return Forbid();
+            }
 
-            bool isCliente =
-                await _userHelper.IsUserInRoleAsync(user, "Cliente");
-
-
-            var result =
-                await _userHelper.DeleteUserAsync(user);
-
+            var result = await _userHelper.DeleteUserAsync(user);
 
             if (!result.Succeeded)
             {
                 TempData["ErrorMessage"] =
-                    "Não foi possível apagar o utilizador.";
+                    "Não foi possível apagar o funcionário.";
 
-                return isCliente
-                    ? RedirectToAction(nameof(Clientes))
-                    : RedirectToAction(nameof(Funcionarios));
+                return RedirectToAction(nameof(Funcionarios));
             }
 
-
             TempData["SuccessMessage"] =
-                "Utilizador apagado com sucesso.";
+                "Funcionário apagado com sucesso.";
 
-
-            return isCliente
-                ? RedirectToAction(nameof(Clientes))
-                : RedirectToAction(nameof(Funcionarios));
+            return RedirectToAction(nameof(Funcionarios));
         }
+
     }
 }
