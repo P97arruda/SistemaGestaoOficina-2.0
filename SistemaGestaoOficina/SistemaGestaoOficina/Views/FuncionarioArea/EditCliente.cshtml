@@ -1,0 +1,64 @@
+﻿@model SistemaGestaoOficina.Models.EditClienteViewModel
+
+@{
+    ViewData["Title"] = "Editar Cliente";
+}
+
+<div class="container mt-4">
+    <h2>Editar Cliente</h2>
+
+    <hr />
+
+    <form asp-controller="FuncionarioArea"
+          asp-action="EditCliente"
+          method="post">
+
+        <input type="hidden" asp-for="Id" />
+
+        <div class="mb-3">
+            <label asp-for="FirstName" class="form-label"></label>
+            <input asp-for="FirstName" class="form-control" />
+            <span asp-validation-for="FirstName" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="LastName" class="form-label"></label>
+            <input asp-for="LastName" class="form-control" />
+            <span asp-validation-for="LastName" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="NIF" class="form-label"></label>
+            <input asp-for="NIF" class="form-control" />
+            <span asp-validation-for="NIF" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Email" class="form-label"></label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="PhoneNumber" class="form-label"></label>
+            <input asp-for="PhoneNumber" class="form-control" />
+            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Guardar
+        </button>
+
+        <a asp-controller="FuncionarioArea"
+           asp-action="Clientes"
+           class="btn btn-secondary">
+            Voltar
+        </a>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

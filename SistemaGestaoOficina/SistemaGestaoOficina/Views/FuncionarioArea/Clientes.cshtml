@@ -14,6 +14,21 @@
             </p>
         </div>
 
+        <div>
+            <a asp-controller="FuncionarioArea"
+               asp-action="CreateCliente"
+               class="btn btn-primary">
+                + Criar Cliente
+            </a>
+
+            <a asp-action="Index"
+               class="btn btn-outline-secondary">
+                Voltar
+            </a>
+        </div>
+
+    </div>
+
         <a asp-action="Index"
            class="btn btn-outline-secondary">
             Voltar
@@ -56,12 +71,30 @@
                                     }
                                 </td>
 
-                                <td>
-                                    <button class="btn btn-sm btn-outline-primary"
-                                            disabled>
-                                        Veículos
+                              <td>
+                                    <a asp-controller="FuncionarioArea"
+                                    asp-action="EditCliente"
+                                    asp-route-id="@cliente.Id"
+                                    class="btn btn-sm btn-warning">
+                                    Editar
+                                    </a>
+
+                                    <form asp-controller="FuncionarioArea"
+                                    asp-action="DeleteCliente"
+                                    asp-route-id="@cliente.Id"
+                                    method="post"
+                                    class="d-inline"
+                                    onsubmit="return confirm('Tem a certeza que deseja apagar este cliente?');">
+
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                    Apagar
                                     </button>
-                                </td>
+                                    </form>
+
+                                    <button class="btn btn-sm btn-outline-primary" disabled>
+                                    Veículos
+                                    </button>
+                             </td>
                             </tr>
                         }
 

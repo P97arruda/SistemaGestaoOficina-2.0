@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using SistemaGestaoOficina.Data.Entities;
 using SistemaGestaoOficina.Helpers;
 using SistemaGestaoOficina.Models;
+
 
 namespace SistemaGestaoOficina.Controllers
 {
@@ -17,7 +19,7 @@ namespace SistemaGestaoOficina.Controllers
             _userHelper = userHelper;
             _mailHelper = mailHelper;
         }
-        
+
         public IActionResult Index()
         {
             return View();
@@ -32,18 +34,23 @@ namespace SistemaGestaoOficina.Controllers
         }
 
 
+        public IActionResult CreateCliente()
+        {
+            var model = new CreateClienteViewModel();
+
+            return View(model);
+        }
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateCliente(CreateUserViewModel model)
+        public async Task<IActionResult> CreateCliente(CreateClienteViewModel model)
         {
-            // O Funcionário só pode criar Clientes
-            model.Role = "Cliente";
 
             if (ModelState.IsValid)
             {
                 // Verificar se já existe um utilizador com este email
-                var userByEmail =
-                    await _userHelper.GetUserByEmailAsync(model.Email);
+                var userByEmail = await _userHelper.GetUserByEmailAsync(model.Email);
 
                 if (userByEmail != null)
                 {
@@ -150,5 +157,114 @@ namespace SistemaGestaoOficina.Controllers
         }
 
 
+
+        public async Task<IActionResult> EditCliente(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                return NotFound();
+            }
+
+            var user = await _userHelper.GetUserByIdAsync(id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            // Garantir que o utilizador é realmente um Cliente
+            if (!await _userHelper.IsUserInRoleAsync(user, "Cliente"))
+            {
+                return Forbid();
+            }
+
+            var model = new EditClienteViewModel
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email!,
+                PhoneNumber = user.PhoneNumber!,
+                NIF = user.NIF
+            };
+
+            return View(model);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditCliente(EditClienteViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userHelper.GetUserByIdAsync(model.Id);
+
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                // Garantir que o utilizador é realmente um Cliente
+                if (!await _userHelper.IsUserInRoleAsync(user, "Cliente"))
+                {
+                    return Forbid();
+                }
+
+                // Atualizar os dados do Cliente
+                user.FirstName = model.FirstName;
+                user.LastName = model.LastName;
+                user.Email = model.Email;
+                user.UserName = model.Email;
+                user.PhoneNumber = model.PhoneNumber;
+                user.NIF = model.NIF;
+
+                var result = await _userHelper.UpdateUserAsync(user);
+
+                if (result.Succeeded)
+                {
+                    return RedirectToAction(nameof(Clientes));
+                }
+
+                ModelState.AddModelError(string.Empty, result.Errors.FirstOrDefault()?.Description
+                    ?? "Erro ao atualizar o cliente.");
+            }
+
+            return View(model);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteCliente(string id)
+        {
+            if(string.IsNullOrEmpty(id))
+            {
+                return NotFound();
+            }
+
+            var user = await _userHelper.GetUserByIdAsync(id);
+
+            if(user == null)
+            {
+                return NotFound();
+            }
+
+            // Garantir que o utilizador é realmente um Cliente
+
+            if (!await _userHelper.IsUserInRoleAsync(user, "Cliente"))
+            {
+                return Forbid();
+            }
+
+            var result = await _userHelper.DeleteUserAsync(user);
+
+            if (!result.Succeeded)
+            {
+                TempData["ErrorMessage"] = "Não foi possível apagar o cliente.";
+            }
+
+            return RedirectToAction(nameof(Clientes));
+        }
     }
 }
