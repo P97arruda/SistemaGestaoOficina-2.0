@@ -1,0 +1,78 @@
+﻿@model IEnumerable<SistemaGestaoOficina.Data.Entities.Veiculo>
+
+@{
+    ViewData["Title"] = "Veículos do Cliente";
+}
+
+<div class="container mt-5">
+
+    <h2 class="fw-bold">Veículos do Cliente</h2>
+
+    <a asp-controller="Veiculos"
+       asp-action="Create"
+       asp-route-id="@ViewBag.ClienteId"
+       class="btn btn-primary mb-3">
+        + Adicionar Veículo
+    </a>
+
+    <p class="text-muted">
+        Veículos registados na oficina.
+    </p>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Marca</th>
+                        <th>Modelo</th>
+                        <th>Matrícula</th>
+                        <th>Ano</th>
+                        <th>Quilometragem</th>
+                        <th>Combustível</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var veiculo in Model)
+                    {
+                        <tr>
+                            <td>@veiculo.Marca</td>
+                            <td>@veiculo.Modelo</td>
+                            <td>@veiculo.Matricula</td>
+                            <td>@veiculo.Ano</td>
+                            <td>@veiculo.Quilometragem</td>
+                            <td>@veiculo.Combustivel</td>
+
+                            <td>
+                                <a asp-controller="Veiculos"
+                                   asp-action="Edit"
+                                   asp-route-id="@veiculo.Id"
+                                   class="btn btn-sm btn-outline-primary">
+                                    Editar
+                                </a>
+
+                                <form asp-controller="Veiculos"
+                                      asp-action="Delete"
+                                      asp-route-id="@veiculo.Id"
+                                      method="post"
+                                      class="d-inline"
+                                      onsubmit="return confirm('Tem a certeza de que deseja eliminar este veículo?');">
+
+                                    <button type="submit"
+                                            class="btn btn-sm btn-outline-danger">
+                                        Eliminar
+                                    </button>
+
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>

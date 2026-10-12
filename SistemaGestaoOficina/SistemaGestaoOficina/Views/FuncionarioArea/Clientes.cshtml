@@ -91,9 +91,12 @@
                                     </button>
                                     </form>
 
-                                    <button class="btn btn-sm btn-outline-primary" disabled>
-                                    Veículos
-                                    </button>
+                                    <a asp-controller="Veiculos"
+                                     asp-action="Index"
+                                     asp-route-id="@cliente.Id"
+                                     class="btn btn-sm btn-outline-primary">
+                                     Veículos
+                                    </a>
                              </td>
                             </tr>
                         }

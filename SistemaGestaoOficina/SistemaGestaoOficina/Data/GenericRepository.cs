@@ -53,6 +53,5 @@ namespace SistemaGestaoOficina.Data
             return await _context.SaveChangesAsync() > 0;
         }
 
-        
     }
 }

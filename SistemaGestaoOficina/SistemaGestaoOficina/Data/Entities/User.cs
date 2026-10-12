@@ -5,6 +5,7 @@ namespace SistemaGestaoOficina.Data.Entities
 {
     public class User : IdentityUser
     {
+
         [Required]
         [MaxLength(50)]
         [Display(Name = "Nome")]
@@ -21,5 +22,6 @@ namespace SistemaGestaoOficina.Data.Entities
 
         [Display(Name = "Nome")]
         public string FullName => $"{FirstName} {LastName}";
+
     }
 }
