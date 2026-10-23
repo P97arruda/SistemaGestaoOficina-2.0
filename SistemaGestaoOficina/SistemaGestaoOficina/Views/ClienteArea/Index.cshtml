@@ -1,5 +1,4 @@
-﻿
-@model IEnumerable<SistemaGestaoOficina.Data.Entities.Veiculo>
+﻿@model IEnumerable<SistemaGestaoOficina.Data.Entities.Veiculo>
 
 @{
     ViewData["Title"] = "Área do Cliente";
@@ -12,36 +11,35 @@
         <h2 class="fw-bold">Bem-vindo à sua oficina!</h2>
 
         <p class="text-muted">
-            Consulte os seus veículos, acompanhe os serviços
-            e encontre informações sobre a nossa oficina.
+            Faça a gestão dos seus veículos, consulte os seus dados
+            e acompanhe os serviços da nossa oficina.
         </p>
     </div>
 
     <!-- Resumo do Cliente -->
     <div class="row g-3 mb-4">
 
+        <!-- Total de Veículos -->
         <div class="col-md-4">
             <div class="card shadow-sm h-100">
                 <div class="card-body">
-
                     <h6 class="text-muted">Meus Veículos</h6>
 
-                    <h2 class="fw-bold">
+                    <h2 class="fw-bold text-primary">
                         @(Model?.Count() ?? 0)
                     </h2>
 
                     <p class="mb-0 text-muted">
                         Veículos associados à sua conta
                     </p>
-
                 </div>
             </div>
         </div>
 
+        <!-- Marcações -->
         <div class="col-md-4">
             <div class="card shadow-sm h-100">
                 <div class="card-body">
-
                     <h6 class="text-muted">Marcações</h6>
 
                     <h2 class="fw-bold">—</h2>
@@ -49,15 +47,14 @@
                     <p class="mb-0 text-muted">
                         Disponível em breve
                     </p>
-
                 </div>
             </div>
         </div>
 
+        <!-- Serviços Realizados -->
         <div class="col-md-4">
             <div class="card shadow-sm h-100">
                 <div class="card-body">
-
                     <h6 class="text-muted">Serviços Realizados</h6>
 
                     <h2 class="fw-bold">—</h2>
@@ -65,87 +62,136 @@
                     <p class="mb-0 text-muted">
                         Disponível em breve
                     </p>
-
                 </div>
             </div>
         </div>
 
     </div>
 
-    <!-- Opções do Cliente -->
-    <h5 class="fw-bold mb-3">O que deseja consultar?</h5>
+    <!-- Funcionalidades do Cliente -->
+    <div id="menuCliente">
 
-    <div class="row g-3">
+        <h5 class="fw-bold mb-3">O que deseja fazer?</h5>
 
-        <!-- Meus Veículos -->
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
+        <div class="row g-3">
 
-                    <h5 class="card-title">Meus Veículos</h5>
+            <!-- Meus Veículos -->
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body d-flex flex-column">
 
-                    <p class="card-text">
-                        Consulte os veículos associados à sua conta.
-                    </p>
+                        <h5 class="card-title fw-bold">
+                            Meus Veículos
+                        </h5>
 
-                    <button type="button"
-                            class="btn btn-primary"
-                            onclick="mostrarSecao('secaoVeiculos')">
-                        Ver Veículos
-                    </button>
+                        <p class="card-text text-muted">
+                            Consulte e edite os veículos associados
+                            à sua conta.
+                        </p>
 
+                        <div class="mt-auto">
+                            <button type="button"
+                                    class="btn btn-primary"
+                                    onclick="mostrarSecao('secaoVeiculos')">
+                                Ver Veículos
+                            </button>
+                        </div>
+
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Marcações -->
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
+            <!-- Meu Perfil -->
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body d-flex flex-column">
 
-                    <h5 class="card-title">Marcações</h5>
+                        <h5 class="card-title fw-bold">
+                            Meu Perfil
+                        </h5>
 
-                    <p class="card-text">
-                        Consulte as suas marcações na oficina.
-                    </p>
+                        <p class="card-text text-muted">
+                            Consulte e atualize os seus dados pessoais
+                            e informações de contacto.
+                        </p>
 
-                    <button type="button"
-                            class="btn btn-primary"
-                            disabled>
-                        Ver Marcações
-                    </button>
+                        <div class="mt-auto">
+                            <a asp-controller="ClienteArea"
+                               asp-action="EditarPerfil"
+                               class="btn btn-primary">
+                                Editar Perfil
+                            </a>
+                        </div>
 
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Histórico -->
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
+            <!-- Marcações -->
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body d-flex flex-column">
 
-                    <h5 class="card-title">Histórico</h5>
+                        <h5 class="card-title fw-bold">
+                            Marcações
+                        </h5>
 
-                    <p class="card-text">
-                        Consulte o histórico dos serviços realizados.
-                    </p>
+                        <p class="card-text text-muted">
+                            Consulte as suas marcações
+                            na oficina.
+                        </p>
 
-                    <button type="button"
-                            class="btn btn-primary"
-                            disabled>
-                        Ver Histórico
-                    </button>
+                        <div class="mt-auto">
+                            <button type="button"
+                                    class="btn btn-outline-secondary"
+                                    disabled>
+                                Disponível em breve
+                            </button>
+                        </div>
 
+                    </div>
                 </div>
             </div>
-        </div>
 
+            <!-- Histórico -->
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body d-flex flex-column">
+
+                        <h5 class="card-title fw-bold">
+                            Histórico de Serviços
+                        </h5>
+
+                        <p class="card-text text-muted">
+                            Consulte o histórico dos serviços
+                            realizados nos seus veículos.
+                        </p>
+
+                        <div class="mt-auto">
+                            <button type="button"
+                                    class="btn btn-outline-secondary"
+                                    disabled>
+                                Disponível em breve
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
 
     <!-- Secção dos Veículos -->
     <div id="secaoVeiculos" class="mt-4" style="display: none;">
 
-        <h4 class="fw-bold">Os Meus Veículos</h4>
+        <div class="mb-3">
+            <h4 class="fw-bold">Os Meus Veículos</h4>
+
+            <p class="text-muted">
+                Consulte e atualize as informações dos seus veículos.
+            </p>
+        </div>
 
         <div class="card shadow-sm">
             <div class="card-body">
@@ -161,9 +207,9 @@
                 {
                     <div class="table-responsive">
 
-                        <table class="table table-hover align-middle">
+                        <table class="table table-hover align-middle mb-0">
 
-                            <thead>
+                            <thead class="table-light">
                                 <tr>
                                     <th>Marca</th>
                                     <th>Modelo</th>
@@ -171,6 +217,7 @@
                                     <th>Ano</th>
                                     <th>Quilometragem</th>
                                     <th>Combustível</th>
+                                    <th>Ações</th>
                                 </tr>
                             </thead>
 
@@ -186,14 +233,14 @@
                                         <td>@veiculo.Combustivel</td>
 
                                         <td>
-                                        <a asp-controller="ClienteArea"
-                                           asp-action="EditarVeiculo"
-                                           asp-route-id="@veiculo.Id"
-                                           class="btn btn-sm btn-outline-primary">
-                                           Editar
-                                        </a>
+                                            <a asp-controller="ClienteArea"
+                                               asp-action="EditarVeiculo"
+                                               asp-route-id="@veiculo.Id"
+                                               class="btn btn-sm btn-outline-primary">
+                                                Editar
+                                            </a>
                                         </td>
-                                     </tr>
+                                    </tr>
                                 }
                             </tbody>
 
@@ -217,8 +264,9 @@
 
 @section Scripts {
     <script>
-
         function mostrarSecao(id) {
+
+            document.getElementById("menuCliente").style.display = "none";
 
             document.getElementById("secaoVeiculos").style.display = "none";
 
@@ -228,7 +276,8 @@
         function fecharSecao() {
 
             document.getElementById("secaoVeiculos").style.display = "none";
-        }
 
+            document.getElementById("menuCliente").style.display = "block";
+        }
     </script>
 }

@@ -1,0 +1,138 @@
+﻿
+@model SistemaGestaoOficina.Models.EditarPerfilViewModel
+
+@{
+    ViewData["Title"] = "Editar Perfil";
+}
+
+<div class="container mt-4 mb-5">
+
+    <!-- Cabeçalho -->
+    <div class="mb-4">
+        <h2 class="fw-bold">Meu Perfil</h2>
+
+        <p class="text-muted">
+            Consulte e atualize os seus dados pessoais.
+        </p>
+    </div>
+
+    <!-- Formulário -->
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+
+            <h5 class="fw-bold mb-3">
+                Informações Pessoais
+            </h5>
+
+            <hr class="mb-4" />
+
+            <form asp-controller="ClienteArea"
+                  asp-action="EditarPerfil"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3"></div>
+
+                <div class="row g-3">
+
+                    <!-- Nome -->
+                    <div class="col-md-6">
+                        <label asp-for="FirstName"
+                               class="form-label"></label>
+
+                        <input asp-for="FirstName"
+                               class="form-control" />
+
+                        <span asp-validation-for="FirstName"
+                              class="text-danger"></span>
+                    </div>
+
+                    <!-- Apelido -->
+                    <div class="col-md-6">
+                        <label asp-for="LastName"
+                               class="form-label"></label>
+
+                        <input asp-for="LastName"
+                               class="form-control" />
+
+                        <span asp-validation-for="LastName"
+                              class="text-danger"></span>
+                    </div>
+
+                    <!-- NIF -->
+                    <div class="col-md-6">
+                        <label asp-for="NIF"
+                               class="form-label"></label>
+
+                        <input asp-for="NIF"
+                               class="form-control"
+                               maxlength="9" />
+
+                        <span asp-validation-for="NIF"
+                              class="text-danger"></span>
+                    </div>
+
+                    <!-- Telefone -->
+                    <div class="col-md-6">
+                        <label asp-for="PhoneNumber"
+                               class="form-label"></label>
+
+                        <input asp-for="PhoneNumber"
+                               class="form-control" />
+
+                        <span asp-validation-for="PhoneNumber"
+                              class="text-danger"></span>
+                    </div>
+
+                </div>
+
+                <!-- Informações da Conta -->
+                <h5 class="fw-bold mt-4 mb-3">
+                    Informações da Conta
+                </h5>
+
+                <hr class="mb-4" />
+
+                <div class="mb-3">
+                    <label asp-for="Email"
+                           class="form-label"></label>
+
+                    <input asp-for="Email"
+                           type="email"
+                           class="form-control bg-light"
+                           readonly />
+
+                    <small class="text-muted">
+                        O email está associado à sua conta
+                        e não pode ser alterado nesta página.
+                    </small>
+                </div>
+
+                <!-- Botões -->
+                <div class="d-flex flex-wrap gap-2 mt-4">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+                        Guardar Alterações
+                    </button>
+
+                    <a asp-controller="ClienteArea"
+                       asp-action="Index"
+                       class="btn btn-outline-secondary">
+                        Voltar
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

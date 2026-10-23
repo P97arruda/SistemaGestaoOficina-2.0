@@ -18,10 +18,7 @@ namespace SistemaGestaoOficina.Controllers
             _veiculoRepository = veiculoRepository;
             _userManager = userManager;
         }
-
         
-
-
         public async Task<IActionResult> Index()
         {
             var cliente = await _userManager.GetUserAsync(User);
@@ -105,6 +102,73 @@ namespace SistemaGestaoOficina.Controllers
             model.UserId = veiculo.UserId;
 
             return View(model);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> EditarPerfil()
+        {
+            var cliente = await _userManager.GetUserAsync(User);
+
+            if (cliente == null)
+            {
+                return NotFound();
+            }
+
+            var model = new EditarPerfilViewModel
+            {
+                FirstName = cliente.FirstName,
+                LastName = cliente.LastName,
+                NIF = cliente.NIF,
+                Email = cliente.Email ?? string.Empty,
+                PhoneNumber = cliente.PhoneNumber
+            };
+
+            return View(model);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditarPerfil(EditarPerfilViewModel model)
+        {
+            var cliente = await _userManager.GetUserAsync(User);
+
+            if(cliente == null)
+            {
+                return NotFound();
+            }
+
+            //O email não pode ser alterado nestapágina
+            model.Email = cliente.Email ?? string.Empty;
+
+            //Validar os dados recebidos do formulário.
+            ModelState.Remove(nameof(model.Email));
+
+            if (ModelState.IsValid)
+            {
+                cliente.FirstName = model.FirstName;
+                cliente.LastName = model.LastName;
+                cliente.NIF = model.NIF;
+                cliente.PhoneNumber = model.PhoneNumber;
+
+                var result = await _userManager.UpdateAsync(cliente);
+
+                if (result.Succeeded)
+                {
+                    TempData["SuccessMessage"] = "Perfil atualizado com sucesso!";
+
+                    return RedirectToAction(nameof(Index));
+                }
+
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+            }
+
+            return View(model);
+
         }
     }
 }
