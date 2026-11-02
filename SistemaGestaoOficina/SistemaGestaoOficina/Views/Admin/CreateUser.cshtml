@@ -1,16 +1,21 @@
-﻿@model SistemaGestaoOficina.Models.CreateUserViewModel
+@model SistemaGestaoOficina.Models.CreateUserViewModel
 
 @{
+    Layout = "_InternalLayout";
     ViewData["Title"] = "Criar Utilizador";
 }
 
-<div class="container mt-4">
+<div class="container py-4">
 
-    <h2>Criar Utilizador</h2>
+    <div class="mb-4">
+        <h2 class="fw-bold mb-1">
+            Criar Utilizador
+        </h2>
 
-    <p>Crie uma conta para um cliente ou funcionário.</p>
-
-    <hr />
+        <p class="text-muted mb-0">
+            Registe um novo cliente ou rececionista  na OficinaCET107.
+        </p>
+    </div>
 
     @if (ViewBag.Message != null)
     {
@@ -28,127 +33,291 @@
         </div>
     }
 
-    <div class="row">
-        <div class="col-md-6">
+    <div class="card shadow-sm border-0">
 
-            <form asp-action="CreateUser" method="post">
+        <div class="card-body p-4">
 
-                <div asp-validation-summary="ModelOnly"
-                     class="text-danger"></div>
+            <div class="row">
+                <div class="col-md-6">
 
-                <div class="mb-3">
-                    <label asp-for="Role" class="form-label"></label>
+                    <form asp-controller="Admin"
+                          asp-action="CreateUser"
+                          method="post"
+                          enctype="multipart/form-data">
 
-                    <select asp-for="Role"
-                            class="form-select"
-                            id="roleSelect">
+                        <div asp-validation-summary="ModelOnly"
+                             class="text-danger mb-3">
+                        </div>
 
-                        <option value="">Selecione...</option>
-                        <option value="Cliente">Cliente</option>
-                        <option value="Funcionario">Funcionário</option>
+                        <!-- Fotografia -->
+                        <div class="mb-3">
 
-                    </select>
+                            <label asp-for="ImageFile"
+                                   class="form-label">
+                            </label>
 
-                    <span asp-validation-for="Role"
-                          class="text-danger"></span>
+                            <div class="d-flex align-items-center gap-3 mb-2">
+
+                                <div id="photoPreviewContainer"
+                                     class="rounded-circle border bg-light d-flex align-items-center justify-content-center overflow-hidden"
+                                     style="width: 90px; height: 90px; flex-shrink: 0;">
+
+                                    <span id="photoPlaceholder"
+                                          class="text-secondary"
+                                          style="font-size: 30px;">
+                                        &#128247;
+                                    </span>
+
+                                    <img id="photoPreview"
+                                         class="d-none"
+                                         alt="Fotografia selecionada"
+                                         style="width: 100%; height: 100%; object-fit: cover;" />
+
+                                </div>
+
+                                <div>
+                                    <input asp-for="ImageFile"
+                                           type="file"
+                                           class="form-control"
+                                           accept=".jpg,.jpeg,.png,.webp" />
+
+                                    <small class="text-muted">
+                                        Fotografia opcional. JPG, PNG ou WebP. Máximo 2 MB.
+                                    </small>
+                                </div>
+
+                            </div>
+
+                            <span asp-validation-for="ImageFile"
+                                  class="text-danger">
+                            </span>
+
+                            <div id="photoError"
+                                 class="text-danger small"
+                                 role="alert"
+                                 aria-live="polite">
+                            </div>
+
+                        </div>
+
+                        <!-- Tipo de utilizador -->
+                        <div class="mb-3">
+
+                            <label asp-for="Role"
+                                   class="form-label">
+                            </label>
+
+                            <select asp-for="Role"
+                                    class="form-select"
+                                    id="roleSelect">
+
+                                <option value="">Selecione...</option>
+                                <option value="Cliente">Cliente</option>
+                                <option value="Rececionista">Rececionista</option>
+
+                            </select>
+
+                            <span asp-validation-for="Role"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                        <!-- Nome -->
+                        <div class="mb-3">
+
+                            <label asp-for="FirstName"
+                                   class="form-label">
+                            </label>
+
+                            <input asp-for="FirstName"
+                                   class="form-control" />
+
+                            <span asp-validation-for="FirstName"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                        <!-- Apelido -->
+                        <div class="mb-3">
+
+                            <label asp-for="LastName"
+                                   class="form-label">
+                            </label>
+
+                            <input asp-for="LastName"
+                                   class="form-control" />
+
+                            <span asp-validation-for="LastName"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                        <!-- NIF -->
+                        <div class="mb-3"
+                             id="nifField"
+                             style="display: none;">
+
+                            <label asp-for="NIF"
+                                   class="form-label">
+                            </label>
+
+                            <input asp-for="NIF"
+                                   class="form-control" />
+
+                            <span asp-validation-for="NIF"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                        <!-- Email -->
+                        <div class="mb-3">
+
+                            <label asp-for="Email"
+                                   class="form-label">
+                            </label>
+
+                            <input asp-for="Email"
+                                   class="form-control" />
+
+                            <span asp-validation-for="Email"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                        <!-- Contacto -->
+                        <div class="mb-3">
+
+                            <label asp-for="PhoneNumber"
+                                   class="form-label">
+                            </label>
+
+                            <input asp-for="PhoneNumber"
+                                   class="form-control" />
+
+                            <span asp-validation-for="PhoneNumber"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                        <!-- Botões -->
+                        <button type="submit"
+                                class="btn btn-primary">
+                            Criar Conta
+                        </button>
+
+                        <a asp-controller="Admin"
+                           asp-action="Index"
+                           class="btn btn-secondary">
+                            Voltar
+                        </a>
+
+                    </form>
+
                 </div>
-
-
-
-                <div class="mb-3">
-                    <label asp-for="FirstName" class="form-label"></label>
-                    <input asp-for="FirstName" class="form-control" />
-                    <span asp-validation-for="FirstName"
-                          class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="LastName" class="form-label"></label>
-                    <input asp-for="LastName" class="form-control" />
-                    <span asp-validation-for="LastName"
-                          class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="Email" class="form-label"></label>
-                    <input asp-for="Email" class="form-control" />
-                    <span asp-validation-for="Email"
-                          class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="PhoneNumber" class="form-label"></label>
-                    <input asp-for="PhoneNumber" class="form-control" />
-                    <span asp-validation-for="PhoneNumber"
-                          class="text-danger"></span>
-                </div>
-
-                
-
-                <div class="mb-3"
-                     id="nifField"
-                     style="display: none;">
-
-                    <label asp-for="NIF" class="form-label"></label>
-
-                    <input asp-for="NIF"
-                           class="form-control" />
-
-                    <span asp-validation-for="NIF"
-                          class="text-danger"></span>
-                </div>
-
-                <button type="submit" class="btn btn-primary">
-                    Criar Conta
-                </button>
-
-                <a asp-action="Index" class="btn btn-secondary">
-                    Voltar
-                </a>
-
-            </form>
+            </div>
 
         </div>
+
     </div>
+
 </div>
 
-@section Scripts {
+@section Scripts
+{
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
     <script>
-        const roleSelect = document.getElementById("roleSelect");
-        const nifField = document.getElementById("nifField");
+        document.addEventListener("DOMContentLoaded", function () {
 
-        function updateNifField() {
+            // Mostrar NIF apenas para Cliente
+            const roleSelect = document.getElementById("roleSelect");
+            const nifField = document.getElementById("nifField");
 
-            if (roleSelect.value === "Cliente") {
-                nifField.style.display = "block";
+            function updateNifField() {
+                nifField.style.display =
+                    roleSelect.value === "Cliente" ? "block" : "none";
             }
-            else {
-                nifField.style.display = "none";
-            }
-        }
 
-        roleSelect.addEventListener("change", updateNifField);
+            roleSelect.addEventListener("change", updateNifField);
+            updateNifField();
 
-        updateNifField();
-    </script>
 
-    @if (ViewBag.Message != null)
-    {
-        <script>
-            setTimeout(function () {
+            // Pré-visualização da fotografia
+            const inputFoto = document.getElementById("ImageFile");
+            const previewFoto = document.getElementById("photoPreview");
+            const placeholder = document.getElementById("photoPlaceholder");
+            const photoError = document.getElementById("photoError");
 
-                const alert =
-                    document.getElementById("successAlert");
+            let imageUrl = null;
 
-                if (alert) {
-                    alert.remove();
+            function clearPhoto() {
+                if (imageUrl) {
+                    URL.revokeObjectURL(imageUrl);
+                    imageUrl = null;
                 }
 
-            }, 4000);
-        </script>
-    }
+                previewFoto.removeAttribute("src");
+                previewFoto.classList.add("d-none");
+                placeholder.classList.remove("d-none");
+            }
+
+            inputFoto.addEventListener("change", function () {
+                photoError.textContent = "";
+                clearPhoto();
+
+                const file = this.files[0];
+
+                if (!file) return;
+
+                const allowedTypes = [
+                    "image/jpeg",
+                    "image/png",
+                    "image/webp"
+                ];
+
+                if (!allowedTypes.includes(file.type) ||
+                    file.size === 0 ||
+                    file.size > 2 * 1024 * 1024) {
+
+                    photoError.textContent =
+                        "Escolha uma fotografia JPG, PNG ou WebP com até 2 MB.";
+
+                    this.value = "";
+                    return;
+                }
+
+                imageUrl = URL.createObjectURL(file);
+
+                previewFoto.onload = function () {
+                    if (imageUrl) {
+                        URL.revokeObjectURL(imageUrl);
+                        imageUrl = null;
+                    }
+                };
+
+                previewFoto.src = imageUrl;
+                previewFoto.classList.remove("d-none");
+                placeholder.classList.add("d-none");
+            });
+
+
+            // Ocultar mensagem de sucesso após 4 segundos
+            const successAlert = document.getElementById("successAlert");
+
+            if (successAlert) {
+                setTimeout(function () {
+                    successAlert.remove();
+                }, 4000);
+            }
+
+        });
+    </script>
 }

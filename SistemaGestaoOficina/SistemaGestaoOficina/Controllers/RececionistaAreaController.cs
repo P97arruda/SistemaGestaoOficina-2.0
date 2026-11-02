@@ -8,13 +8,13 @@ using SistemaGestaoOficina.Models;
 
 namespace SistemaGestaoOficina.Controllers
 {
-    [Authorize(Roles = "Funcionario")]
-    public class FuncionarioAreaController : Controller
+    [Authorize(Roles = "Rececionista")]
+    public class RececionistaAreaController : Controller
     {
         private readonly IUserHelper _userHelper;
         private readonly IMailHelper _mailHelper;
 
-        public FuncionarioAreaController(IUserHelper userHelper, IMailHelper mailHelper)
+        public RececionistaAreaController(IUserHelper userHelper, IMailHelper mailHelper)
         {
             _userHelper = userHelper;
             _mailHelper = mailHelper;
@@ -226,8 +226,7 @@ namespace SistemaGestaoOficina.Controllers
                     return RedirectToAction(nameof(Clientes));
                 }
 
-                ModelState.AddModelError(string.Empty, result.Errors.FirstOrDefault()?.Description
-                    ?? "Erro ao atualizar o cliente.");
+                ModelState.AddModelError(string.Empty, result.Errors.FirstOrDefault()?.Description ?? "Erro ao atualizar o cliente.");
             }
 
             return View(model);

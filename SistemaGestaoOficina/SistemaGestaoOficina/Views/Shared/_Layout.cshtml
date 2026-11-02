@@ -1,3 +1,11 @@
+@using SistemaGestaoOficina.Helpers
+@inject IUserHelper UserHelper
+@{
+    var userEmail = User.Identity?.Name;
+    var user = User.Identity?.IsAuthenticated == true && !string.IsNullOrWhiteSpace(userEmail)
+        ? await UserHelper.GetUserByEmailAsync(userEmail)
+        : null;
+}
 ﻿<!DOCTYPE html>
 <html lang="pt">
 <head>
@@ -96,7 +104,7 @@
             color: white;
         }
 
-        @@media (max-width: 991px) {
+        @@media (max-width: 1199px) {
             .oficina-navbar {
                 padding: 8px 0;
             }
@@ -144,7 +152,7 @@
 <body>
 
     <header>
-        <nav class="navbar navbar-expand-lg navbar-dark oficina-navbar">
+        <nav class="navbar navbar-expand-xl navbar-dark oficina-navbar">
             <div class="container">
 
                 <a class="navbar-brand oficina-brand"
@@ -164,7 +172,7 @@
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarOficina">
-                    <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <ul class="navbar-nav ms-auto align-items-xl-center">
 
                         <li class="nav-item">
                             <a class="nav-link"
@@ -184,22 +192,22 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                Mecânicos
-                            </a>
+                            <span class="nav-link disabled" aria-disabled="true" title="Informação em preparação">Mecânicos</span>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                Horários
-                            </a>
+                            <span class="nav-link disabled" aria-disabled="true" title="Informação em preparação">Horários</span>
                         </li>
 
                         @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item user-info">
                                 <span class="nav-link">
-                                    Olá, @User.Identity.Name
+                                    @if (user != null && user.ImageId != Guid.Empty)
+                                    {
+                                        <img src="@user.ImageFullPath" alt="Fotografia do utilizador" width="36" height="36" class="rounded-circle me-2" style="object-fit: cover;" />
+                                    }
+                                    Olá, @(user?.FullName ?? User.Identity.Name)
 
                                     @if (User.IsInRole("Admin"))
                                     {
@@ -218,6 +226,18 @@
                                 </span>
                             </li>
 
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item"><a class="nav-link" asp-controller="Admin" asp-action="Index">Administração</a></li>
+                            }
+                            @if (User.IsInRole("Funcionario"))
+                            {
+                                <li class="nav-item"><a class="nav-link" asp-controller="FuncionarioArea" asp-action="Index">Área do Funcionário</a></li>
+                            }
+                            @if (User.IsInRole("Cliente"))
+                            {
+                                <li class="nav-item"><a class="nav-link" asp-controller="ClienteArea" asp-action="Index">Área do Cliente</a></li>
+                            }
                             <li class="nav-item ms-lg-2">
                                 <a class="login-button"
                                    asp-controller="Account"
@@ -254,7 +274,7 @@
 
     <footer class="oficina-footer">
         <div class="container text-center">
-            <strong>OficinaCET107 3.0</strong>
+            <strong>OficinaCET107</strong>
             <span class="mx-2">|</span>
             &copy; 2026 - Todos os direitos reservados
         </div>

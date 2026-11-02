@@ -1,0 +1,616 @@
+﻿
+@using SistemaGestaoOficina.Helpers
+@inject IUserHelper UserHelper
+
+@{
+    var userEmail = User.Identity?.Name;
+
+    var user = User.Identity?.IsAuthenticated == true
+        && !string.IsNullOrWhiteSpace(userEmail)
+        ? await UserHelper.GetUserByEmailAsync(userEmail)
+        : null;
+
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+}
+
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>@ViewData["Title"] - OficinaCET107</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/SistemaGestaoOficina.styles.css" asp-append-version="true" />
+
+    <style>
+        body {
+            margin: 0;
+            background-color: #edf3fa;
+            font-family: Arial, sans-serif;
+        }
+
+        /* MENU LATERAL */
+
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: #111820;
+            color: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-logo {
+            padding: 25px 20px;
+            font-size: 22px;
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+        }
+
+        .sidebar-logo:hover {
+            color: white;
+        }
+
+        .sidebar-logo span {
+            color: #1683ff;
+        }
+
+        .sidebar-menu {
+            padding: 10px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .sidebar-title {
+            padding: 14px 12px 6px;
+            color: #8fa3bf;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 12px;
+            margin-bottom: 2px;
+            border-radius: 8px;
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .sidebar-icon {
+            width: 18px;
+            height: 18px;
+            flex: 0 0 18px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.75;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .sidebar-link:hover {
+            background-color: #253449;
+            color: white;
+        }
+
+        .sidebar-link.active {
+            background-color: #1683ff;
+            color: white;
+        }
+
+        .sidebar-link.disabled {
+            color: #718096;
+            cursor: not-allowed;
+        }
+
+        .sidebar-link.disabled:hover {
+            background-color: transparent;
+            color: #718096;
+        }
+
+        .sidebar-user {
+            border-top: 1px solid #344154;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .sidebar-avatar-default {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background-color: #1683ff;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .sidebar-user-name {
+            color: white;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .sidebar-user-role {
+            color: #aeb7c0;
+            font-size: 12px;
+        }
+
+        /* CONTEÚDO PRINCIPAL */
+
+        .main-area {
+            margin-left: 260px;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background-color: white;
+            border-bottom: 1px solid #dce5f0;
+            padding: 18px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .topbar-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #172033;
+            margin: 0;
+        }
+
+        .topbar-subtitle {
+            color: #64748b;
+            font-size: 13px;
+            margin: 4px 0 0;
+        }
+
+        .topbar-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .topbar-user-info {
+            text-align: right;
+        }
+
+        .topbar-user-name {
+            font-size: 13px;
+            font-weight: bold;
+            color: #172033;
+        }
+
+        .topbar-user-role {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .topbar-logout {
+            color: #64748b;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .topbar-logout:hover {
+            color: #dc3545;
+        }
+
+        .main-content {
+            padding: 30px;
+            min-width: 0;
+        }
+
+        .main-content > .container {
+            margin-top: 0 !important;
+        }
+
+        .main-content .card {
+            border-radius: 12px;
+        }
+
+        .sidebar-link:focus-visible,
+        .sidebar-logo:focus-visible {
+            outline: 2px solid #1683ff;
+            outline-offset: 2px;
+        }
+
+        /* RESPONSIVIDADE */
+
+        @@media (max-width: 768px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+            }
+
+            .sidebar-user {
+                display: none;
+            }
+
+            .main-area {
+                margin-left: 0;
+            }
+
+            .topbar {
+                padding: 15px;
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            .main-content {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- MENU LATERAL -->
+
+    <aside class="sidebar">
+
+        <a asp-controller="Home"
+           asp-action="Index"
+           class="sidebar-logo">
+            Oficina<span>CET107</span>
+        </a>
+
+        <nav class="sidebar-menu">
+
+            @if (User.IsInRole("Admin"))
+            {
+                <!-- ADMINISTRAÇÃO -->
+
+                <div class="sidebar-title">
+                    Administração
+                </div>
+
+                <a asp-controller="Admin"
+                   asp-action="Index"
+                   class="sidebar-link @(currentController == "Admin" && currentAction == "Index" ? "active" : "")">
+
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <rect x="3" y="3" width="7" height="7" rx="1.5" />
+                        <rect x="14" y="3" width="7" height="7" rx="1.5" />
+                        <rect x="3" y="14" width="7" height="7" rx="1.5" />
+                        <rect x="14" y="14" width="7" height="7" rx="1.5" />
+                    </svg>
+
+                    Administração
+                </a>
+
+                <!-- GESTÃO DE UTILIZADORES -->
+
+                <div class="sidebar-title">
+                    Gestão de Utilizadores
+                </div>
+
+                <a asp-controller="Admin"
+                   asp-action="CreateUser"
+                   class="sidebar-link @(currentController == "Admin" && currentAction == "CreateUser" ? "active" : "")">
+
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="9" cy="7" r="3" />
+                        <path d="M3 21v-2a6 6 0 0 1 12 0v2M19 8v6m-3-3h6" />
+                    </svg>
+
+                    Criar Utilizador
+                </a>
+
+                <a asp-controller="Admin"
+                   asp-action="Rececionistas"
+                   class="sidebar-link @(currentController == "Admin" && (currentAction == "Rececionistas" || currentAction == "EditUser") ? "active" : "")">
+
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="9" cy="7" r="3" />
+                        <path d="M3 21v-2a6 6 0 0 1 12 0v2M16 4a3 3 0 0 1 0 6m2 5a5 5 0 0 1 3 4v2" />
+                    </svg>
+
+                    Rececionistas
+                </a>
+
+                <!-- MECÂNICOS -->
+
+                <span class="sidebar-link disabled" aria-disabled="true">
+
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M14 6a5 5 0 0 0-6 6l-5 5a2.1 2.1 0 0 0 3 3l5-5a5 5 0 0 0 6-6l-3 3-3-3 3-3Z" />
+                    </svg>
+
+                    Mecânicos
+                </span>
+
+                <a asp-controller="Admin"
+                   asp-action="Clientes"
+                   class="sidebar-link @(currentController == "Admin" && currentAction == "Clientes" ? "active" : "")">
+
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="9" cy="7" r="3" />
+                        <path d="M3 21v-2a6 6 0 0 1 12 0v2M16 4a3 3 0 0 1 0 6m2 5a5 5 0 0 1 3 4v2" />
+                    </svg>
+
+                    Clientes
+                </a>
+
+                <!-- CONFIGURAÇÃO DA OFICINA -->
+
+                <div class="sidebar-title">
+                    Configuração da Oficina
+                </div>
+
+                <span class="sidebar-link disabled" aria-disabled="true">
+
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="m14 4 6 6M3 21l9-9M15 3l6 6-3 3-6-6 3-3Z" />
+                    </svg>
+
+                    Tipos de Reparações
+                </span>
+            }
+
+            @if (User.IsInRole("Rececionista"))
+            {
+                <!-- GESTÃO DA OFICINA -->
+
+                <div class="sidebar-title">
+                    Gestão da Oficina
+                </div>
+
+                <!-- PAINEL DA OFICINA -->
+
+                <a asp-controller="RececionistaArea"
+                   asp-action="Index"
+                   class="sidebar-link @(currentController == "RececionistaArea" && currentAction == "Index" ? "active" : "")">
+
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <rect x="3" y="3" width="7" height="7" rx="1.5" />
+                        <rect x="14" y="3" width="7" height="7" rx="1.5" />
+                        <rect x="3" y="14" width="7" height="7" rx="1.5" />
+                        <rect x="14" y="14" width="7" height="7" rx="1.5" />
+                    </svg>
+
+                    Painel da Oficina
+                </a>
+
+                <!-- CLIENTES -->
+
+                <a asp-controller="RececionistaArea"
+                   asp-action="Clientes"
+                   class="sidebar-link @(currentController == "RececionistaArea" && currentAction != "Index" ? "active" : "")">
+
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="9" cy="7" r="3" />
+                        <path d="M3 21v-2a6 6 0 0 1 12 0v2M16 4a3 3 0 0 1 0 6m2 5a5 5 0 0 1 3 4v2" />
+                    </svg>
+
+                    Clientes
+                </a>
+
+                <!-- VEÍCULOS -->
+
+                <a asp-controller="Veiculos"
+                   asp-action="TodosVeiculos"
+                   class="sidebar-link @(currentController == "Veiculos" ? "active" : "")">
+
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="m5 7 2-4h10l2 4 2 3v9H3v-9l2-3ZM5 7h14M3 14h18M6 18v3m12-3v3M6 11h2m8 0h2" />
+                    </svg>
+
+                    Veículos
+                </a>
+
+                <!-- MARCAÇÕES - FUTURO -->
+
+                <span class="sidebar-link disabled" aria-disabled="true">
+
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <rect x="3" y="5" width="18" height="16" rx="2" />
+                        <path d="M7 3v4m10-4v4M3 11h18m-13 5h2m4 0h2" />
+                    </svg>
+
+                    Marcações
+                </span>
+
+                <!-- SERVIÇOS E REPARAÇÕES - FUTURO -->
+
+                <span class="sidebar-link disabled" aria-disabled="true">
+
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M14 6a5 5 0 0 0-6 6l-5 5a2.1 2.1 0 0 0 3 3l5-5a5 5 0 0 0 6-6l-3 3-3-3 3-3Z" />
+                    </svg>
+
+                    Serviços e Reparações
+                </span>
+
+                <!-- FATURAÇÃO - FUTURO -->
+
+                <span class="sidebar-link disabled" aria-disabled="true">
+
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3Zm3 5h6m-6 4h6m-6 4h3" />
+                    </svg>
+
+                    Faturação
+                </span>
+            }
+
+            <!-- CONTA -->
+
+            <div class="sidebar-title">
+                Conta
+            </div>
+
+            <span class="sidebar-link disabled" aria-disabled="true">
+
+                <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="8" r="4" />
+                    <path d="M4 21v-1a8 8 0 0 1 16 0v1" />
+                </svg>
+
+                Meu Perfil
+            </span>
+
+            <span class="sidebar-link disabled" aria-disabled="true">
+
+                <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="8" cy="9" r="5" />
+                    <path d="m12 13 8 8m-3-3 3-3m-6 0 3-3-6-6" />
+                </svg>
+
+                Recuperar Password
+            </span>
+
+            <a asp-controller="Home"
+               asp-action="Index"
+               class="sidebar-link">
+
+                <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="m3 10 9-7 9 7M5 9v12h14V9M9 21v-8h6v8" />
+                </svg>
+
+                Página Inicial
+            </a>
+
+        </nav>
+
+        <!-- UTILIZADOR NO RODAPÉ -->
+
+        <div class="sidebar-user">
+
+            @if (user != null && user.ImageId != Guid.Empty)
+            {
+                <img src="@user.ImageFullPath"
+                     class="sidebar-avatar"
+                     alt="Fotografia do utilizador" />
+            }
+            else
+            {
+                <div class="sidebar-avatar-default">
+                    U
+                </div>
+            }
+
+            <div>
+                <div class="sidebar-user-name">
+                    @user?.FirstName @user?.LastName
+                </div>
+
+                <div class="sidebar-user-role">
+
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <span>Administrador</span>
+                    }
+                    else if (User.IsInRole("Rececionista"))
+                    {
+                        <span>Rececionista</span>
+                    }
+
+                </div>
+            </div>
+
+        </div>
+
+    </aside>
+
+    <!-- ÁREA PRINCIPAL -->
+
+    <div class="main-area">
+
+        <header class="topbar">
+
+            <div>
+                <h1 class="topbar-title">
+                    OficinaCET107
+                </h1>
+
+                <p class="topbar-subtitle">
+                    Gestão da OficinaCET107
+                </p>
+            </div>
+
+            <div class="topbar-user">
+
+                <div class="topbar-user-info">
+
+                    <div class="topbar-user-name">
+                        @user?.FirstName @user?.LastName
+                    </div>
+
+                    <div class="topbar-user-role">
+
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <span>Administrador</span>
+                        }
+                        else if (User.IsInRole("Rececionista"))
+                        {
+                            <span>Rececionista</span>
+                        }
+
+                    </div>
+                </div>
+
+                @if (user != null && user.ImageId != Guid.Empty)
+                {
+                    <img src="@user.ImageFullPath"
+                         class="sidebar-avatar"
+                         alt="Fotografia de perfil" />
+                }
+                else
+                {
+                    <div class="sidebar-avatar-default">
+                        U
+                    </div>
+                }
+
+                <a asp-controller="Account"
+                   asp-action="Logout"
+                   class="topbar-logout ms-2">
+                    Sair
+                </a>
+
+            </div>
+
+        </header>
+
+        <main class="main-content">
+            @RenderBody()
+        </main>
+
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>

@@ -1,6 +1,7 @@
-﻿@model SistemaGestaoOficina.Models.VeiculoViewModel
+@model SistemaGestaoOficina.Models.VeiculoViewModel
 
 @{
+    Layout = "_InternalLayout";
     ViewData["Title"] = "Adicionar Veículo";
 }
 
@@ -8,7 +9,7 @@
 
     <h2 class="fw-bold">Adicionar Veículo</h2>
 
-    <form action="/Veiculos/Create" method="post">
+    <form asp-controller="Veiculos" asp-action="Create" method="post">
 
         @Html.AntiForgeryToken()
 

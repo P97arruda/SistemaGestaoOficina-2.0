@@ -51,9 +51,9 @@ namespace SistemaGestaoOficina.Controllers
                             return RedirectToAction("Index", "ClienteArea");
                         }
 
-                        if (await _userHelper.IsUserInRoleAsync(user, "Funcionario"))
+                        if (await _userHelper.IsUserInRoleAsync(user, "Rececionista"))
                         {
-                            return RedirectToAction("Index", "FuncionarioArea");
+                            return RedirectToAction("Index", "RececionistaArea");
                         }
                     }
 
@@ -61,9 +61,7 @@ namespace SistemaGestaoOficina.Controllers
                 }
             }
 
-            ModelState.AddModelError(
-                string.Empty,
-                "Email ou password incorretos.");
+            ModelState.AddModelError(string.Empty, "Email ou password incorretos.");
 
             return View(model);
         }
@@ -92,8 +90,7 @@ namespace SistemaGestaoOficina.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ResetPassword(
-            ResetPasswordViewModel model)
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -105,8 +102,7 @@ namespace SistemaGestaoOficina.Controllers
 
             if (user != null)
             {
-                var result =
-                    await _userHelper.ResetPasswordAsync(
+                var result = await _userHelper.ResetPasswordAsync(
                         user,
                         model.Token,
                         model.Password);
@@ -116,30 +112,22 @@ namespace SistemaGestaoOficina.Controllers
                     if (!user.EmailConfirmed)
                     {
                         var confirmationToken =
-                            await _userHelper
-                                .GenerateEmailConfirmationTokenAsync(user);
+                            await _userHelper.GenerateEmailConfirmationTokenAsync(user);
 
-                        await _userHelper.ConfirmEmailAsync(
-                            user,
-                            confirmationToken);
+                        await _userHelper.ConfirmEmailAsync(user, confirmationToken);
                     }
 
-                    TempData["SuccessMessage"] =
-                        "Password definida com sucesso. Já pode entrar na sua conta.";
+                    TempData["SuccessMessage"] = "Password definida com sucesso. Já pode entrar na sua conta.";
 
-                    return RedirectToAction(
-                        "Login",
-                        "Account");
+                    return RedirectToAction("Login", "Account");
                 }
 
-                ViewBag.Message =
-                    "Erro ao definir a password.";
+                ViewBag.Message = "Erro ao definir a password.";
 
                 return View(model);
             }
 
-            ViewBag.Message =
-                "Utilizador não encontrado.";
+            ViewBag.Message = "Utilizador não encontrado.";
 
             return View(model);
         }

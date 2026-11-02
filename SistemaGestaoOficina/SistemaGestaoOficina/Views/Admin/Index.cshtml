@@ -1,281 +1,51 @@
-﻿@{
+@{
+    Layout = "_InternalLayout";
     ViewData["Title"] = "Administração";
 }
 
 <div class="container py-4">
-
-    <!-- Cabeçalho -->
     <div class="mb-4">
-        <h2 class="fw-bold mb-1">
-            Área de Administração
-        </h2>
-
-        <p class="text-muted mb-0">
-            Gestão administrativa da OficinaCET107.
-        </p>
+        <span class="text-primary small fw-bold text-uppercase">Administração</span>
+        <h2 class="fw-bold mt-2">Bem-vindo à OficinaCET107</h2>
+        <p class="text-muted mb-0">Organize as contas dos utilizadores e acompanhe os módulos de gestão da oficina.</p>
     </div>
 
-
-    <!-- Gestão de Utilizadores -->
     <div class="card shadow-sm border-0 mb-4">
-
         <div class="card-body p-4">
-
-            <div class="mb-4">
-
-                <h4 class="fw-bold mb-1">
-                    Gestão de Utilizadores
-                </h4>
-
-                <p class="text-muted mb-0">
-                    Criação de contas e gestão dos utilizadores da oficina.
-                </p>
-
-            </div>
-
-
-            <div class="row g-3">
-
-                <!-- Criar Utilizador -->
-                <div class="col-md-4">
-
-                    <div class="border rounded p-4 h-100">
-
-                        <h5 class="fw-bold">
-                            Criar Utilizador
-                        </h5>
-
-                        <p class="text-muted">
-                            Criar uma nova conta para um cliente
-                            ou funcionário.
-                        </p>
-
-                        <a asp-controller="Admin"
-                           asp-action="CreateUser"
-                           class="btn btn-primary">
-
-                            + Criar Utilizador
-
-                        </a>
-
-                    </div>
-
-                </div>
-
-
-                <!-- Clientes -->
-                <div class="col-md-4">
-
-                    <div class="border rounded p-4 h-100">
-
-                        <h5 class="fw-bold">
-                            Clientes
-                        </h5>
-
-                        <p class="text-muted">
-                            Consultar as contas dos clientes
-                            registados na oficina.
-                        </p>
-
-                        <a asp-controller="Admin"
-                           asp-action="Clientes"
-                           class="btn btn-outline-primary">
-
-                            Ver Clientes
-
-                        </a>
-
-                    </div>
-
-                </div>
-
-
-                <!-- Funcionários -->
-                <div class="col-md-4">
-
-                    <div class="border rounded p-4 h-100">
-
-                        <h5 class="fw-bold">
-                            Funcionários
-                        </h5>
-
-                        <p class="text-muted">
-                            Consultar, editar e remover
-                            funcionários da oficina.
-                        </p>
-
-                        <a asp-controller="Admin"
-                           asp-action="Funcionarios"
-                           class="btn btn-outline-primary">
-
-                            Gerir Funcionários
-
-                        </a>
-
-                    </div>
-
-                </div>
-
-            </div>
-
+            <span class="badge bg-success mb-3">Disponível</span>
+            <h3 class="h5 fw-bold">Gestão de utilizadores</h3>
+            <p class="text-muted">Crie contas para clientes e funcionários, consulte os utilizadores registados e edite ou remova contas de funcionários.</p>
+            <p class="mb-0 small">Escolha <strong>Criar Utilizador</strong>, <strong>Clientes</strong> ou <strong>Funcionários</strong> no menu lateral para começar.</p>
         </div>
-
     </div>
 
-
-    <!-- Gestão da Oficina -->
-    <div class="card shadow-sm border-0 mb-4">
-
-        <div class="card-body p-4">
-
-            <div class="mb-4">
-
-                <h4 class="fw-bold mb-1">
-                    Gestão da Oficina
-                </h4>
-
-                <p class="text-muted mb-0">
-                    Gestão dos mecânicos e tipos de reparações.
-                </p>
-
-            </div>
-
-
-            <div class="row g-3">
-
-                <!-- Mecânicos -->
-                <div class="col-md-6">
-
-                    <div class="border rounded p-4 h-100">
-
-                        <h5 class="fw-bold">
-                            Mecânicos
-                        </h5>
-
-                        <p class="text-muted">
-                            Criar, consultar, editar e remover
-                            mecânicos da oficina.
-                        </p>
-
-                        <button class="btn btn-outline-secondary"
-                                disabled>
-
-                            Gerir Mecânicos
-
-                        </button>
-
-                    </div>
-
+    <div class="row g-4">
+        <div class="col-md-6">
+            <section class="card shadow-sm border-0 h-100">
+                <div class="card-body p-4">
+                    <span class="badge bg-light text-secondary border mb-3">Em desenvolvimento</span>
+                    <h3 class="h5 fw-bold">Equipa da oficina</h3>
+                    <p class="text-muted mb-0">Gestão de mecânicos e rececionistas. A organização destas funções será disponibilizada numa próxima etapa.</p>
                 </div>
-
-
-                <!-- Tipos de Reparações -->
-                <div class="col-md-6">
-
-                    <div class="border rounded p-4 h-100">
-
-                        <h5 class="fw-bold">
-                            Tipos de Reparações
-                        </h5>
-
-                        <p class="text-muted">
-                            Criar e gerir os tipos de reparações
-                            disponibilizados pela oficina.
-                        </p>
-
-                        <button class="btn btn-outline-secondary"
-                                disabled>
-
-                            Gerir Tipos de Reparações
-
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </div>
-
+            </section>
         </div>
-
-    </div>
-
-
-    <!-- Conta do Administrador -->
-    <div class="card shadow-sm border-0">
-
-        <div class="card-body p-4">
-
-            <div class="mb-4">
-
-                <h4 class="fw-bold mb-1">
-                    Minha Conta
-                </h4>
-
-                <p class="text-muted mb-0">
-                    Gestão dos dados da conta do administrador.
-                </p>
-
-            </div>
-
-
-            <div class="row g-3">
-
-                <!-- Perfil -->
-                <div class="col-md-6">
-
-                    <div class="border rounded p-4 h-100">
-
-                        <h5 class="fw-bold">
-                            Perfil
-                        </h5>
-
-                        <p class="text-muted">
-                            Consultar e modificar os dados
-                            do seu perfil.
-                        </p>
-
-                        <button class="btn btn-outline-secondary"
-                                disabled>
-
-                            Modificar Perfil
-
-                        </button>
-
-                    </div>
-
+        <div class="col-md-6">
+            <section class="card shadow-sm border-0 h-100">
+                <div class="card-body p-4">
+                    <span class="badge bg-light text-secondary border mb-3">Em desenvolvimento</span>
+                    <h3 class="h5 fw-bold">Tipos de reparações</h3>
+                    <p class="text-muted mb-0">Organização dos tipos de reparações disponibilizados pela oficina.</p>
                 </div>
-
-
-                <!-- Password -->
-                <div class="col-md-6">
-
-                    <div class="border rounded p-4 h-100">
-
-                        <h5 class="fw-bold">
-                            Password
-                        </h5>
-
-                        <p class="text-muted">
-                            Alterar ou recuperar a password
-                            da sua conta.
-                        </p>
-
-                        <button class="btn btn-outline-secondary"
-                                disabled>
-
-                            Alterar Password
-
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </div>
-
+            </section>
         </div>
-
+        <div class="col-12">
+            <section class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <span class="badge bg-light text-secondary border mb-3">Em desenvolvimento</span>
+                    <h3 class="h5 fw-bold">A minha conta</h3>
+                    <p class="text-muted mb-0">A edição do perfil do administrador e a recuperação de password ainda não estão disponíveis nesta área.</p>
+                </div>
+            </section>
+        </div>
     </div>
-
 </div>

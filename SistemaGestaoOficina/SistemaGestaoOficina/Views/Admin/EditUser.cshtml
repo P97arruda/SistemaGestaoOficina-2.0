@@ -1,18 +1,20 @@
-﻿@model SistemaGestaoOficina.Models.EditUserViewModel
+
+@model SistemaGestaoOficina.Models.EditUserViewModel
 
 @{
-    ViewData["Title"] = "Editar Funcionário";
+    Layout = "_InternalLayout";
+    ViewData["Title"] = "Editar Rececionista";
 }
 
 <div class="container py-4">
 
     <div class="mb-4">
         <h2 class="fw-bold mb-1">
-            Editar Funcionário
+            Editar Rececionista
         </h2>
 
         <p class="text-muted mb-0">
-            Altere os dados da conta do funcionário.
+            Altere os dados da conta do rececionista.
         </p>
     </div>
 
@@ -27,6 +29,8 @@
                           asp-action="EditUser"
                           method="post">
 
+                        @Html.AntiForgeryToken()
+
                         <div asp-validation-summary="ModelOnly"
                              class="text-danger mb-3">
                         </div>
@@ -37,7 +41,6 @@
                         <!-- Role -->
                         <input asp-for="Role" type="hidden" />
 
-
                         <!-- Tipo de Utilizador -->
                         <div class="mb-3">
 
@@ -45,12 +48,11 @@
                                 Tipo de Utilizador
                             </label>
 
-                            <input value="Funcionário"
+                            <input value="Rececionista"
                                    class="form-control"
                                    readonly />
 
                         </div>
-
 
                         <!-- Nome -->
                         <div class="mb-3">
@@ -68,7 +70,6 @@
 
                         </div>
 
-
                         <!-- Apelido -->
                         <div class="mb-3">
 
@@ -84,7 +85,6 @@
                             </span>
 
                         </div>
-
 
                         <!-- Email -->
                         <div class="mb-3">
@@ -102,7 +102,6 @@
 
                         </div>
 
-
                         <!-- Contacto -->
                         <div class="mb-3">
 
@@ -119,20 +118,15 @@
 
                         </div>
 
-
                         <button type="submit"
                                 class="btn btn-primary">
-
                             Guardar Alterações
-
                         </button>
 
                         <a asp-controller="Admin"
-                           asp-action="Funcionarios"
+                           asp-action="Rececionistas"
                            class="btn btn-secondary">
-
                             Voltar
-
                         </a>
 
                     </form>

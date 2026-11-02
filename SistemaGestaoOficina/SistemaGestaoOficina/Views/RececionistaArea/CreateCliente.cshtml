@@ -1,7 +1,8 @@
-﻿@model SistemaGestaoOficina.Models.CreateClienteViewModel
 
+@model SistemaGestaoOficina.Models.CreateClienteViewModel
 
 @{
+    Layout = "_InternalLayout";
     ViewData["Title"] = "Criar Cliente";
 }
 
@@ -24,14 +25,15 @@
             <div class="row">
                 <div class="col-md-6">
 
-                    <form asp-controller="FuncionarioArea"
+                    <form asp-controller="RececionistaArea"
                           asp-action="CreateCliente"
                           method="post">
+
+                        @Html.AntiForgeryToken()
 
                         <div asp-validation-summary="ModelOnly"
                              class="text-danger mb-3">
                         </div>
-
 
                         <!-- Nome -->
                         <div class="mb-3">
@@ -49,7 +51,6 @@
 
                         </div>
 
-
                         <!-- Apelido -->
                         <div class="mb-3">
 
@@ -65,7 +66,6 @@
                             </span>
 
                         </div>
-
 
                         <!-- NIF -->
                         <div class="mb-3">
@@ -83,7 +83,6 @@
 
                         </div>
 
-
                         <!-- Email -->
                         <div class="mb-3">
 
@@ -99,7 +98,6 @@
                             </span>
 
                         </div>
-
 
                         <!-- Contacto -->
                         <div class="mb-3">
@@ -117,13 +115,12 @@
 
                         </div>
 
-
                         <button type="submit"
                                 class="btn btn-primary">
                             Criar Cliente
                         </button>
 
-                        <a asp-controller="FuncionarioArea"
+                        <a asp-controller="RececionistaArea"
                            asp-action="Clientes"
                            class="btn btn-secondary">
                             Voltar

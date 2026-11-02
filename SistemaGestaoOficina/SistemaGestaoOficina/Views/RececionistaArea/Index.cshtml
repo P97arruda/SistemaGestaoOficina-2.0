@@ -1,0 +1,226 @@
+
+@{
+    Layout = "_InternalLayout";
+    ViewData["Title"] = "Painel do Rececionista";
+}
+
+<div class="container-fluid px-4 py-4">
+
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+
+        <div>
+            <h2 class="fw-bold mb-1">Painel do Rececionista</h2>
+            <p class="text-muted mb-0">
+                Acompanhe a atividade e os atendimentos da oficina.
+            </p>
+        </div>
+
+        <div class="bg-white border rounded px-3 py-2 shadow-sm">
+            <span class="text-muted">
+                📅 @DateTime.Today.ToString("dd/MM/yyyy")
+            </span>
+        </div>
+
+    </div>
+
+    <!-- Indicadores -->
+    <div class="row g-4 mb-4">
+
+        <!-- Clientes -->
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100"
+                 style="border-radius: 12px;">
+
+                <div class="card-body p-4">
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-2">Clientes</p>
+                            <h2 class="fw-bold mb-0">—</h2>
+                        </div>
+
+                        <div class="rounded p-3 fs-3"
+                             style="background-color: #e8f2ff;">
+                            👥
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Veículos -->
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100"
+                 style="border-radius: 12px;">
+
+                <div class="card-body p-4">
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-2">Veículos</p>
+                            <h2 class="fw-bold mb-0">—</h2>
+                        </div>
+
+                        <div class="rounded p-3 fs-3"
+                             style="background-color: #e5f7ef;">
+                            🚘
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Marcações de Hoje -->
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100"
+                 style="border-radius: 12px;">
+
+                <div class="card-body p-4">
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-2">Marcações de Hoje</p>
+                            <h2 class="fw-bold mb-0">—</h2>
+                        </div>
+
+                        <div class="rounded p-3 fs-3"
+                             style="background-color: #fff2e6;">
+                            📅
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Serviços em Curso -->
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100"
+                 style="border-radius: 12px;">
+
+                <div class="card-body p-4">
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-2">Serviços em Curso</p>
+                            <h2 class="fw-bold mb-0">—</h2>
+                        </div>
+
+                        <div class="rounded p-3 fs-3"
+                             style="background-color: #f1eaff;">
+                            🔧
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Tabelas -->
+    <div class="row g-4">
+
+        <!-- Marcações de Hoje -->
+        <div class="col-lg-6">
+
+            <div class="card border-0 shadow-sm h-100"
+                 style="border-radius: 12px;">
+
+                <div class="card-header bg-white border-0 px-4 pt-4 pb-2">
+                    <h5 class="fw-bold mb-1">
+                        📅 Marcações de Hoje
+                    </h5>
+
+                    <p class="text-muted small mb-0">
+                        Atendimentos previstos para hoje.
+                    </p>
+                </div>
+
+                <div class="card-body px-4">
+
+                    <div class="table-responsive">
+                         <table class="table table-hover align-middle">
+
+                        <thead class="table-light">
+                        <tr>
+                        <th>Hora</th>
+                        <th>Cliente</th>
+                        <th>Veículo</th>
+                        <th>Serviço</th>
+                        <th>Estado</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                          <tr>
+                         <td colspan="5"
+                            class="text-center text-muted py-4">
+                            As marcações serão apresentadas aqui
+                            quando este módulo estiver disponível.
+                        </td>
+                     </tr>
+                   </tbody>
+
+                </table>
+            </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Últimos Veículos -->
+        <div class="col-lg-6">
+
+            <div class="card border-0 shadow-sm h-100"
+                 style="border-radius: 12px;">
+
+                <div class="card-header bg-white border-0 px-4 pt-4 pb-2">
+                    <h5 class="fw-bold mb-1">
+                        🚘 Últimos Veículos Registados
+                    </h5>
+
+                    <p class="text-muted small mb-0">
+                        Veículos adicionados recentemente à oficina.
+                    </p>
+                </div>
+
+                <div class="card-body px-4">
+
+                   <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+
+                        <thead class="table-light">
+                        <tr>
+                        <th>Matrícula</th>
+                        <th>Marca / Modelo</th>
+                        <th>Proprietário</th>
+                        <th>Data</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        <tr>
+                        <td colspan="4"
+                        class="text-center text-muted py-4">
+                        Os últimos veículos registados
+                        serão apresentados aqui.
+                        </td>
+                        </tr>
+                        </tbody>
+
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

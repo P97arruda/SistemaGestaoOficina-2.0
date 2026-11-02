@@ -1,0 +1,125 @@
+
+@model IEnumerable<SistemaGestaoOficina.Data.Entities.User>
+
+@{
+    Layout = "_InternalLayout";
+    ViewData["Title"] = "Rececionistas";
+}
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2 class="fw-bold mb-1">Rececionistas</h2>
+
+            <p class="text-muted mb-0">
+                Consulte os rececionistas registados na OficinaCET107.
+            </p>
+        </div>
+
+        <a asp-controller="Admin"
+           asp-action="CreateUser"
+           class="btn btn-primary">
+            + Criar Rececionista
+        </a>
+
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-body p-4">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Email</th>
+                            <th>Contacto</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @if (Model != null && Model.Any())
+                        {
+                            @foreach (var rececionista in Model)
+                            {
+                                <tr>
+                                    <td>@rececionista.FullName</td>
+                                    <td>@rececionista.Email</td>
+                                    <td>@rececionista.PhoneNumber</td>
+
+                                    <td>
+                                        <a asp-controller="Admin"
+                                           asp-action="EditUser"
+                                           asp-route-id="@rececionista.Id"
+                                           class="btn btn-sm btn-warning">
+                                            Editar
+                                        </a>
+
+                                        <form asp-controller="Admin"
+                                              asp-action="DeleteUser"
+                                              asp-route-id="@rececionista.Id"
+                                              method="post"
+                                              class="d-inline"
+                                              onsubmit="return confirm('Tem a certeza de que deseja apagar este rececionista?');">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-danger">
+                                                Apagar
+                                            </button>
+
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">
+                                    Ainda não existem rececionistas registados.
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="mt-3">
+        <a asp-controller="Admin"
+           asp-action="Index"
+           class="btn btn-secondary">
+            Voltar
+        </a>
+    </div>
+
+</div>

@@ -28,5 +28,8 @@ namespace SistemaGestaoOficina.Models
         [Display(Name = "NIF")]
         [MaxLength(9, ErrorMessage = "O campo {0} pode conter no máximo {1} caracteres.")]
         public string? NIF { get; set; }
+
+        [Display(Name = "Foto de Perfil")]
+        public IFormFile? ImageFile { get; set; }
     }
 }

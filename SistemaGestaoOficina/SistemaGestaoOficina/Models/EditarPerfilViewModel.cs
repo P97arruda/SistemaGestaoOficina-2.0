@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Drawing;
 
 namespace SistemaGestaoOficina.Models
 {
@@ -27,5 +26,10 @@ namespace SistemaGestaoOficina.Models
         [Phone]
         [Display(Name = "Telefone")]
         public string PhoneNumber { get; set; }
+
+        [Display(Name = "Foto de Perfil")]
+        public IFormFile? ImageFile { get; set; }
+
+        public string? ImageFullPath { get; set; }
     }
 }

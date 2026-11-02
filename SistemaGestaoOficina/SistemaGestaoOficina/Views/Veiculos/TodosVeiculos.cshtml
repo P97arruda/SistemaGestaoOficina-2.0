@@ -1,0 +1,126 @@
+﻿
+@model IEnumerable<SistemaGestaoOficina.Data.Entities.Veiculo>
+
+@{
+    Layout = "_InternalLayout";
+    ViewData["Title"] = "Todos os Veículos";
+}
+
+<div class="container mt-5">
+
+    <h2 class="fw-bold">Todos os Veículos</h2>
+
+    <p class="text-muted">
+        Consulte os veículos registados na oficina e os respetivos proprietários.
+    </p>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <input type="text"
+               id="pesquisaVeiculos"
+               class="form-control me-3"
+               placeholder="Pesquisar por matrícula, marca, modelo ou proprietário..." />
+
+        <a asp-controller="RececionistaArea"
+           asp-action="Clientes"
+           class="btn btn-primary text-nowrap">
+            + Adicionar Veículo
+        </a>
+
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle" id="tabelaVeiculos">
+
+                    <thead>
+                        <tr>
+                            <th>Matrícula</th>
+                            <th>Marca</th>
+                            <th>Modelo</th>
+                            <th>Ano</th>
+                            <th>Proprietário</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var veiculo in Model)
+                        {
+                            <tr>
+                                <td>@veiculo.Matricula</td>
+                                <td>@veiculo.Marca</td>
+                                <td>@veiculo.Modelo</td>
+                                <td>@veiculo.Ano</td>
+
+                                <td>
+                                    @(veiculo.User?.FullName ?? "Não identificado")
+                                </td>
+
+                                <td>
+                                    <a asp-controller="Veiculos"
+                                       asp-action="Index"
+                                       asp-route-id="@veiculo.UserId"
+                                       class="btn btn-sm btn-outline-primary">
+                                        Gerir
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <p id="semResultados"
+               class="text-muted text-center mt-3"
+               style="display: none;">
+                Nenhum veículo encontrado.
+            </p>
+
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a asp-controller="RececionistaArea"
+           asp-action="Index"
+           class="btn btn-outline-secondary">
+            Voltar
+        </a>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById("pesquisaVeiculos")
+            .addEventListener("input", function () {
+
+                const pesquisa = this.value.toLowerCase().trim();
+                const linhas = document.querySelectorAll(
+                    "#tabelaVeiculos tbody tr"
+                );
+
+                let encontrados = 0;
+
+                linhas.forEach(function (linha) {
+
+                    const texto = linha.innerText.toLowerCase();
+                    const corresponde = texto.includes(pesquisa);
+
+                    linha.style.display = corresponde ? "" : "none";
+
+                    if (corresponde) {
+                        encontrados++;
+                    }
+                });
+
+                document.getElementById("semResultados").style.display =
+                    encontrados === 0 ? "block" : "none";
+            });
+    </script>
+}

@@ -1,4 +1,4 @@
-﻿
+
 @model SistemaGestaoOficina.Models.VeiculoViewModel
 
 @{
@@ -13,7 +13,7 @@
         Atualize os dados do seu veículo.
     </p>
 
-    <form action="/ClienteArea/EditarVeiculo" method="post">
+    <form asp-controller="ClienteArea" asp-action="EditarVeiculo" method="post">
 
         @Html.AntiForgeryToken()
 

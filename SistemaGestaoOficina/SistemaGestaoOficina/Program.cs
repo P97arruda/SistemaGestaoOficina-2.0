@@ -36,6 +36,7 @@ builder.Services.AddTransient<SeedDb>();
 
 builder.Services.AddScoped<IUserHelper, UserHelper>();
 builder.Services.AddScoped<IMailHelper, MailHelper>();
+builder.Services.AddScoped<IBlobHelper, BlobHelper>();
 builder.Services.AddScoped<IVeiculoRepository, VeiculoRepository>();
 
 

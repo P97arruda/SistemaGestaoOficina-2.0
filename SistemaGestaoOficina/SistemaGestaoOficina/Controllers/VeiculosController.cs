@@ -7,7 +7,7 @@ using SistemaGestaoOficina.Models;
 
 namespace SistemaGestaoOficina.Controllers
 {
-    [Authorize(Roles = "Funcionario")]
+    [Authorize(Roles = "Rececionista")]
     public class VeiculosController : Controller
     {
         private readonly IUserHelper _userHelper;
@@ -131,6 +131,15 @@ namespace SistemaGestaoOficina.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        public IActionResult TodosVeiculos()
+        {
+            var veiculos = _veiculoRepository.GetAllWithUsers().OrderBy(v => v.Matricula).ToList();
+
+            return View(veiculos);
+        }
+
+
 
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
@@ -207,8 +216,6 @@ namespace SistemaGestaoOficina.Controllers
         }
     }
  }
-
-
 
 
 

@@ -13,11 +13,7 @@ namespace SistemaGestaoOficina.Helpers
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly DataContext _context;
         
-        public UserHelper(
-            UserManager<User> userManager,
-            SignInManager<User> signInManager,
-            RoleManager<IdentityRole> roleManager,
-            DataContext context)
+        public UserHelper(UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<IdentityRole> roleManager, DataContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -87,9 +83,7 @@ namespace SistemaGestaoOficina.Helpers
             return await _userManager.FindByIdAsync(userId);
         }
 
-        public async Task<bool> IsUserInRoleAsync(
-            User user,
-            string roleName)
+        public async Task<bool> IsUserInRoleAsync(User user, string roleName)
         {
             return await _userManager.IsInRoleAsync(user, roleName);
         }
@@ -134,8 +128,7 @@ namespace SistemaGestaoOficina.Helpers
 
         public async Task<User?> GetUserByPhoneNumberAsync(string phoneNumber)
         {
-            return await _context.Users
-                .FirstOrDefaultAsync(u => u.PhoneNumber == phoneNumber);
+            return await _context.Users.FirstOrDefaultAsync(u => u.PhoneNumber == phoneNumber);
         }
 
         public async Task<IList<User>> GetUsersInRoleAsync(string roleName)

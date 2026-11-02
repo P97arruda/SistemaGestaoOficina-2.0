@@ -10,9 +10,7 @@ namespace SistemaGestaoOficina.Data
         private readonly DataContext _context;
         private readonly IUserHelper _userHelper;
 
-        public SeedDb(
-            DataContext context,
-            IUserHelper userHelper)
+        public SeedDb(DataContext context, IUserHelper userHelper)
         {
             _context = context;
             _userHelper = userHelper;
@@ -24,7 +22,7 @@ namespace SistemaGestaoOficina.Data
 
             // Criar Roles
             await _userHelper.CheckRoleAsync("Admin");
-            await _userHelper.CheckRoleAsync("Funcionario");
+            await _userHelper.CheckRoleAsync("Rececionista");
             await _userHelper.CheckRoleAsync("Cliente");
 
             // Procurar o Admin
@@ -49,30 +47,20 @@ namespace SistemaGestaoOficina.Data
                     throw new InvalidOperationException("Could not create the Admin user in seeder");
                 }
 
-                await _userHelper.AddUserToRoleAsync(
-                    user,
-                    "Admin");
+                await _userHelper.AddUserToRoleAsync(user, "Admin");
 
                 // Confirmar email automaticamente
-                var token =
-                    await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+                var token = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
 
-                await _userHelper.ConfirmEmailAsync(
-                    user,
-                    token);
+                await _userHelper.ConfirmEmailAsync(user, token);
             }
 
             // Garantir que o utilizador pertence ao Role Admin
-            var isInRole =
-                await _userHelper.IsUserInRoleAsync(
-                    user,
-                    "Admin");
+            var isInRole = await _userHelper.IsUserInRoleAsync(user, "Admin");
 
             if (!isInRole)
             {
-                await _userHelper.AddUserToRoleAsync(
-                    user,
-                    "Admin");
+                await _userHelper.AddUserToRoleAsync(user, "Admin");
             }
         }
     }

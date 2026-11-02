@@ -1,6 +1,8 @@
-﻿@model SistemaGestaoOficina.Models.EditClienteViewModel
+
+@model SistemaGestaoOficina.Models.EditClienteViewModel
 
 @{
+    Layout = "_InternalLayout";
     ViewData["Title"] = "Editar Cliente";
 }
 
@@ -9,9 +11,15 @@
 
     <hr />
 
-    <form asp-controller="FuncionarioArea"
+    <form asp-controller="RececionistaArea"
           asp-action="EditCliente"
           method="post">
+
+        @Html.AntiForgeryToken()
+
+        <div asp-validation-summary="ModelOnly"
+             class="text-danger mb-3">
+        </div>
 
         <input type="hidden" asp-for="Id" />
 
@@ -49,7 +57,7 @@
             Guardar
         </button>
 
-        <a asp-controller="FuncionarioArea"
+        <a asp-controller="RececionistaArea"
            asp-action="Clientes"
            class="btn btn-secondary">
             Voltar

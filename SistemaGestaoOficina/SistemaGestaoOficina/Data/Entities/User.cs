@@ -23,5 +23,11 @@ namespace SistemaGestaoOficina.Data.Entities
         [Display(Name = "Nome")]
         public string FullName => $"{FirstName} {LastName}";
 
+        [Display(Name = "Fot de Perfil")]
+        public Guid ImageId { get; set; }
+
+        public string ImageFullPath => ImageId == Guid.Empty
+            ? "/images/noimage.png"
+            : $"https://SEU_STORAGE.blob.core.windows.net/profiles/{ImageId}";
     }
 }
