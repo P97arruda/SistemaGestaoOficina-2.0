@@ -1,7 +1,14 @@
 
+@using SistemaGestaoOficina.Data.Entities
+@using System.Collections.Generic
+@using System.Linq
+
 @{
     Layout = "_InternalLayout";
     ViewData["Title"] = "Painel do Rececionista";
+
+    var ultimosVeiculos = ViewBag.UltimosVeiculos as List<Veiculo>
+        ?? new List<Veiculo>();
 }
 
 <div class="container-fluid px-4 py-4">
@@ -35,15 +42,20 @@
                 <div class="card-body p-4">
 
                     <div class="d-flex justify-content-between align-items-center">
+
                         <div>
                             <p class="text-muted mb-2">Clientes</p>
-                            <h2 class="fw-bold mb-0">—</h2>
+
+                            <h2 class="fw-bold mb-0">
+                                @ViewBag.TotalClientes
+                            </h2>
                         </div>
 
                         <div class="rounded p-3 fs-3"
                              style="background-color: #e8f2ff;">
                             👥
                         </div>
+
                     </div>
 
                 </div>
@@ -58,15 +70,20 @@
                 <div class="card-body p-4">
 
                     <div class="d-flex justify-content-between align-items-center">
+
                         <div>
                             <p class="text-muted mb-2">Veículos</p>
-                            <h2 class="fw-bold mb-0">—</h2>
+
+                            <h2 class="fw-bold mb-0">
+                                @ViewBag.TotalVeiculos
+                            </h2>
                         </div>
 
                         <div class="rounded p-3 fs-3"
                              style="background-color: #e5f7ef;">
                             🚘
                         </div>
+
                     </div>
 
                 </div>
@@ -81,15 +98,20 @@
                 <div class="card-body p-4">
 
                     <div class="d-flex justify-content-between align-items-center">
+
                         <div>
                             <p class="text-muted mb-2">Marcações de Hoje</p>
-                            <h2 class="fw-bold mb-0">—</h2>
+
+                            <h2 class="fw-bold mb-0">
+                                —
+                            </h2>
                         </div>
 
                         <div class="rounded p-3 fs-3"
                              style="background-color: #fff2e6;">
                             📅
                         </div>
+
                     </div>
 
                 </div>
@@ -104,15 +126,20 @@
                 <div class="card-body p-4">
 
                     <div class="d-flex justify-content-between align-items-center">
+
                         <div>
                             <p class="text-muted mb-2">Serviços em Curso</p>
-                            <h2 class="fw-bold mb-0">—</h2>
+
+                            <h2 class="fw-bold mb-0">
+                                —
+                            </h2>
                         </div>
 
                         <div class="rounded p-3 fs-3"
                              style="background-color: #f1eaff;">
                             🔧
                         </div>
+
                     </div>
 
                 </div>
@@ -131,6 +158,7 @@
                  style="border-radius: 12px;">
 
                 <div class="card-header bg-white border-0 px-4 pt-4 pb-2">
+
                     <h5 class="fw-bold mb-1">
                         📅 Marcações de Hoje
                     </h5>
@@ -138,48 +166,54 @@
                     <p class="text-muted small mb-0">
                         Atendimentos previstos para hoje.
                     </p>
+
                 </div>
 
                 <div class="card-body px-4">
 
                     <div class="table-responsive">
-                         <table class="table table-hover align-middle">
 
-                        <thead class="table-light">
-                        <tr>
-                        <th>Hora</th>
-                        <th>Cliente</th>
-                        <th>Veículo</th>
-                        <th>Serviço</th>
-                        <th>Estado</th>
-                        </tr>
-                        </thead>
+                        <table class="table table-hover align-middle">
 
-                        <tbody>
-                          <tr>
-                         <td colspan="5"
-                            class="text-center text-muted py-4">
-                            As marcações serão apresentadas aqui
-                            quando este módulo estiver disponível.
-                        </td>
-                     </tr>
-                   </tbody>
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Hora</th>
+                                    <th>Cliente</th>
+                                    <th>Veículo</th>
+                                    <th>Serviço</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
 
-                </table>
-            </div>
+                            <tbody>
+                                <tr>
+                                    <td colspan="5"
+                                        class="text-center text-muted py-4">
+
+                                        As marcações serão apresentadas aqui
+                                        quando este módulo estiver disponível.
+
+                                    </td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+
+                    </div>
 
                 </div>
             </div>
 
         </div>
 
-        <!-- Últimos Veículos -->
+        <!-- Últimos Veículos Registados -->
         <div class="col-lg-6">
 
             <div class="card border-0 shadow-sm h-100"
                  style="border-radius: 12px;">
 
                 <div class="card-header bg-white border-0 px-4 pt-4 pb-2">
+
                     <h5 class="fw-bold mb-1">
                         🚘 Últimos Veículos Registados
                     </h5>
@@ -187,33 +221,65 @@
                     <p class="text-muted small mb-0">
                         Veículos adicionados recentemente à oficina.
                     </p>
+
                 </div>
 
                 <div class="card-body px-4">
 
-                   <div class="table-responsive">
+                    <div class="table-responsive">
+
                         <table class="table table-hover align-middle">
 
-                        <thead class="table-light">
-                        <tr>
-                        <th>Matrícula</th>
-                        <th>Marca / Modelo</th>
-                        <th>Proprietário</th>
-                        <th>Data</th>
-                        </tr>
-                        </thead>
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Matrícula</th>
+                                    <th>Marca / Modelo</th>
+                                    <th>Proprietário</th>
+                                    <th>Data</th>
+                                </tr>
+                            </thead>
 
-                        <tbody>
-                        <tr>
-                        <td colspan="4"
-                        class="text-center text-muted py-4">
-                        Os últimos veículos registados
-                        serão apresentados aqui.
-                        </td>
-                        </tr>
-                        </tbody>
+                            <tbody>
+
+                                @if (ultimosVeiculos.Any())
+                                {
+                                    foreach (var veiculo in ultimosVeiculos)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @veiculo.Matricula
+                                            </td>
+
+                                            <td>
+                                                @veiculo.Marca @veiculo.Modelo
+                                            </td>
+
+                                            <td>
+                                                @veiculo.User.FullName 
+                                            </td>
+
+                                            <td>
+                                                —
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="4"
+                                            class="text-center text-muted py-4">
+
+                                            Nenhum veículo registado.
+
+                                        </td>
+                                    </tr>
+                                }
+
+                            </tbody>
 
                         </table>
+
                     </div>
 
                 </div>

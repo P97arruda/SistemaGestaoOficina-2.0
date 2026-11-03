@@ -1,51 +1,229 @@
+
+@using SistemaGestaoOficina.Data.Entities
+@using System.Collections.Generic
+@using System.Linq
+
 @{
     Layout = "_InternalLayout";
-    ViewData["Title"] = "Administração";
+    ViewData["Title"] = "Painel do Administrador";
+
+    var rececionistas = ViewBag.Rececionistas as IEnumerable<User>
+        ?? Enumerable.Empty<User>();
 }
 
-<div class="container py-4">
-    <div class="mb-4">
-        <span class="text-primary small fw-bold text-uppercase">Administração</span>
-        <h2 class="fw-bold mt-2">Bem-vindo à OficinaCET107</h2>
-        <p class="text-muted mb-0">Organize as contas dos utilizadores e acompanhe os módulos de gestão da oficina.</p>
-    </div>
+<div class="container-fluid px-4 py-4">
 
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-body p-4">
-            <span class="badge bg-success mb-3">Disponível</span>
-            <h3 class="h5 fw-bold">Gestão de utilizadores</h3>
-            <p class="text-muted">Crie contas para clientes e funcionários, consulte os utilizadores registados e edite ou remova contas de funcionários.</p>
-            <p class="mb-0 small">Escolha <strong>Criar Utilizador</strong>, <strong>Clientes</strong> ou <strong>Funcionários</strong> no menu lateral para começar.</p>
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+
+        <div>
+            <h2 class="fw-bold mb-1">Painel do Administrador</h2>
+            <p class="text-muted mb-0">
+                Acompanhe os funcionários e a gestão da oficina.
+            </p>
         </div>
+
+        <div class="bg-white border rounded px-3 py-2 shadow-sm">
+            <span class="text-muted">
+                📅 @DateTime.Today.ToString("dd/MM/yyyy")
+            </span>
+        </div>
+
     </div>
 
+    <!-- Indicadores -->
+    <div class="row g-4 mb-4">
+
+        <!-- Rececionistas -->
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-2">Rececionistas</p>
+                            <h2 class="fw-bold mb-0">
+                                @ViewBag.TotalRececionistas
+                            </h2>
+                        </div>
+                        <div class="rounded p-3 fs-3"
+                             style="background-color: #e8f2ff;">
+                            👥
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mecânicos -->
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-2">Mecânicos</p>
+                            <h2 class="fw-bold mb-0">—</h2>
+                        </div>
+                        <div class="rounded p-3 fs-3"
+                             style="background-color: #e5f7ef;">
+                            🔧
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tipos de Reparações -->
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-2">Tipos de Reparações</p>
+                            <h2 class="fw-bold mb-0">—</h2>
+                        </div>
+                        <div class="rounded p-3 fs-3"
+                             style="background-color: #fff2e6;">
+                            🛠️
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total de Utilizadores -->
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-2">
+                                Total de Utilizadores
+                            </p>
+                            <h2 class="fw-bold mb-0">
+                                @ViewBag.TotalUtilizadores
+                            </h2>
+                        </div>
+                        <div class="rounded p-3 fs-3"
+                             style="background-color: #f1eaff;">
+                            👤
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Tabelas -->
     <div class="row g-4">
-        <div class="col-md-6">
-            <section class="card shadow-sm border-0 h-100">
-                <div class="card-body p-4">
-                    <span class="badge bg-light text-secondary border mb-3">Em desenvolvimento</span>
-                    <h3 class="h5 fw-bold">Equipa da oficina</h3>
-                    <p class="text-muted mb-0">Gestão de mecânicos e rececionistas. A organização destas funções será disponibilizada numa próxima etapa.</p>
-                </div>
-            </section>
+
+        <!-- Rececionistas -->
+        <div class="col-lg-6">
+    <div class="card border-0 shadow-sm h-100"
+         style="border-radius: 12px;">
+
+        <div class="card-header bg-white border-0 px-4 pt-4 pb-3">
+            <h5 class="fw-bold mb-1">
+                👥 Rececionistas
+            </h5>
+
+            <p class="text-muted small mb-0">
+                Rececionistas registados na oficina.
+            </p>
         </div>
-        <div class="col-md-6">
-            <section class="card shadow-sm border-0 h-100">
-                <div class="card-body p-4">
-                    <span class="badge bg-light text-secondary border mb-3">Em desenvolvimento</span>
-                    <h3 class="h5 fw-bold">Tipos de reparações</h3>
-                    <p class="text-muted mb-0">Organização dos tipos de reparações disponibilizados pela oficina.</p>
-                </div>
-            </section>
-        </div>
-        <div class="col-12">
-            <section class="card shadow-sm border-0">
-                <div class="card-body p-4">
-                    <span class="badge bg-light text-secondary border mb-3">Em desenvolvimento</span>
-                    <h3 class="h5 fw-bold">A minha conta</h3>
-                    <p class="text-muted mb-0">A edição do perfil do administrador e a recuperação de password ainda não estão disponíveis nesta área.</p>
-                </div>
-            </section>
+
+        <div class="card-body px-4 pb-4 pt-0">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead style="background-color: #f4f6f8;">
+                        <tr>
+                            <th class="py-3 ps-3">Nome</th>
+                            <th class="py-3">Email</th>
+                            <th class="py-3 pe-3">Contacto</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (rececionistas.Any())
+                        {
+                            foreach (var rececionista in rececionistas)
+                            {
+                                <tr>
+                                    <td class="py-3 ps-3 fw-semibold">
+                                        @rececionista.FullName
+                                    </td>
+
+                                    <td class="py-3 text-muted">
+                                        @rececionista.Email
+                                    </td>
+
+                                    <td class="py-3 pe-3 text-muted text-nowrap">
+                                        @rececionista.PhoneNumber
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="3"
+                                    class="text-center text-muted py-4">
+                                    Nenhum rececionista registado.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+
+            </div>
+
         </div>
     </div>
+</div>
+
+        <!-- Mecânicos -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-header bg-white border-0 px-4 pt-4 pb-2">
+                    <h5 class="fw-bold mb-1">🔧 Mecânicos</h5>
+                    <p class="text-muted small mb-0">
+                        Mecânicos registados na oficina.
+                    </p>
+                </div>
+
+                <div class="card-body px-4">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Email</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr>
+                                    <td colspan="2"
+                                        class="text-center text-muted py-4">
+                                        O módulo de Mecânicos
+                                        ainda não foi implementado.
+                                    </td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
 </div>

@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using SistemaGestaoOficina.Data;
 using SistemaGestaoOficina.Data.Entities;
 using SistemaGestaoOficina.Helpers;
 using SistemaGestaoOficina.Models;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace SistemaGestaoOficina.Controllers
@@ -14,14 +17,30 @@ namespace SistemaGestaoOficina.Controllers
         private readonly IUserHelper _userHelper;
         private readonly IMailHelper _mailHelper;
 
-        public RececionistaAreaController(IUserHelper userHelper, IMailHelper mailHelper)
+        private readonly IVeiculoRepository _veiculoRepository;
+
+        public RececionistaAreaController(IUserHelper userHelper, IMailHelper mailHelper, IVeiculoRepository veiculoRepository)
         {
             _userHelper = userHelper;
             _mailHelper = mailHelper;
+            _veiculoRepository = veiculoRepository;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            // Contar os clientes
+            var clientes = await _userHelper.GetUsersInRoleAsync("Cliente");
+
+            ViewBag.TotalClientes = clientes.Count();
+
+            // Contar os veículos
+            ViewBag.TotalVeiculos = await _veiculoRepository.GetAll().CountAsync();
+
+            // Buscar os últimos 5 veículos
+            var ultimosVeiculos = await _veiculoRepository.GetAllWithUsers().OrderByDescending(v => v.Id).Take(5).ToListAsync();
+
+            ViewBag.UltimosVeiculos = ultimosVeiculos;
+
             return View();
         }
 

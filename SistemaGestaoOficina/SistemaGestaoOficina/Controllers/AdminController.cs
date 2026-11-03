@@ -21,8 +21,23 @@ namespace SistemaGestaoOficina.Controllers
         }
 
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            // Buscar os rececionistas registados
+            var rececionistas = await _userHelper
+                .GetUsersInRoleAsync("Rececionista");
+
+            // Quantidade de rececionistas
+            ViewBag.TotalRececionistas = rececionistas.Count();
+
+            // Lista de rececionistas
+            ViewBag.Rececionistas = rececionistas;
+
+            // Quantidade total de utilizadores
+            ViewBag.TotalUtilizadores = _userHelper
+                .GetUsers()
+                .Count();
+
             return View();
         }
 
@@ -39,6 +54,14 @@ namespace SistemaGestaoOficina.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateUser(CreateUserViewModel model)
         {
+            // O Administrador só pode criar Rececionistas por enquanto
+            if (model.Role != "Rececionista")
+            {
+                ModelState.AddModelError(
+                    nameof(model.Role),
+                    "O Administrador só pode criar contas de funcionários.");
+            }
+
             // Validar a fotografia
             if (model.ImageFile != null)
             {
@@ -46,83 +69,82 @@ namespace SistemaGestaoOficina.Controllers
 
                 var extensoesPermitidas = new[]
                 {
-                    ".jpg", ".jpeg", ".png", ".webp"
-                };
+            ".jpg", ".jpeg", ".png", ".webp"
+        };
 
                 if (!extensoesPermitidas.Contains(extensao))
                 {
-                    ModelState.AddModelError(nameof(model.ImageFile),"A fotografia deve ser JPG, PNG ou WebP.");
+                    ModelState.AddModelError(
+                        nameof(model.ImageFile),
+                        "A fotografia deve ser JPG, PNG ou WebP.");
                 }
 
-                if (model.ImageFile.Length == 0 || model.ImageFile.Length > 2 * 1024 * 1024)
+                if (model.ImageFile.Length == 0 ||
+                    model.ImageFile.Length > 2 * 1024 * 1024)
                 {
-                    ModelState.AddModelError(nameof(model.ImageFile),"A fotografia deve ter no máximo 2 MB.");
+                    ModelState.AddModelError(
+                        nameof(model.ImageFile),
+                        "A fotografia deve ter no máximo 2 MB.");
                 }
             }
 
             if (ModelState.IsValid)
             {
+                // Verificar se o email já existe
                 var userByEmail = await _userHelper.GetUserByEmailAsync(model.Email);
 
                 if (userByEmail != null)
                 {
-                    ModelState.AddModelError(nameof(model.Email), "Já existe um utilizador com este email.");
+                    ModelState.AddModelError(
+                        nameof(model.Email),
+                        "Já existe um utilizador com este email.");
 
                     return View(model);
                 }
 
-
+                // Verificar se o contacto já existe
                 var userByPhone = await _userHelper.GetUserByPhoneNumberAsync(model.PhoneNumber);
 
                 if (userByPhone != null)
                 {
-                    ModelState.AddModelError(nameof(model.PhoneNumber), "Já existe um utilizador com este contacto.");
+                    ModelState.AddModelError(
+                        nameof(model.PhoneNumber),
+                        "Já existe um utilizador com este contacto.");
 
                     return View(model);
                 }
 
-
-                // Se informou NIF, verificar se já existe
-                if (!string.IsNullOrWhiteSpace(model.NIF))
-                {
-                    var userByNif = _userHelper.GetUsers().FirstOrDefault(u => u.NIF == model.NIF);
-
-                    if (userByNif != null)
-                    {
-                        ModelState.AddModelError(nameof(model.NIF),"Já existe um utilizador com este NIF.");
-
-                        return View(model);
-                    }
-                }
-
-
+                // Criar o Rececionista
                 var user = new User
                 {
                     FirstName = model.FirstName,
                     LastName = model.LastName,
                     Email = model.Email,
                     UserName = model.Email,
-                    PhoneNumber = model.PhoneNumber,
-
-                    NIF = model.Role == "Cliente" ? model.NIF : null
+                    PhoneNumber = model.PhoneNumber
                 };
 
+                // Guardar fotografia, caso exista
                 if (model.ImageFile != null)
                 {
-                    user.ImageId = await _blobHelper.UploadBlobAsync(model.ImageFile, "profile");
+                    user.ImageId = await _blobHelper.UploadBlobAsync(
+                        model.ImageFile, "profile");
                 }
-                
+
+                // Criar a conta com password temporária
                 var result = await _userHelper.AddUserAsync(user, "Temp123!");
-                
+
                 if (result.Succeeded)
                 {
-                    await _userHelper.AddUserToRoleAsync(user, model.Role);
+                    // Atribuir a Role de Rececionista
+                    await _userHelper.AddUserToRoleAsync(user, "Rececionista");
 
-
+                    // Gerar token para definir a password
                     var token = await _userHelper.GeneratePasswordResetTokenAsync(user);
 
-
-                    var link = Url.Action("ResetPassword", "Account",
+                    var link = Url.Action(
+                        "ResetPassword",
+                        "Account",
                         new
                         {
                             userName = user.Email,
@@ -130,38 +152,34 @@ namespace SistemaGestaoOficina.Controllers
                         },
                         protocol: HttpContext.Request.Scheme);
 
-
-                    var response = _mailHelper.SendEmail( user.Email!,
+                    // Enviar email ao novo Rececionista
+                    var response = _mailHelper.SendEmail(
+                        user.Email!,
                         "Criação de Conta - OficinaCET107",
                         $"<h2>Bem-vindo à OficinaCET107</h2>" +
                         $"<p>A sua conta foi criada.</p>" +
                         $"<p>Para definir a sua password, clique no link abaixo:</p>" +
                         $"<a href=\"{link}\">Definir Password</a>");
 
-
                     if (!response.IsSuccess)
                     {
-                        ModelState.AddModelError(string.Empty, response.Message);
-                        
+                        ModelState.AddModelError(
+                            string.Empty,
+                            response.Message);
+
                         return View(model);
                     }
 
-
-                    if (model.Role == "Rececionista")
-                    {
-                        return RedirectToAction("Rececionistas", "Admin");
-                    }
-
-                    if (model.Role == "Cliente")
-                    {
-                        return RedirectToAction("Clientes", "Admin");
-                    }
-
-                    return RedirectToAction("Index", "Admin");
+                    // Voltar à lista de Rececionistas
+                    return RedirectToAction(nameof(Rececionistas));
                 }
-                
-                ModelState.AddModelError(string.Empty, result.Errors.FirstOrDefault()?.Description ?? "Erro ao criar o utilizador.");
+
+                ModelState.AddModelError(
+                    string.Empty,
+                    result.Errors.FirstOrDefault()?.Description
+                    ?? "Erro ao criar o rececionista.");
             }
+
             return View(model);
         }
 
@@ -174,21 +192,12 @@ namespace SistemaGestaoOficina.Controllers
         }
 
 
-        public async Task<IActionResult> Clientes()
-        {
-            var clientes = await _userHelper.GetUsersInRoleAsync("Cliente");
-
-            return View(clientes);
-        }
-
-
         public async Task<IActionResult> EditUser(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
                 return NotFound();
             }
-
 
             var user = await _userHelper.GetUserByIdAsync(id);
 
@@ -197,6 +206,11 @@ namespace SistemaGestaoOficina.Controllers
                 return NotFound();
             }
 
+            // O Administrador só pode editar Rececionistas
+            if (!await _userHelper.IsUserInRoleAsync(user, "Rececionista"))
+            {
+                return Forbid();
+            }
 
             var model = new EditUserViewModel
             {
@@ -205,19 +219,8 @@ namespace SistemaGestaoOficina.Controllers
                 LastName = user.LastName,
                 Email = user.Email!,
                 PhoneNumber = user.PhoneNumber!,
-                NIF = user.NIF
+                Role = "Rececionista"
             };
-
-
-            if (await _userHelper.IsUserInRoleAsync(user, "Cliente"))
-            {
-                model.Role = "Cliente";
-            }
-            else if (await _userHelper.IsUserInRoleAsync(user, "Rececionista"))
-            {
-                model.Role = "Rececionista";
-            }
-
 
             return View(model);
         }

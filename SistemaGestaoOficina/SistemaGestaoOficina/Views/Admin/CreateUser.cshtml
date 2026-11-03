@@ -1,3 +1,4 @@
+
 @model SistemaGestaoOficina.Models.CreateUserViewModel
 
 @{
@@ -13,7 +14,7 @@
         </h2>
 
         <p class="text-muted mb-0">
-            Registe um novo cliente ou rececionista  na OficinaCET107.
+            Registe um novo funcionário na OficinaCET107.
         </p>
     </div>
 
@@ -112,7 +113,6 @@
                                     id="roleSelect">
 
                                 <option value="">Selecione...</option>
-                                <option value="Cliente">Cliente</option>
                                 <option value="Rececionista">Rececionista</option>
 
                             </select>
@@ -150,24 +150,6 @@
                                    class="form-control" />
 
                             <span asp-validation-for="LastName"
-                                  class="text-danger">
-                            </span>
-
-                        </div>
-
-                        <!-- NIF -->
-                        <div class="mb-3"
-                             id="nifField"
-                             style="display: none;">
-
-                            <label asp-for="NIF"
-                                   class="form-label">
-                            </label>
-
-                            <input asp-for="NIF"
-                                   class="form-control" />
-
-                            <span asp-validation-for="NIF"
                                   class="text-danger">
                             </span>
 
@@ -237,19 +219,6 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
 
-            // Mostrar NIF apenas para Cliente
-            const roleSelect = document.getElementById("roleSelect");
-            const nifField = document.getElementById("nifField");
-
-            function updateNifField() {
-                nifField.style.display =
-                    roleSelect.value === "Cliente" ? "block" : "none";
-            }
-
-            roleSelect.addEventListener("change", updateNifField);
-            updateNifField();
-
-
             // Pré-visualização da fotografia
             const inputFoto = document.getElementById("ImageFile");
             const previewFoto = document.getElementById("photoPreview");
@@ -307,7 +276,6 @@
                 previewFoto.classList.remove("d-none");
                 placeholder.classList.add("d-none");
             });
-
 
             // Ocultar mensagem de sucesso após 4 segundos
             const successAlert = document.getElementById("successAlert");
