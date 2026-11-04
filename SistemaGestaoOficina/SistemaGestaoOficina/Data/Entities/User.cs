@@ -23,11 +23,11 @@ namespace SistemaGestaoOficina.Data.Entities
         [Display(Name = "Nome")]
         public string FullName => $"{FirstName} {LastName}";
 
-        [Display(Name = "Fot de Perfil")]
+        [Display(Name = "Fotografia de perfil")]
         public Guid ImageId { get; set; }
 
         public string ImageFullPath => ImageId == Guid.Empty
             ? "/images/noimage.png"
-            : $"https://SEU_STORAGE.blob.core.windows.net/profiles/{ImageId}";
+            : $"https://supershopp97.blob.core.windows.net/profile/{ImageId}";
     }
 }

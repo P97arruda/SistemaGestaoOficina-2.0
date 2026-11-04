@@ -16,7 +16,7 @@ namespace SistemaGestaoOficina.Models
 
         [MaxLength(9)]
         [Display(Name = "NIF")]
-        public string NIF { get; set; }
+        public string? NIF { get; set; }
 
         [Required]
         [EmailAddress]
@@ -25,7 +25,7 @@ namespace SistemaGestaoOficina.Models
 
         [Phone]
         [Display(Name = "Telefone")]
-        public string PhoneNumber { get; set; }
+        public string? PhoneNumber { get; set; }
 
         [Display(Name = "Foto de Perfil")]
         public IFormFile? ImageFile { get; set; }

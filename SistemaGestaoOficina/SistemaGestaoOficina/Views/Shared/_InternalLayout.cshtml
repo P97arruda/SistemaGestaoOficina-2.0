@@ -454,7 +454,11 @@
                 Conta
             </div>
 
-            <span class="sidebar-link disabled" aria-disabled="true">
+            <!-- MEU PERFIL -->
+
+            <a asp-controller="Account"
+               asp-action="EditarPerfil"
+               class="sidebar-link @(currentController == "Account" && currentAction == "EditarPerfil" ? "active" : "")">
 
                 <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
                     <circle cx="12" cy="8" r="4" />
@@ -462,7 +466,9 @@
                 </svg>
 
                 Meu Perfil
-            </span>
+            </a>
+
+            <!-- RECUPERAR PASSWORD - FUTURO -->
 
             <span class="sidebar-link disabled" aria-disabled="true">
 

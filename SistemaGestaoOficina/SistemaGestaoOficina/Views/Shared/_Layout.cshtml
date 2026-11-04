@@ -1,12 +1,17 @@
+
 @using SistemaGestaoOficina.Helpers
 @inject IUserHelper UserHelper
+
 @{
     var userEmail = User.Identity?.Name;
-    var user = User.Identity?.IsAuthenticated == true && !string.IsNullOrWhiteSpace(userEmail)
+
+    var user = User.Identity?.IsAuthenticated == true &&
+               !string.IsNullOrWhiteSpace(userEmail)
         ? await UserHelper.GetUserByEmailAsync(userEmail)
         : null;
 }
-﻿<!DOCTYPE html>
+
+<!DOCTYPE html>
 <html lang="pt">
 <head>
     <meta charset="utf-8" />
@@ -34,6 +39,8 @@
             flex: 1;
         }
 
+        /* NAVBAR */
+
         .oficina-navbar {
             background: #111820;
             min-height: 76px;
@@ -56,8 +63,8 @@
         .oficina-navbar .nav-link {
             color: #d6dce2 !important;
             font-weight: 500;
-            margin: 0 7px;
-            padding: 10px 7px !important;
+            margin: 0 5px;
+            padding: 10px 6px !important;
             transition: 0.2s;
         }
 
@@ -65,22 +72,82 @@
             color: #1683ff !important;
         }
 
-        .user-info .nav-link {
-            color: white !important;
-            cursor: default;
+        /* UTILIZADOR AUTENTICADO */
+
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: 18px;
+            padding-left: 18px;
+            border-left: 1px solid #344154;
+        }
+
+        .navbar-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+            border: 2px solid #344154;
+        }
+
+        .navbar-avatar-default {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #1683ff;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .navbar-user-details {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .navbar-user-name {
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.3;
             white-space: nowrap;
         }
 
-        .user-info .nav-link:hover {
-            color: white !important;
+        .navbar-user-role {
+            color: #94a3b8;
+            font-size: 11px;
+            line-height: 1.3;
+            margin-top: 3px;
         }
+
+        .navbar-dashboard-link {
+            color: #d6dce2;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            white-space: nowrap;
+            margin-left: 12px;
+        }
+
+        .navbar-dashboard-link:hover {
+            color: #1683ff;
+        }
+
+        /* BOTÃO LOGIN / LOGOUT */
 
         .login-button {
             display: inline-block;
             background: #1683ff;
             color: white !important;
-            padding: 9px 24px !important;
+            padding: 10px 20px !important;
             border-radius: 8px;
+            font-size: 13px;
             font-weight: 600;
             text-decoration: none;
             transition: 0.2s;
@@ -91,6 +158,8 @@
             background: #0d6efd;
             transform: translateY(-1px);
         }
+
+        /* FOOTER */
 
         .oficina-footer {
             background: #111820;
@@ -103,6 +172,8 @@
         .oficina-footer strong {
             color: white;
         }
+
+        /* RESPONSIVIDADE */
 
         @@media (max-width: 1199px) {
             .oficina-navbar {
@@ -128,17 +199,35 @@
                 border-bottom: 1px solid #27313b;
             }
 
+            .navbar-user {
+                margin-left: 0;
+                margin-top: 15px;
+                padding: 12px 5px;
+                border-left: none;
+                border-top: 1px solid #344154;
+            }
+
+            .navbar-dashboard-link {
+                display: block;
+                margin: 10px 0;
+                padding: 10px 5px;
+            }
+
             .login-button {
                 display: block;
                 width: 100%;
                 text-align: center;
-                margin-top: 15px;
+                margin-top: 10px;
             }
         }
 
         @@media (max-width: 576px) {
             .oficina-brand {
                 font-size: 1rem;
+            }
+
+            .navbar-user-name {
+                white-space: normal;
             }
 
             .oficina-footer {
@@ -155,11 +244,15 @@
         <nav class="navbar navbar-expand-xl navbar-dark oficina-navbar">
             <div class="container">
 
+                <!-- LOGO -->
+
                 <a class="navbar-brand oficina-brand"
                    asp-controller="Home"
                    asp-action="Index">
                     Oficina<span class="brand-blue">CET107</span>
                 </a>
+
+                <!-- MENU MOBILE -->
 
                 <button class="navbar-toggler"
                         type="button"
@@ -172,7 +265,10 @@
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarOficina">
+
                     <ul class="navbar-nav ms-auto align-items-xl-center">
+
+                        <!-- HOME -->
 
                         <li class="nav-item">
                             <a class="nav-link"
@@ -181,6 +277,8 @@
                                 Home
                             </a>
                         </li>
+
+                        <!-- SERVIÇOS -->
 
                         <li class="nav-item">
                             <a class="nav-link"
@@ -191,68 +289,132 @@
                             </a>
                         </li>
 
-                        <li class="nav-item">
-                            <span class="nav-link disabled" aria-disabled="true" title="Informação em preparação">Mecânicos</span>
-                        </li>
+                        <!-- MECÂNICOS -->
 
                         <li class="nav-item">
-                            <span class="nav-link disabled" aria-disabled="true" title="Informação em preparação">Horários</span>
+                            <span class="nav-link disabled"
+                                  aria-disabled="true"
+                                  title="Informação em preparação">
+                                Mecânicos
+                            </span>
                         </li>
 
-                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        <!-- HORÁRIOS -->
+
+                        <li class="nav-item">
+                            <span class="nav-link disabled"
+                                  aria-disabled="true"
+                                  title="Informação em preparação">
+                                Horários
+                            </span>
+                        </li>
+
+                        @if (User.Identity?.IsAuthenticated == true)
                         {
-                            <li class="nav-item user-info">
-                                <span class="nav-link">
+                            <!-- INFORMAÇÃO DO UTILIZADOR -->
+
+                            <li class="nav-item">
+                                <div class="navbar-user">
+
                                     @if (user != null && user.ImageId != Guid.Empty)
                                     {
-                                        <img src="@user.ImageFullPath" alt="Fotografia do utilizador" width="36" height="36" class="rounded-circle me-2" style="object-fit: cover;" />
+                                        <img src="@user.ImageFullPath"
+                                             alt="Fotografia do utilizador"
+                                             class="navbar-avatar" />
                                     }
-                                    Olá, @(user?.FullName ?? User.Identity.Name)
-
-                                    @if (User.IsInRole("Admin"))
+                                    else
                                     {
-                                        <span class="badge bg-danger ms-2">Admin</span>
-                                    }
-
-                                    @if (User.IsInRole("Funcionario"))
-                                    {
-                                        <span class="badge bg-warning text-dark ms-2">Funcionário</span>
+                                        <div class="navbar-avatar-default">
+                                            U
+                                        </div>
                                     }
 
-                                    @if (User.IsInRole("Cliente"))
-                                    {
-                                        <span class="badge bg-success ms-2">Cliente</span>
-                                    }
-                                </span>
+                                    <div class="navbar-user-details">
+
+                                        <span class="navbar-user-name">
+                                            @(user?.FullName ?? User.Identity.Name)
+                                        </span>
+
+                                        <span class="navbar-user-role">
+
+                                            @if (User.IsInRole("Admin"))
+                                            {
+                                                <text>Administrador</text>
+                                            }
+                                            else if (User.IsInRole("Rececionista"))
+                                            {
+                                                <text>Rececionista</text>
+                                            }
+                                            else if (User.IsInRole("Cliente"))
+                                            {
+                                                <text>Cliente</text>
+                                            }
+
+                                        </span>
+
+                                    </div>
+
+                                </div>
                             </li>
+
+                            <!-- ÁREA DO ADMINISTRADOR -->
 
                             @if (User.IsInRole("Admin"))
                             {
-                                <li class="nav-item"><a class="nav-link" asp-controller="Admin" asp-action="Index">Administração</a></li>
+                                <li class="nav-item">
+                                    <a class="navbar-dashboard-link"
+                                       asp-controller="Admin"
+                                       asp-action="Index">
+                                        Administração
+                                    </a>
+                                </li>
                             }
-                            @if (User.IsInRole("Funcionario"))
+
+                            <!-- ÁREA DO RECECIONISTA -->
+
+                            @if (User.IsInRole("Rececionista"))
                             {
-                                <li class="nav-item"><a class="nav-link" asp-controller="FuncionarioArea" asp-action="Index">Área do Funcionário</a></li>
+                                <li class="nav-item">
+                                    <a class="navbar-dashboard-link"
+                                       asp-controller="RececionistaArea"
+                                       asp-action="Index">
+                                        Painel da Oficina
+                                    </a>
+                                </li>
                             }
+
+                            <!-- ÁREA DO CLIENTE -->
+
                             @if (User.IsInRole("Cliente"))
                             {
-                                <li class="nav-item"><a class="nav-link" asp-controller="ClienteArea" asp-action="Index">Área do Cliente</a></li>
+                                <li class="nav-item">
+                                    <a class="navbar-dashboard-link"
+                                       asp-controller="ClienteArea"
+                                       asp-action="Index">
+                                        Área do Cliente
+                                    </a>
+                                </li>
                             }
-                            <li class="nav-item ms-lg-2">
+
+                            <!-- LOGOUT -->
+
+                            <li class="nav-item ms-xl-3">
                                 <a class="login-button"
                                    asp-controller="Account"
                                    asp-action="Logout">
-                                    Logout
+                                    Sair
                                 </a>
                             </li>
                         }
                         else
                         {
-                            <li class="nav-item ms-lg-3">
+                            <!-- LOGIN -->
+
+                            <li class="nav-item ms-xl-3">
                                 <a class="login-button"
                                    asp-controller="Account"
                                    asp-action="Login">
-                                    Login
+                                    Entrar
                                 </a>
                             </li>
                         }
@@ -264,6 +426,8 @@
         </nav>
     </header>
 
+    <!-- CONTEÚDO PRINCIPAL -->
+
     <div class="page-content">
         <div class="container">
             <main role="main" class="pb-3">
@@ -272,6 +436,8 @@
         </div>
     </div>
 
+    <!-- FOOTER -->
+
     <footer class="oficina-footer">
         <div class="container text-center">
             <strong>OficinaCET107</strong>
@@ -279,6 +445,8 @@
             &copy; 2026 - Todos os direitos reservados
         </div>
     </footer>
+
+    <!-- SCRIPTS -->
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
