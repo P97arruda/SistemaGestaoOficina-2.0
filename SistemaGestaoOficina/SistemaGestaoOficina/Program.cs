@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SistemaGestaoOficina.Data;
 using SistemaGestaoOficina.Data.Entities;
+using SistemaGestaoOficina.Data.Repository;
 using SistemaGestaoOficina.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,6 +39,7 @@ builder.Services.AddScoped<IUserHelper, UserHelper>();
 builder.Services.AddScoped<IMailHelper, MailHelper>();
 builder.Services.AddScoped<IBlobHelper, BlobHelper>();
 builder.Services.AddScoped<IVeiculoRepository, VeiculoRepository>();
+builder.Services.AddScoped<IMecanicoRepository, MecanicoRepository>();
 
 
 // Add services to the container.
