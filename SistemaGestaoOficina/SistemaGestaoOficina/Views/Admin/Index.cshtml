@@ -54,23 +54,30 @@
             </div>
         </div>
 
-        <!-- Mecânicos -->
-        <div class="col-md-6 col-xl-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body p-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="text-muted mb-2">Mecânicos</p>
-                            <h2 class="fw-bold mb-0">—</h2>
-                        </div>
-                        <div class="rounded p-3 fs-3"
-                             style="background-color: #e5f7ef;">
-                            🔧
-                        </div>
+       <!-- Mecânicos -->
+       <div class="col-md-6 col-xl-3">
+         <a asp-controller="Mecanicos"
+         asp-action="Index"
+         class="text-decoration-none text-dark">
+
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-2">Mecânicos</p>
+                        <h2 class="fw-bold mb-0">—</h2>
+                    </div>
+
+                    <div class="rounded p-3 fs-3"
+                         style="background-color: #e5f7ef;">
+                        🔧
                     </div>
                 </div>
             </div>
         </div>
+
+       </a>
+      </div>
 
         <!-- Tipos de Reparações -->
         <div class="col-md-6 col-xl-3">

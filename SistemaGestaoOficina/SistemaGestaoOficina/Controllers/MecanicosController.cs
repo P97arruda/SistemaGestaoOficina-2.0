@@ -15,7 +15,7 @@ namespace SistemaGestaoOficina.Controllers
         {
             _mecanicoRepository = mecanicoRepository;
         }
-        
+
         //GET: Mecanicos
         public async Task<ActionResult> Index()
         {
@@ -61,7 +61,16 @@ namespace SistemaGestaoOficina.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            foreach (var item in ModelState)
+            {
+                foreach (var erro in item.Value.Errors)
+                {
+                    Console.WriteLine($"Campo: {item.Key} | Erro: {erro.ErrorMessage}");
+                }
+            }
+
             return View(mecanico);
+        
         }
 
         // GET: Mecanicos/Edit/5
@@ -143,16 +152,14 @@ namespace SistemaGestaoOficina.Controllers
             {
                 await _mecanicoRepository.DeleteAsync(mecanico);
 
-                return RedirectToAction(nameof(Index));
+                TempData["SuccessMessage"] = "Mecânico eliminado com sucesso!";
             }
             catch (DbUpdateException)
             {
-                ModelState.AddModelError("",
-                    "Não é possível eliminar este mecânico porque possui registos associados.");
-
-                return View("Delete", mecanico);
+                TempData["ErrorMessage"] = "Não é possível eliminar este mecânico.";
             }
+
+            return RedirectToAction(nameof(Index));
         }
-
-
     }
+}

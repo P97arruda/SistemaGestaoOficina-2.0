@@ -24,8 +24,8 @@ namespace SistemaGestaoOficina.Data.Entities
 
         public bool Ativo { get; set; }
 
-        public ICollection<Marcacao> Marcacaos { get; set; }
+        public ICollection<Marcacao>? Marcacaos { get; set; }
 
-        public ICollection<MecanicoReparacao> MecanicoReparacaoes { get; set; }
+        public ICollection<MecanicoReparacao>? MecanicoReparacaoes { get; set; }
     }
 }
