@@ -320,7 +320,7 @@
                         <path d="M3 21v-2a6 6 0 0 1 12 0v2M19 8v6m-3-3h6" />
                     </svg>
 
-                    Criar Utilizador
+                    Criar Rececionistas
                 </a>
 
                 <a asp-controller="Admin"
@@ -337,31 +337,33 @@
 
                 <!-- MECÂNICOS -->
 
-                <a asp-controller="Mecanicos"
-                   asp-action="Index"
-                   class="sidebar-link">
+               <a asp-controller="Mecanicos"
+                  asp-action="Index"
+                  class="sidebar-link @(currentController == "Mecanicos" ? "active" : "")">
 
-                   <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
-                   <path d="M14 6a5 5 0 0 0-6 6l-5 5a2.1 2.1 0 0 0 3 3l5-5a5 5 0 0 0 6-6l-3 3-3-3 3-3Z" />
-                   </svg>
+                  <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M14 6a5 5 0 0 0-6 6l-5 5a2.1 2.1 0 0 0 3 3l5-5a5 5 0 0 0 6-6l-3 3-3-3 3-3Z" />
+                  </svg>
 
-                   Mecânicos
-                 </a>
+                  Mecânicos
+               </a>
 
-                <!-- CONFIGURAÇÃO DA OFICINA -->
+               <!-- CONFIGURAÇÃO DA OFICINA -->
 
                 <div class="sidebar-title">
-                    Configuração da Oficina
+                Configuração da Oficina
                 </div>
 
-                <span class="sidebar-link disabled" aria-disabled="true">
+                <a asp-controller="TiposReparacoes"
+                asp-action="Index"
+                class="sidebar-link @(currentController == "TiposReparacoes" ? "active" : "")">
 
-                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="m14 4 6 6M3 21l9-9M15 3l6 6-3 3-6-6 3-3Z" />
-                    </svg>
+                <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m14 4 6 6M3 21l9-9M15 3l6 6-3 3-6-6 3-3Z" />
+                </svg>
 
-                    Tipos de Reparações
-                </span>
+                Tipos de Reparações
+                </a>
             }
 
             @if (User.IsInRole("Rececionista"))
@@ -470,17 +472,6 @@
                 Meu Perfil
             </a>
 
-            <!-- RECUPERAR PASSWORD - FUTURO -->
-
-            <span class="sidebar-link disabled" aria-disabled="true">
-
-                <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
-                    <circle cx="8" cy="9" r="5" />
-                    <path d="m12 13 8 8m-3-3 3-3m-6 0 3-3-6-6" />
-                </svg>
-
-                Recuperar Password
-            </span>
 
             <a asp-controller="Home"
                asp-action="Index"

@@ -18,7 +18,11 @@ namespace SistemaGestaoOficina.Data
 
         public DbSet<Reparacao> Reparacoes { get; set; }
 
+        public DbSet<TipoReparacao> TipoReparacoes { get; set; }
+
         public DbSet<MecanicoReparacao> MecanicoReparacoes { get; set; }
+
+        public DbSet<ReparacaoTipoReparacao> ReparacaoTipoReparacoes { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -66,8 +70,27 @@ namespace SistemaGestaoOficina.Data
                 .HasForeignKey(m => m.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<ReparacaoTipoReparacao>()
+                .HasOne(rtr => rtr.Reparacao)
+                .WithMany(r => r.ReparacaoTipoReparacoes)
+                .HasForeignKey(rtr => rtr.ReparacaoId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<ReparacaoTipoReparacao>()
+                .HasOne(rtr => rtr.TipoReparacao)
+                .WithMany(tr => tr.ReparacaoTipoReparacoes)
+                .HasForeignKey(rtr => rtr.TipoReparacaoId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ReparacaoTipoReparacao>().HasIndex(rtr => new
+               {
+                 rtr.ReparacaoId,
+                 rtr.TipoReparacaoId
+               })
+                .IsUnique();
+
+
+                base.OnModelCreating(modelBuilder);
         }
     }
 }

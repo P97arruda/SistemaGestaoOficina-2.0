@@ -296,6 +296,48 @@ namespace SistemaGestaoOficina.Migrations
                     b.ToTable("Reparacoes");
                 });
 
+            modelBuilder.Entity("SistemaGestaoOficina.Data.Entities.ReparacaoTipoReparacao", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ReparacaoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TipoReparacaoId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TipoReparacaoId");
+
+                    b.HasIndex("ReparacaoId", "TipoReparacaoId")
+                        .IsUnique();
+
+                    b.ToTable("ReparacaoTipoReparacoes");
+                });
+
+            modelBuilder.Entity("SistemaGestaoOficina.Data.Entities.TipoReparacao", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(70)
+                        .HasColumnType("nvarchar(70)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TipoReparacoes");
+                });
+
             modelBuilder.Entity("SistemaGestaoOficina.Data.Entities.User", b =>
                 {
                     b.Property<string>("Id")
@@ -543,6 +585,25 @@ namespace SistemaGestaoOficina.Migrations
                     b.Navigation("Marcacao");
                 });
 
+            modelBuilder.Entity("SistemaGestaoOficina.Data.Entities.ReparacaoTipoReparacao", b =>
+                {
+                    b.HasOne("SistemaGestaoOficina.Data.Entities.Reparacao", "Reparacao")
+                        .WithMany("ReparacaoTipoReparacoes")
+                        .HasForeignKey("ReparacaoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SistemaGestaoOficina.Data.Entities.TipoReparacao", "TipoReparacao")
+                        .WithMany("ReparacaoTipoReparacoes")
+                        .HasForeignKey("TipoReparacaoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Reparacao");
+
+                    b.Navigation("TipoReparacao");
+                });
+
             modelBuilder.Entity("SistemaGestaoOficina.Data.Entities.Veiculo", b =>
                 {
                     b.HasOne("SistemaGestaoOficina.Data.Entities.User", "User")
@@ -564,6 +625,13 @@ namespace SistemaGestaoOficina.Migrations
             modelBuilder.Entity("SistemaGestaoOficina.Data.Entities.Reparacao", b =>
                 {
                     b.Navigation("MecanicoReparacaos");
+
+                    b.Navigation("ReparacaoTipoReparacoes");
+                });
+
+            modelBuilder.Entity("SistemaGestaoOficina.Data.Entities.TipoReparacao", b =>
+                {
+                    b.Navigation("ReparacaoTipoReparacoes");
                 });
 
             modelBuilder.Entity("SistemaGestaoOficina.Data.Entities.Veiculo", b =>

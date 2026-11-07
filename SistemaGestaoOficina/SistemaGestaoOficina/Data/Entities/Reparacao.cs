@@ -25,5 +25,7 @@ namespace SistemaGestaoOficina.Data.Entities
         public Marcacao Marcacao { get; set; }
 
         public ICollection<MecanicoReparacao> MecanicoReparacaos { get; set; }
+
+        public ICollection<ReparacaoTipoReparacao>? ReparacaoTipoReparacoes { get; set; }
     }
 }

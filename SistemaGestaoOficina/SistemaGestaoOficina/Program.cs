@@ -40,6 +40,7 @@ builder.Services.AddScoped<IMailHelper, MailHelper>();
 builder.Services.AddScoped<IBlobHelper, BlobHelper>();
 builder.Services.AddScoped<IVeiculoRepository, VeiculoRepository>();
 builder.Services.AddScoped<IMecanicoRepository, MecanicoRepository>();
+builder.Services.AddScoped<ITipoReparacaoRepository, TipoReparacaoRepository>();
 
 
 // Add services to the container.

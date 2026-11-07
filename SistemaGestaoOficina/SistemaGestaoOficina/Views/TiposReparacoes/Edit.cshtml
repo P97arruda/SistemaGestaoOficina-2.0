@@ -1,0 +1,61 @@
+﻿
+@model SistemaGestaoOficina.Data.Entities.TipoReparacao
+
+@{
+    ViewData["Title"] = "Editar Tipo de Reparação";
+    Layout = "~/Views/Shared/_InternalLayout.cshtml";
+}
+
+<div class="container-fluid py-4">
+
+    <div class="mb-4">
+        <h2>Editar Tipo de Reparação</h2>
+        <p class="text-muted">
+            Altere o nome do tipo de reparação.
+        </p>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+
+            <form asp-action="Edit" asp-route-id="@Model.Id" method="post">
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" asp-for="Id" />
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Nome" class="form-label">
+                        Nome do Tipo de Reparação
+                    </label>
+
+                    <input asp-for="Nome"
+                           class="form-control"
+                           placeholder="Ex: Troca de óleo" />
+
+                    <span asp-validation-for="Nome"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        Guardar Alterações
+                    </button>
+
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        Cancelar
+                    </a>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
