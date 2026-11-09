@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SistemaGestaoOficina.Data.Entities;
+using SistemaGestaoOficina.Data.Repository;
 using SistemaGestaoOficina.Helpers;
 using SistemaGestaoOficina.Models;
 
@@ -13,19 +14,27 @@ namespace SistemaGestaoOficina.Controllers
         private readonly IMailHelper _mailHelper;
         private readonly IBlobHelper _blobHelper;
 
-        public AdminController(IUserHelper userHelper, IMailHelper mailHelper, IBlobHelper blobHelper)
+        private readonly IMecanicoRepository _mecanicoRepository;
+        private readonly ITipoReparacaoRepository _tipoReparacaoRepository;
+
+        public AdminController(IUserHelper userHelper, 
+            IMailHelper mailHelper, 
+            IBlobHelper blobHelper, 
+            ITipoReparacaoRepository tipoReparacaoRepository,
+            IMecanicoRepository mecanicoRepository)
         {
             _userHelper = userHelper;
             _mailHelper = mailHelper;
             _blobHelper = blobHelper;
+            _tipoReparacaoRepository = tipoReparacaoRepository;
+            _mecanicoRepository = mecanicoRepository;
         }
 
 
         public async Task<IActionResult> Index()
         {
             // Buscar os rececionistas registados
-            var rececionistas = await _userHelper
-                .GetUsersInRoleAsync("Rececionista");
+            var rececionistas = await _userHelper.GetUsersInRoleAsync("Rececionista");
 
             // Quantidade de rececionistas
             ViewBag.TotalRececionistas = rececionistas.Count();
@@ -34,9 +43,16 @@ namespace SistemaGestaoOficina.Controllers
             ViewBag.Rececionistas = rececionistas;
 
             // Quantidade total de utilizadores
-            ViewBag.TotalUtilizadores = _userHelper
-                .GetUsers()
-                .Count();
+            ViewBag.TotalUtilizadores = _userHelper.GetUsers().Count();
+
+            // Mecânicos registados
+            var mecanicos = _mecanicoRepository.GetAll().ToList();
+
+            ViewBag.TotalMecanicos = mecanicos.Count;
+            ViewBag.Mecanicos = mecanicos;
+
+            // Quantidade de tipos de reparações
+            ViewBag.TotalTiposReparacoes = _tipoReparacaoRepository.GetAll().Count();
 
             return View();
         }

@@ -2,7 +2,7 @@
 
 namespace SistemaGestaoOficina.Data.Entities
 {
-    public class Marcacao
+    public class Marcacao : IEntity
     {
         public int Id { get; set; }
 
@@ -21,8 +21,13 @@ namespace SistemaGestaoOficina.Data.Entities
 
         public User User { get; set; }
 
+        [Required]
+        public int VeiculoId { get; set; }
+
         public Veiculo Veiculo { get; set; }
 
+        [Required]
+        public int MecanicoId { get; set; }
         public Mecanico Mecanico { get; set; }
     }
 }

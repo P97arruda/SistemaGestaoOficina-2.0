@@ -41,6 +41,7 @@ builder.Services.AddScoped<IBlobHelper, BlobHelper>();
 builder.Services.AddScoped<IVeiculoRepository, VeiculoRepository>();
 builder.Services.AddScoped<IMecanicoRepository, MecanicoRepository>();
 builder.Services.AddScoped<ITipoReparacaoRepository, TipoReparacaoRepository>();
+builder.Services.AddScoped<IMarcacaoRepository, MarcacaoRepository>();
 
 
 // Add services to the container.
