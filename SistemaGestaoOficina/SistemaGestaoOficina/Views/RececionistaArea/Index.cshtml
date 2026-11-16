@@ -157,15 +157,28 @@
             <div class="card border-0 shadow-sm h-100"
                  style="border-radius: 12px;">
 
+                <!-- Cabeçalho com botão Ver Marcações -->
                 <div class="card-header bg-white border-0 px-4 pt-4 pb-2">
 
-                    <h5 class="fw-bold mb-1">
-                        📅 Marcações de Hoje
-                    </h5>
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
 
-                    <p class="text-muted small mb-0">
-                        Atendimentos previstos para hoje.
-                    </p>
+                        <div>
+                            <h5 class="fw-bold mb-1">
+                                📅 Marcações de Hoje
+                            </h5>
+
+                            <p class="text-muted small mb-0">
+                                Atendimentos previstos para hoje.
+                            </p>
+                        </div>
+
+                        <a asp-controller="Marcacoes"
+                           asp-action="Index"
+                           class="btn btn-primary btn-sm">
+                            Ver Marcações
+                        </a>
+
+                    </div>
 
                 </div>
 
@@ -255,7 +268,7 @@
                                             </td>
 
                                             <td>
-                                                @veiculo.User.FullName 
+                                                @veiculo.User?.FullName
                                             </td>
 
                                             <td>

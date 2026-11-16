@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using SistemaGestaoOficina.Data.Entities;
 
 namespace SistemaGestaoOficina.Data.Repository
@@ -34,6 +35,49 @@ namespace SistemaGestaoOficina.Data.Repository
                 .AnyAsync(m => m.Id == marcacao.MecanicoId && m.Ativo);
 
             return clienteExiste && veiculoValido && mecanicoValido;
+        }
+
+        public async Task<List<User>> GetClientesAsync()
+        {
+            return await _context.Users
+                .Where(u => _context.UserRoles.Any(ur =>
+                    ur.UserId == u.Id &&
+                    _context.Roles.Any(r =>
+                        r.Id == ur.RoleId &&
+                        r.Name == "Cliente")))
+                .OrderBy(u => u.FirstName)
+                .ToListAsync();
+        }
+
+        public async Task<List<Veiculo>> GetVeiculosAsync()
+        {
+            return await _context.Set<Veiculo>()
+                .ToListAsync();
+        }
+
+        public async Task<List<Mecanico>> GetMecanicosAsync()
+        {
+           return await _context.Set<Mecanico>()
+                .Where(m => m.Ativo)
+                .OrderBy(m => m.Nome)
+                .ToListAsync();
+        }
+
+        public async Task<List<TipoReparacao>> GetTiposReparacaoAsync()
+        {
+            return await _context.Set<TipoReparacao>()
+                .OrderBy(t => t.Nome)
+                .ToListAsync();
+        }
+
+        public async Task<bool> ExisteMarcacaoDuplicadaAsync(Marcacao marcacao)
+        {
+            return await GetAll().AnyAsync(m =>
+                m.UserId == marcacao.UserId &&
+                m.VeiculoId == marcacao.VeiculoId &&
+                m.TipoServico == marcacao.TipoServico &&
+                m.Estado == "Agendada" &&
+                m.Id != marcacao.Id);
         }
     }
 }

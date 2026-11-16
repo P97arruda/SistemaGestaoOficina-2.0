@@ -1,0 +1,479 @@
+﻿@model SistemaGestaoOficina.Data.Entities.Marcacao
+
+@{
+    Layout = "_InternalLayout";
+    ViewData["Title"] = "Criar Marcação";
+}
+
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+
+<style>
+    .flatpickr-calendar {
+        border-radius: 10px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    .flatpickr-day.selected,
+    .flatpickr-day.selected:hover {
+        background: var(--bs-primary);
+        border-color: var(--bs-primary);
+        color: white;
+    }
+
+    .flatpickr-day.today {
+        border-color: var(--bs-primary);
+    }
+
+    .flatpickr-day:hover {
+        background: #e9ecef;
+    }
+
+    .flatpickr-day.flatpickr-disabled {
+        color: #ced4da;
+        cursor: not-allowed;
+    }
+
+    .campo-calendario {
+        position: relative;
+    }
+
+        .campo-calendario .form-control {
+            padding-right: 45px;
+            cursor: pointer;
+        }
+
+    .icone-calendario {
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--bs-primary);
+        cursor: pointer;
+        z-index: 5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .horario-btn {
+        min-width: 85px;
+    }
+</style>
+
+<div class="container py-4">
+
+    <!-- Cabeçalho -->
+    <div class="mb-4">
+        <h2 class="fw-bold mb-1">Nova Marcação</h2>
+
+        <p class="text-muted">
+            Registe uma nova marcação na OficinaCET107.
+        </p>
+    </div>
+
+    <!-- Formulário -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+
+            <form asp-controller="Marcacoes"
+                  asp-action="Create"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <!-- Estado inicial da marcação -->
+                <input type="hidden"
+                       asp-for="Estado"
+                       value="Agendada" />
+
+                <div asp-validation-summary="All"
+                     class="text-danger mb-3"></div>
+
+                <div class="row">
+
+                    <!-- Cliente -->
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="UserId"
+                               class="form-label">
+                            Cliente
+                        </label>
+
+                        <select asp-for="UserId"
+                                asp-items="ViewBag.Clientes"
+                                class="form-select">
+                            <option value="">
+                                Selecione o cliente
+                            </option>
+                        </select>
+
+                        <span asp-validation-for="UserId"
+                              class="text-danger"></span>
+                    </div>
+
+                    <!-- Veículo -->
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="VeiculoId"
+                               class="form-label">
+                            Veículo
+                        </label>
+
+                        <select asp-for="VeiculoId"
+                                asp-items="ViewBag.Veiculos"
+                                class="form-select">
+                            <option value="">
+                                Selecione o veículo
+                            </option>
+                        </select>
+
+                        <span asp-validation-for="VeiculoId"
+                              class="text-danger"></span>
+                    </div>
+
+                    <!-- Mecânico -->
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="MecanicoId"
+                               class="form-label">
+                            Mecânico
+                        </label>
+
+                        <select asp-for="MecanicoId"
+                                asp-items="ViewBag.Mecanicos"
+                                class="form-select">
+                            <option value="">
+                                Selecione o mecânico
+                            </option>
+                        </select>
+
+                        <span asp-validation-for="MecanicoId"
+                              class="text-danger"></span>
+                    </div>
+
+                    <!-- Tipo de Serviço -->
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="TipoServico"
+                               class="form-label">
+                            Tipo de Serviço
+                        </label>
+
+                        <select asp-for="TipoServico"
+                                asp-items="ViewBag.TiposServico"
+                                class="form-select">
+                            <option value="">
+                                Selecione o tipo de serviço
+                            </option>
+                        </select>
+
+                        <span asp-validation-for="TipoServico"
+                              class="text-danger"></span>
+                    </div>
+
+                </div>
+
+                <!-- Calendário e Horários -->
+                <div class="mt-3 mb-4">
+
+                    <h5 class="fw-bold mb-3">
+                        Escolha a data e o horário
+                    </h5>
+
+                    <div class="row">
+
+                        <!-- Data -->
+                        <div class="col-md-5 mb-3">
+
+                            <label for="dataMarcacao"
+                                   class="form-label">
+                                Data da Marcação
+                            </label>
+
+                            <div class="campo-calendario">
+
+                                <input type="text"
+                                       id="dataMarcacao"
+                                       class="form-control bg-white"
+                                       placeholder="Selecione uma data"
+                                       autocomplete="off"
+                                       readonly
+                                       required />
+
+                                <!-- Ícone do calendário -->
+                                <span id="iconeCalendario"
+                                      class="icone-calendario"
+                                      title="Abrir calendário">
+
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                         width="18"
+                                         height="18"
+                                         viewBox="0 0 24 24"
+                                         fill="none"
+                                         stroke="currentColor"
+                                         stroke-width="2"
+                                         stroke-linecap="round"
+                                         stroke-linejoin="round">
+
+                                        <rect x="3"
+                                              y="5"
+                                              width="18"
+                                              height="16"
+                                              rx="2" />
+
+                                        <path d="M16 3v4" />
+                                        <path d="M8 3v4" />
+                                        <path d="M3 10h18" />
+
+                                    </svg>
+
+                                </span>
+
+                            </div>
+
+                            <small class="text-muted">
+                                Escolha uma data no calendário.
+                            </small>
+
+                        </div>
+
+                        <!-- Horários -->
+                        <div class="col-md-7 mb-3">
+
+                            <label class="form-label">
+                                Horários disponíveis
+                            </label>
+
+                            <div id="horariosDisponiveis"
+                                 class="d-flex flex-wrap gap-2">
+
+                                <p class="text-muted mb-0">
+                                    Selecione primeiro uma data.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Data e hora enviadas ao Controller -->
+                    <input asp-for="DataHora"
+                           type="hidden"
+                           id="DataHora" />
+
+                    <span asp-validation-for="DataHora"
+                          class="text-danger"></span>
+
+                </div>
+
+                <!-- Botões -->
+                <div class="d-flex gap-2 mt-3">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+                        Guardar Marcação
+                    </button>
+
+                    <a asp-controller="Marcacoes"
+                       asp-action="Index"
+                       class="btn btn-secondary">
+                        Cancelar
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const dataInput =
+                document.getElementById("dataMarcacao");
+
+            const horariosContainer =
+                document.getElementById("horariosDisponiveis");
+
+            const dataHoraInput =
+                document.getElementById("DataHora");
+
+            const formulario =
+                dataInput.closest("form");
+
+            const iconeCalendario =
+                document.getElementById("iconeCalendario");
+
+            // Configuração do calendário
+            const calendario = flatpickr(dataInput, {
+
+                locale: "pt",
+
+                dateFormat: "Y-m-d",
+
+                altInput: true,
+
+                altFormat: "d/m/Y",
+
+                minDate: "today",
+
+                maxDate: "2030-12-31",
+
+                disableMobile: true,
+
+                // Não permitir domingos
+                disable: [
+                    function (date) {
+                        return date.getDay() === 0;
+                    }
+                ],
+
+                onChange: function () {
+                    mostrarHorarios();
+                }
+            });
+
+            // Abrir calendário ao clicar no ícone
+            iconeCalendario.addEventListener("click", function () {
+                calendario.open();
+            });
+
+            // Apresentar horários conforme a data
+            function mostrarHorarios() {
+
+                horariosContainer.innerHTML = "";
+
+                dataHoraInput.value = "";
+
+                if (!dataInput.value) {
+
+                    horariosContainer.innerHTML =
+                        '<p class="text-muted">Selecione uma data.</p>';
+
+                    return;
+                }
+
+                const data = new Date(
+                    dataInput.value + "T12:00:00"
+                );
+
+                const diaSemana = data.getDay();
+
+                // Domingo encerrado
+                if (diaSemana === 0) {
+
+                    horariosContainer.innerHTML =
+                        '<p class="text-danger">A oficina está encerrada aos domingos.</p>';
+
+                    return;
+                }
+
+                // Segunda a sexta: 09:00 às 18:00
+                // Sábado: 09:00 às 13:00
+                const horaFinal = diaSemana === 6 ? 13 : 18;
+
+                let horariosAdicionados = 0;
+
+                for (let hora = 9; hora < horaFinal; hora++) {
+
+                    const horario =
+                        String(hora).padStart(2, "0") + ":00";
+
+                    const dataHorario = new Date(
+                        dataInput.value + "T" + horario + ":00"
+                    );
+
+                    // Não mostrar horários que já passaram
+                    if (dataHorario <= new Date()) {
+                        continue;
+                    }
+
+                    const botao = document.createElement("button");
+
+                    botao.type = "button";
+
+                    botao.className =
+                        "btn btn-outline-primary horario-btn";
+
+                    botao.textContent = horario;
+
+                    // Selecionar horário
+                    botao.addEventListener("click", function () {
+
+                        const botoes =
+                            horariosContainer.querySelectorAll("button");
+
+                        // Remover seleção anterior
+                        botoes.forEach(function (btn) {
+
+                            btn.classList.remove("btn-primary");
+
+                            btn.classList.add("btn-outline-primary");
+
+                        });
+
+                        // Destacar horário selecionado
+                        botao.classList.remove("btn-outline-primary");
+
+                        botao.classList.add("btn-primary");
+
+                        // Guardar data e hora no Model
+                        dataHoraInput.value =
+                            dataInput.value + "T" + horario;
+
+                    });
+
+                    horariosContainer.appendChild(botao);
+
+                    horariosAdicionados++;
+                }
+
+                if (horariosAdicionados === 0) {
+
+                    horariosContainer.innerHTML =
+                        '<p class="text-muted">Não existem horários futuros para esta data.</p>';
+                }
+            }
+
+            // Validar antes de enviar
+            formulario.addEventListener("submit", function (event) {
+
+                if (!dataHoraInput.value) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Selecione uma data e um horário para a marcação."
+                    );
+
+                    return;
+                }
+
+                const dataSelecionada = new Date(
+                    dataHoraInput.value + ":00"
+                );
+
+                if (dataSelecionada <= new Date()) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "A data e o horário devem ser futuros."
+                    );
+                }
+
+            });
+
+        });
+    </script>
+}

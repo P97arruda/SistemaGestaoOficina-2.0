@@ -17,17 +17,19 @@ namespace SistemaGestaoOficina.Data.Entities
         [MaxLength(30)]
         public string Estado { get; set; }
 
+        [Required]
         public string UserId { get; set; }
 
-        public User User { get; set; }
+        public User? User { get; set; }
 
         [Required]
         public int VeiculoId { get; set; }
 
-        public Veiculo Veiculo { get; set; }
+        public Veiculo? Veiculo { get; set; }
 
         [Required]
         public int MecanicoId { get; set; }
-        public Mecanico Mecanico { get; set; }
+
+        public Mecanico? Mecanico { get; set; }
     }
 }
