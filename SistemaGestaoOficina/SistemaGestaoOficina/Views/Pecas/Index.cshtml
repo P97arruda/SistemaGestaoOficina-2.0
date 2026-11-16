@@ -1,0 +1,90 @@
+﻿
+@model IEnumerable<SistemaGestaoOficina.Data.Entities.Peca>
+
+@{
+    ViewData["Title"] = "Gestão de Peças";
+}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Gestão de Peças</h2>
+
+        <a asp-action="Create" class="btn btn-primary">
+            + Criar Peça
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <table class="table table-striped table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>Nome</th>
+                <th>Preço (€)</th>
+                <th>Estado</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var peca in Model)
+            {
+                <tr>
+                    <td>@peca.Nome</td>
+                    <td>@peca.Preco.ToString("N2") €</td>
+                    <td>
+                        @if (peca.Ativa)
+                        {
+                            <span class="badge bg-success">Ativa</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Inativa</span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="Details"
+                           asp-route-id="@peca.Id"
+                           class="btn btn-info btn-sm">
+                            Ver
+                        </a>
+
+                        <a asp-action="Edit"
+                           asp-route-id="@peca.Id"
+                           class="btn btn-warning btn-sm">
+                            Editar
+                        </a>
+
+                       <form asp-action="Delete"
+                             asp-route-id="@peca.Id"
+                             method="post"
+                             class="d-inline"
+                             onsubmit="return confirm('Tem a certeza de que deseja apagar esta peça?');">
+
+                             @Html.AntiForgeryToken()
+
+                            <button type="submit" class="btn btn-danger btn-sm">
+                            Apagar
+                            </button>
+
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <a asp-controller="Admin"
+       asp-action="Index"
+       class="btn btn-secondary">
+        Voltar
+    </a>
+
+</div>
+

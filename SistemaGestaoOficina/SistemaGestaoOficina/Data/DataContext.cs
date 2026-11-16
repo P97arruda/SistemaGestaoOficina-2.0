@@ -24,6 +24,10 @@ namespace SistemaGestaoOficina.Data
 
         public DbSet<ReparacaoTipoReparacao> ReparacaoTipoReparacoes { get; set; }
 
+        public DbSet<Peca> Pecas { get; set; }
+
+        public DbSet<ReparacaoPeca> ReparacaoPecas { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -81,6 +85,32 @@ namespace SistemaGestaoOficina.Data
                 .WithMany(tr => tr.ReparacaoTipoReparacoes)
                 .HasForeignKey(rtr => rtr.TipoReparacaoId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ReparacaoPeca>()
+                .HasOne(rp => rp.Reparacao)
+                .WithMany(r => r.ReparacaoPecas)
+                .HasForeignKey(rp => rp.ReparacaoId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ReparacaoPeca>()
+                .HasOne(rp => rp.Peca)
+                .WithMany(p => p.ReparacaoPecas)
+                .HasForeignKey(rp => rp.PecaId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ReparacaoPeca>()
+                .HasIndex(rp => new { rp.ReparacaoId, rp.PecaId })
+                .IsUnique();
+
+            modelBuilder.Entity<ReparacaoPeca>()
+                .Property(rp => rp.PrecoUnitario)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<Peca>()
+                .Property(p => p.Preco)
+                .HasColumnType("decimal(18,2)");
+
+
 
             modelBuilder.Entity<ReparacaoTipoReparacao>().HasIndex(rtr => new
                {

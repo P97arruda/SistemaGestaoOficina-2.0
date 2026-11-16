@@ -354,6 +354,8 @@
                 Configuração da Oficina
                 </div>
 
+                <!-- TIPOS DE REPARAÇÕES -->
+
                 <a asp-controller="TiposReparacoes"
                 asp-action="Index"
                 class="sidebar-link @(currentController == "TiposReparacoes" ? "active" : "")">
@@ -363,6 +365,19 @@
                 </svg>
 
                 Tipos de Reparações
+                </a>
+
+                <!-- PEÇAS -->
+
+                <a asp-controller="Pecas"
+                asp-action="Index"
+                class="sidebar-link @(currentController == "Pecas" ? "active" : "")">
+
+                <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 7h16v13H4zM4 7l4-4h8l4 4M9 12h6m-6 4h6" />
+                </svg>
+
+                Peças
                 </a>
             }
 

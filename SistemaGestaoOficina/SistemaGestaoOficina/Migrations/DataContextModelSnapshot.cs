@@ -256,6 +256,30 @@ namespace SistemaGestaoOficina.Migrations
                     b.ToTable("MecanicoReparacoes");
                 });
 
+            modelBuilder.Entity("SistemaGestaoOficina.Data.Entities.Peca", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Ativa")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal>("Preco")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Pecas");
+                });
+
             modelBuilder.Entity("SistemaGestaoOficina.Data.Entities.Reparacao", b =>
                 {
                     b.Property<int>("Id")
@@ -279,11 +303,6 @@ namespace SistemaGestaoOficina.Migrations
                     b.Property<int>("MarcacaoId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Pecas")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
                     b.Property<string>("TipoServico")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -294,6 +313,36 @@ namespace SistemaGestaoOficina.Migrations
                     b.HasIndex("MarcacaoId");
 
                     b.ToTable("Reparacoes");
+                });
+
+            modelBuilder.Entity("SistemaGestaoOficina.Data.Entities.ReparacaoPeca", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("PecaId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("PrecoUnitario")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Quantidade")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ReparacaoId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PecaId");
+
+                    b.HasIndex("ReparacaoId", "PecaId")
+                        .IsUnique();
+
+                    b.ToTable("ReparacaoPecas");
                 });
 
             modelBuilder.Entity("SistemaGestaoOficina.Data.Entities.ReparacaoTipoReparacao", b =>
@@ -585,6 +634,25 @@ namespace SistemaGestaoOficina.Migrations
                     b.Navigation("Marcacao");
                 });
 
+            modelBuilder.Entity("SistemaGestaoOficina.Data.Entities.ReparacaoPeca", b =>
+                {
+                    b.HasOne("SistemaGestaoOficina.Data.Entities.Peca", "Peca")
+                        .WithMany("ReparacaoPecas")
+                        .HasForeignKey("PecaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SistemaGestaoOficina.Data.Entities.Reparacao", "Reparacao")
+                        .WithMany("ReparacaoPecas")
+                        .HasForeignKey("ReparacaoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Peca");
+
+                    b.Navigation("Reparacao");
+                });
+
             modelBuilder.Entity("SistemaGestaoOficina.Data.Entities.ReparacaoTipoReparacao", b =>
                 {
                     b.HasOne("SistemaGestaoOficina.Data.Entities.Reparacao", "Reparacao")
@@ -622,9 +690,16 @@ namespace SistemaGestaoOficina.Migrations
                     b.Navigation("MecanicoReparacaoes");
                 });
 
+            modelBuilder.Entity("SistemaGestaoOficina.Data.Entities.Peca", b =>
+                {
+                    b.Navigation("ReparacaoPecas");
+                });
+
             modelBuilder.Entity("SistemaGestaoOficina.Data.Entities.Reparacao", b =>
                 {
                     b.Navigation("MecanicoReparacaos");
+
+                    b.Navigation("ReparacaoPecas");
 
                     b.Navigation("ReparacaoTipoReparacoes");
                 });

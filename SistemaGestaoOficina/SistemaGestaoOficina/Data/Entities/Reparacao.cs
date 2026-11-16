@@ -6,9 +6,6 @@ namespace SistemaGestaoOficina.Data.Entities
     {
         public int Id { get; set; }
 
-        [MaxLength(50)]
-        public string Pecas { get; set; }
-
         public decimal CustoTotal { get; set; }
 
         [Required]
@@ -27,5 +24,8 @@ namespace SistemaGestaoOficina.Data.Entities
         public ICollection<MecanicoReparacao> MecanicoReparacaos { get; set; }
 
         public ICollection<ReparacaoTipoReparacao>? ReparacaoTipoReparacoes { get; set; }
+
+        
+        public ICollection<ReparacaoPeca>? ReparacaoPecas { get; set; }
     }
 }
