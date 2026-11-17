@@ -43,6 +43,7 @@ builder.Services.AddScoped<IMecanicoRepository, MecanicoRepository>();
 builder.Services.AddScoped<ITipoReparacaoRepository, TipoReparacaoRepository>();
 builder.Services.AddScoped<IMarcacaoRepository, MarcacaoRepository>();
 builder.Services.AddScoped<IPecaRepository, PecaRepository>();
+builder.Services.AddScoped<IReparacaoRepository, ReparacaoRepository>();
 
 
 // Add services to the container.

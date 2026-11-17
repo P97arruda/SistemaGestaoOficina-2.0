@@ -2,7 +2,7 @@
 
 namespace SistemaGestaoOficina.Data.Entities
 {
-    public class Reparacao
+    public class Reparacao : IEntity
     {
         public int Id { get; set; }
 

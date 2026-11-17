@@ -1,0 +1,86 @@
+﻿@model IEnumerable<SistemaGestaoOficina.Data.Entities.Reparacao>
+
+@{
+    ViewData["Title"] = "Gestão de Reparações";
+}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Gestão de Reparações</h2>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <div class="card">
+        <div class="card-body">
+
+            <table class="table table-striped table-hover">
+
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tipo de Serviço</th>
+                        <th>Data de Início</th>
+                        <th>Data de Fim</th>
+                        <th>Custo Total</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var reparacao in Model)
+                    {
+                        <tr>
+                            <td>@reparacao.Id</td>
+
+                            <td>@reparacao.TipoServico</td>
+
+                            <td>
+                                @reparacao.DataInicio.ToString("dd/MM/yyyy HH:mm")
+                            </td>
+
+                            <td>
+                                @(reparacao.DataFim?.ToString("dd/MM/yyyy HH:mm") ?? "-")
+                            </td>
+
+                            <td>
+                                @reparacao.CustoTotal.ToString("N2") €
+                            </td>
+
+                            <td>
+                                @if (reparacao.Concluida)
+                                {
+                                    <span class="badge bg-success">
+                                        Concluída
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark">
+                                        Em andamento
+                                    </span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+
+            @if (!Model.Any())
+            {
+                <div class="alert alert-info mt-3">
+                    Ainda não existem reparações registadas.
+                </div>
+            }
+
+        </div>
+    </div>
+
+</div>
