@@ -19,7 +19,10 @@ namespace SistemaGestaoOficina.Data.Entities
         [MaxLength(50)]
         public string TipoServico { get; set; }
 
-        public Marcacao Marcacao { get; set; }
+        [Required]
+        public int MarcacaoId { get; set; }
+
+        public Marcacao? Marcacao { get; set; }
 
         public ICollection<MecanicoReparacao> MecanicoReparacaos { get; set; }
 

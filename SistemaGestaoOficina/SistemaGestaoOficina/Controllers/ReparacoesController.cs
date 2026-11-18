@@ -10,10 +10,22 @@ namespace SistemaGestaoOficina.Controllers
     public class ReparacoesController : Controller
     {
         private readonly IReparacaoRepository _reparacaoRepository;
+        private readonly IMarcacaoRepository _marcacaoRepository;
 
-        public ReparacoesController(IReparacaoRepository reparacaoRepository)
+        private readonly IMecanicoRepository _mecanicoRepository;
+        private readonly IPecaRepository _pecaRepository;
+        
+
+        public ReparacoesController(
+            IReparacaoRepository reparacaoRepository,
+            IMarcacaoRepository marcacaoRepository,
+            IPecaRepository pecaRepository, 
+            IMecanicoRepository mecanicoRepository)
         {
             _reparacaoRepository = reparacaoRepository;
+            _marcacaoRepository = marcacaoRepository;
+            _pecaRepository = pecaRepository;
+            _mecanicoRepository = mecanicoRepository;
         }
 
         public async Task<IActionResult> Index()
@@ -44,8 +56,33 @@ namespace SistemaGestaoOficina.Controllers
         }
 
         // GET: Reparacoes/Create
-        public IActionResult Create()
+        public async Task <IActionResult> Create()
         {
+            // Carregar as marcações
+            var marcacoes = await _marcacaoRepository
+                .GetAll()
+                .OrderByDescending(m => m.DataHora)
+                .ToListAsync();
+
+            // Carregar os mecânicos ativos
+            var mecanicos = await _mecanicoRepository
+                .GetAll()
+                .Where(m => m.Ativo)
+                .OrderBy(m => m.Nome)
+                .ToListAsync();
+
+            // Carregar as peças ativas
+            var pecas = await _pecaRepository
+                .GetAll()
+                .Where(p => p.Ativa)
+                .OrderBy(p => p.Nome)
+                .ToListAsync();
+
+            // Enviar as listas para a View
+            ViewBag.Marcacoes = marcacoes;
+            ViewBag.Mecanicos = mecanicos;
+            ViewBag.Pecas = pecas;
+
             return View();
         }
 

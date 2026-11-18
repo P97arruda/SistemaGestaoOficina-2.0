@@ -1,0 +1,889 @@
+﻿
+@model SistemaGestaoOficina.Data.Entities.Reparacao
+
+@{
+    ViewData["Title"] = "Nova Reparação";
+    Layout = "_InternalLayout";
+}
+
+<style>
+    .repair-page {
+        padding: 8px 4px 14px;
+    }
+
+    .repair-heading {
+        margin-bottom: 14px;
+    }
+
+    .repair-heading h2 {
+        font-size: 21px;
+        margin-bottom: 3px;
+    }
+
+    .repair-heading p {
+        font-size: 12px;
+        margin-bottom: 0;
+    }
+
+    /* Cartões */
+    .repair-card {
+        background: #fff;
+        border: 1px solid #e5eaf0;
+        border-radius: 10px;
+        overflow: hidden;
+        min-width: 0;
+    }
+
+    .repair-card-header {
+        min-height: 46px;
+        padding: 11px 14px;
+        border-bottom: 1px solid #edf0f4;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+    }
+
+    .repair-card-header i {
+        color: #2563eb;
+        font-size: 17px;
+    }
+
+    .repair-card-header h5 {
+        font-size: 14px;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .repair-card-body {
+        padding: 14px;
+    }
+
+    /* Campos */
+    .repair-card .form-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #344054;
+        margin-bottom: 5px;
+    }
+
+    .repair-card .form-control,
+    .repair-card .form-select {
+        height: 36px;
+        min-height: 36px;
+        font-size: 12px;
+        border-radius: 7px;
+        border-color: #dce2ea;
+    }
+
+    .repair-card .form-control:focus,
+    .repair-card .form-select:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 2px rgba(37, 99, 235, .1);
+    }
+
+    .repair-card .btn {
+        font-size: 12px;
+        min-height: 36px;
+        border-radius: 7px;
+        white-space: nowrap;
+    }
+
+    /* Estado */
+    .repair-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #fff7e6;
+        color: #b7791f;
+        border-radius: 7px;
+        padding: 7px 12px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    /* Lista de mecânicos */
+    .repair-list {
+        height: 180px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        margin-top: 10px;
+        padding: 8px;
+        background: #f8fafc;
+        border: 1px solid #e9edf3;
+        border-radius: 8px;
+    }
+
+    .repair-mechanic-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 8px 10px;
+        margin-bottom: 6px;
+        background: #fff;
+        border: 1px solid #e5eaf0;
+        border-radius: 7px;
+        font-size: 12px;
+    }
+
+    .repair-mechanic-item span {
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    .repair-mechanic-item .btn {
+        min-height: 28px;
+        flex-shrink: 0;
+    }
+
+    /* Tabela de peças */
+    .repair-table-wrapper {
+        height: 190px;
+        overflow: auto;
+        border: 1px solid #edf0f4;
+        border-radius: 8px;
+    }
+
+    .repair-table {
+        font-size: 12px;
+        margin-bottom: 0;
+    }
+
+    .repair-table thead th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: #f8fafc;
+        color: #667085;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 9px;
+        white-space: nowrap;
+    }
+
+    .repair-table tbody td {
+        padding: 8px;
+        vertical-align: middle;
+    }
+
+    .repair-table tbody td:first-child {
+        overflow-wrap: anywhere;
+    }
+
+    .repair-table .btn {
+        min-height: 28px;
+    }
+
+    .repair-empty {
+        text-align: center;
+        color: #98a2b3;
+        padding: 20px 8px;
+        font-size: 12px;
+    }
+
+    /* Resumo */
+    .repair-summary-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 12px;
+        margin-bottom: 12px;
+    }
+
+    .repair-total-box {
+        padding: 14px;
+        border-radius: 9px;
+        background: #f1f6ff;
+        border: 1px solid #dbeafe;
+        margin-top: 12px;
+    }
+
+    .repair-total-value {
+        font-size: 25px;
+        font-weight: 700;
+        color: #1d4ed8;
+        overflow-wrap: anywhere;
+    }
+
+    .repair-action-area {
+        margin-top: 15px;
+    }
+
+    /* Distribuição em ecrãs grandes */
+    @@media (min-width: 1200px) {
+        .repair-left {
+            width: 30%;
+        }
+
+        .repair-center {
+            width: 45%;
+        }
+
+        .repair-right {
+            width: 25%;
+        }
+    }
+
+    /* Ajustes para ecrãs mais pequenos */
+    @@media (max-width: 1199.98px) {
+        .repair-list {
+            height: 170px;
+        }
+
+        .repair-table-wrapper {
+            height: 180px;
+        }
+    }
+</style>
+
+<div class="container-fluid repair-page">
+
+    <!-- CABEÇALHO -->
+    <div class="repair-heading d-flex justify-content-between
+                align-items-center flex-wrap gap-2">
+
+        <div>
+            <h2 class="fw-bold">
+                <i class="bi bi-wrench-adjustable text-primary me-2"></i>
+                Nova Reparação
+            </h2>
+
+            <p class="text-muted">
+                Registe a reparação, os mecânicos e as peças utilizadas.
+            </p>
+        </div>
+
+        <a asp-action="Index"
+           class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>
+            Voltar
+        </a>
+    </div>
+
+    <form asp-action="Create" method="post" id="repairForm">
+        @Html.AntiForgeryToken()
+
+        <div asp-validation-summary="ModelOnly"
+             class="text-danger small mb-2"></div>
+
+        <div class="row g-3">
+
+            <!-- COLUNA ESQUERDA -->
+            <div class="col-12 col-xl-4 repair-left">
+
+                <div class="repair-card shadow-sm">
+
+                    <div class="repair-card-header">
+                        <i class="bi bi-clipboard-check"></i>
+                        <h5>Informações da Reparação</h5>
+                    </div>
+
+                    <div class="repair-card-body">
+
+                        <!-- Marcação -->
+                        <div class="mb-3">
+                            <label for="MarcacaoId" class="form-label">
+                                Marcação *
+                            </label>
+
+                            <select id="MarcacaoId"
+                                    name="MarcacaoId"
+                                    class="form-select"
+                                    required>
+
+                                <option value="">
+                                    Selecione uma marcação...
+                                </option>
+
+                                @if (ViewBag.Marcacoes != null)
+                                {
+                                    @foreach (var marcacao in ViewBag.Marcacoes)
+                                    {
+                                        <option value="@marcacao.Id"
+                                                data-servico="@marcacao.TipoServico"
+                                                data-data="@marcacao.DataHora.ToString("yyyy-MM-ddTHH:mm")">
+                                            #@marcacao.Id -
+                                            @marcacao.TipoServico -
+                                            @marcacao.DataHora.ToString("dd/MM/yyyy HH:mm")
+                                        </option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <!-- Tipo de Serviço -->
+                        <div class="mb-3">
+                            <label asp-for="TipoServico" class="form-label">
+                                Tipo de Serviço
+                            </label>
+
+                            <input asp-for="TipoServico"
+                                   class="form-control"
+                                   placeholder="Preenchido pela marcação" />
+
+                            <span asp-validation-for="TipoServico"
+                                  class="text-danger small"></span>
+                        </div>
+
+                        <!-- Datas -->
+                        <div class="row g-2 mb-3">
+
+                            <div class="col-6">
+                                <label asp-for="DataInicio" class="form-label">
+                                    Data de Início
+                                </label>
+
+                                <input asp-for="DataInicio"
+                                       type="datetime-local"
+                                       class="form-control" />
+
+                                <span asp-validation-for="DataInicio"
+                                      class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-6">
+                                <label asp-for="DataFim" class="form-label">
+                                    Data de Fim
+                                </label>
+
+                                <input asp-for="DataFim"
+                                       type="datetime-local"
+                                       class="form-control" />
+
+                                <span asp-validation-for="DataFim"
+                                      class="text-danger small"></span>
+                            </div>
+
+                        </div>
+
+                        <!-- Estado -->
+                        <div>
+                            <label class="form-label">
+                                Estado
+                            </label>
+
+                            <div>
+                                <span class="repair-status">
+                                    <i class="bi bi-clock-history"></i>
+                                    Em Curso
+                                </span>
+                            </div>
+
+                            <input asp-for="Concluida"
+                                   type="hidden"
+                                   value="false" />
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- COLUNA CENTRAL -->
+            <div class="col-12 col-xl-5 repair-center">
+
+                <div class="d-flex flex-column gap-3">
+
+                    <!-- MECÂNICOS -->
+                    <div class="repair-card shadow-sm">
+
+                        <div class="repair-card-header">
+                            <i class="bi bi-people"></i>
+                            <h5>Mecânicos Responsáveis</h5>
+                        </div>
+
+                        <div class="repair-card-body">
+
+                            <div class="row g-2 align-items-end">
+
+                                <div class="col-9">
+                                    <label for="mecanicoSelect"
+                                           class="form-label">
+                                        Mecânico
+                                    </label>
+
+                                    <select id="mecanicoSelect"
+                                            class="form-select">
+
+                                        <option value="">
+                                            Selecione...
+                                        </option>
+
+                                        @if (ViewBag.Mecanicos != null)
+                                        {
+                                            @foreach (var mecanico in ViewBag.Mecanicos)
+                                            {
+                                                <option value="@mecanico.Id">
+                                                    @mecanico.Nome
+                                                </option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+
+                                <div class="col-3">
+                                    <button type="button"
+                                            class="btn btn-outline-primary w-100"
+                                            onclick="adicionarMecanico()">
+                                        <i class="bi bi-plus-lg"></i>
+                                        Adicionar
+                                    </button>
+                                </div>
+
+                            </div>
+
+                            <div id="listaMecanicos"
+                                 class="repair-list">
+                                <div class="repair-empty">
+                                    Nenhum mecânico adicionado.
+                                </div>
+                            </div>
+
+                            <div id="mecanicosInputs"></div>
+
+                        </div>
+                    </div>
+
+                    <!-- PEÇAS -->
+                    <div class="repair-card shadow-sm">
+
+                        <div class="repair-card-header">
+                            <i class="bi bi-gear"></i>
+                            <h5>Peças Utilizadas</h5>
+                        </div>
+
+                        <div class="repair-card-body">
+
+                            <div class="row g-2 align-items-end mb-3">
+
+                                <div class="col-7">
+                                    <label for="pecaSelect"
+                                           class="form-label">
+                                        Peça
+                                    </label>
+
+                                    <select id="pecaSelect"
+                                            class="form-select">
+
+                                        <option value="">
+                                            Selecione...
+                                        </option>
+
+                                        @if (ViewBag.Pecas != null)
+                                        {
+                                            @foreach (var peca in ViewBag.Pecas)
+                                            {
+                                                <option value="@peca.Id"
+                                                        data-preco="@peca.Preco.ToString(System.Globalization.CultureInfo.InvariantCulture)">
+                                                    @peca.Nome
+                                                </option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+
+                                <div class="col-2">
+                                    <label for="quantidadePeca"
+                                           class="form-label">
+                                        Qtd.
+                                    </label>
+
+                                    <input type="number"
+                                           id="quantidadePeca"
+                                           class="form-control"
+                                           value="1"
+                                           min="1"
+                                           step="1" />
+                                </div>
+
+                                <div class="col-3">
+                                    <button type="button"
+                                            class="btn btn-outline-primary w-100"
+                                            onclick="adicionarPeca()">
+                                        <i class="bi bi-plus-lg"></i>
+                                        Adicionar
+                                    </button>
+                                </div>
+
+                            </div>
+
+                            <div class="repair-table-wrapper">
+                                <table class="table repair-table">
+
+                                    <thead>
+                                        <tr>
+                                            <th>Peça</th>
+                                            <th>Qtd.</th>
+                                            <th>Preço</th>
+                                            <th>Subtotal</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody id="tabelaPecas">
+                                        <tr>
+                                            <td colspan="5"
+                                                class="repair-empty">
+                                                Nenhuma peça adicionada.
+                                            </td>
+                                        </tr>
+                                    </tbody>
+
+                                </table>
+                            </div>
+
+                            <div id="pecasInputs"></div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- COLUNA DIREITA -->
+            <div class="col-12 col-xl-3 repair-right">
+
+                <div class="repair-card shadow-sm">
+
+                    <div class="repair-card-header">
+                        <i class="bi bi-receipt"></i>
+                        <h5>Resumo da Reparação</h5>
+                    </div>
+
+                    <div class="repair-card-body">
+
+                        <div class="repair-summary-row">
+                            <span class="text-muted">Peças</span>
+                            <strong id="totalQuantidadePecas">0</strong>
+                        </div>
+
+                        <div class="repair-summary-row">
+                            <span class="text-muted">Mecânicos</span>
+                            <strong id="totalMecanicos">0</strong>
+                        </div>
+
+                        <hr />
+
+                        <label asp-for="CustoTotal"
+                               class="form-label">
+                            Custo Total (€)
+                        </label>
+
+                        <input asp-for="CustoTotal"
+                               type="number"
+                               min="0"
+                               step="0.01"
+                               class="form-control"
+                               id="CustoTotal"
+                               readonly />
+
+                        <span asp-validation-for="CustoTotal"
+                              class="text-danger small"></span>
+
+                        <div class="repair-total-box">
+                            <small class="text-muted">
+                                Total das peças
+                            </small>
+
+                            <div id="totalVisual"
+                                 class="repair-total-value">
+                                0,00 €
+                            </div>
+                        </div>
+
+                        <p class="text-muted small mt-3 mb-0">
+                            O valor é atualizado automaticamente
+                            ao adicionar ou remover peças.
+                        </p>
+
+                        <div class="repair-action-area">
+
+                            <button type="submit"
+                                    class="btn btn-primary w-100 mb-2">
+                                <i class="bi bi-check-lg me-1"></i>
+                                Guardar Reparação
+                            </button>
+
+                            <a asp-action="Index"
+                               class="btn btn-outline-secondary w-100">
+                                Cancelar
+                            </a>
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </form>
+</div>
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        const mecanicos = [];
+        const pecas = [];
+
+        const formatarEuro = valor =>
+            new Intl.NumberFormat("pt-PT", {
+                style: "currency",
+                currency: "EUR"
+            }).format(valor);
+
+        // Preencher serviço e data a partir da marcação
+        document.getElementById("MarcacaoId")
+            .addEventListener("change", function () {
+
+                const opcao = this.options[this.selectedIndex];
+
+                document.getElementById("TipoServico").value =
+                    opcao.dataset.servico || "";
+
+                document.getElementById("DataInicio").value =
+                    opcao.dataset.data || "";
+            });
+
+        // Adicionar mecânico
+        function adicionarMecanico() {
+
+            const select = document.getElementById("mecanicoSelect");
+            const id = Number(select.value);
+
+            if (!id) {
+                alert("Selecione um mecânico.");
+                return;
+            }
+
+            if (mecanicos.some(m => m.id === id)) {
+                alert("Este mecânico já foi adicionado.");
+                return;
+            }
+
+            mecanicos.push({
+                id: id,
+                nome: select.options[select.selectedIndex].text.trim()
+            });
+
+            select.value = "";
+            atualizarMecanicos();
+        }
+
+        // Remover mecânico
+        function removerMecanico(id) {
+
+            const indice = mecanicos.findIndex(m => m.id === id);
+
+            if (indice !== -1) {
+                mecanicos.splice(indice, 1);
+            }
+
+            atualizarMecanicos();
+        }
+
+        // Atualizar lista de mecânicos
+        function atualizarMecanicos() {
+
+            const lista = document.getElementById("listaMecanicos");
+            const inputs = document.getElementById("mecanicosInputs");
+
+            lista.replaceChildren();
+            inputs.replaceChildren();
+
+            if (mecanicos.length === 0) {
+
+                const vazio = document.createElement("div");
+                vazio.className = "repair-empty";
+                vazio.textContent = "Nenhum mecânico adicionado.";
+
+                lista.appendChild(vazio);
+            }
+
+            mecanicos.forEach((mecanico, index) => {
+
+                const item = document.createElement("div");
+                item.className = "repair-mechanic-item";
+
+                const nome = document.createElement("span");
+                nome.textContent = mecanico.nome;
+
+                const botao = document.createElement("button");
+                botao.type = "button";
+                botao.className = "btn btn-sm btn-outline-danger";
+                botao.textContent = "Remover";
+
+                botao.addEventListener("click", () =>
+                    removerMecanico(mecanico.id));
+
+                item.append(nome, botao);
+                lista.appendChild(item);
+
+                const input = document.createElement("input");
+                input.type = "hidden";
+                input.name = `MecanicoIds[${index}]`;
+                input.value = mecanico.id;
+
+                inputs.appendChild(input);
+            });
+
+            document.getElementById("totalMecanicos").textContent =
+                mecanicos.length;
+        }
+
+        // Adicionar peça
+        function adicionarPeca() {
+
+            const select = document.getElementById("pecaSelect");
+            const id = Number(select.value);
+
+            const quantidade = Number(
+                document.getElementById("quantidadePeca").value
+            );
+
+            if (!id) {
+                alert("Selecione uma peça.");
+                return;
+            }
+
+            if (!Number.isSafeInteger(quantidade) || quantidade < 1) {
+                alert("Informe uma quantidade válida.");
+                return;
+            }
+
+            const opcao = select.options[select.selectedIndex];
+            const preco = Number(opcao.dataset.preco);
+
+            if (!Number.isFinite(preco) || preco < 0) {
+                alert("Preço inválido.");
+                return;
+            }
+
+            const existente = pecas.find(p => p.id === id);
+
+            if (existente) {
+                existente.quantidade += quantidade;
+            } else {
+                pecas.push({
+                    id: id,
+                    nome: opcao.text.trim(),
+                    preco: preco,
+                    quantidade: quantidade
+                });
+            }
+
+            select.value = "";
+            document.getElementById("quantidadePeca").value = 1;
+
+            atualizarPecas();
+        }
+
+        // Remover peça
+        function removerPeca(id) {
+
+            const indice = pecas.findIndex(p => p.id === id);
+
+            if (indice !== -1) {
+                pecas.splice(indice, 1);
+            }
+
+            atualizarPecas();
+        }
+
+        // Atualizar tabela e total
+        function atualizarPecas() {
+
+            const tabela = document.getElementById("tabelaPecas");
+            const inputs = document.getElementById("pecasInputs");
+
+            tabela.replaceChildren();
+            inputs.replaceChildren();
+
+            let total = 0;
+            let quantidadeTotal = 0;
+
+            if (pecas.length === 0) {
+
+                const linha = document.createElement("tr");
+                const coluna = document.createElement("td");
+
+                coluna.colSpan = 5;
+                coluna.className = "repair-empty";
+                coluna.textContent = "Nenhuma peça adicionada.";
+
+                linha.appendChild(coluna);
+                tabela.appendChild(linha);
+            }
+
+            pecas.forEach((peca, index) => {
+
+                const subtotal = peca.preco * peca.quantidade;
+
+                total += subtotal;
+                quantidadeTotal += peca.quantidade;
+
+                const linha = document.createElement("tr");
+
+                const criarColuna = (texto, classe = "") => {
+                    const td = document.createElement("td");
+                    td.className = classe;
+                    td.textContent = texto;
+                    return td;
+                };
+
+                linha.appendChild(criarColuna(peca.nome));
+                linha.appendChild(
+                    criarColuna(peca.quantidade, "text-center")
+                );
+                linha.appendChild(
+                    criarColuna(formatarEuro(peca.preco), "text-end")
+                );
+                linha.appendChild(
+                    criarColuna(formatarEuro(subtotal), "text-end fw-semibold")
+                );
+
+                const colunaAcao = document.createElement("td");
+                colunaAcao.className = "text-end";
+
+                const botao = document.createElement("button");
+                botao.type = "button";
+                botao.className = "btn btn-sm btn-outline-danger";
+                botao.textContent = "Remover";
+
+                botao.addEventListener("click", () =>
+                    removerPeca(peca.id));
+
+                colunaAcao.appendChild(botao);
+                linha.appendChild(colunaAcao);
+                tabela.appendChild(linha);
+
+                const criarInput = (nome, valor) => {
+                    const input = document.createElement("input");
+                    input.type = "hidden";
+                    input.name = nome;
+                    input.value = valor;
+                    inputs.appendChild(input);
+                };
+
+                criarInput(`Pecas[${index}].PecaId`, peca.id);
+                criarInput(`Pecas[${index}].Quantidade`, peca.quantidade);
+            });
+
+            document.getElementById("totalQuantidadePecas").textContent =
+                quantidadeTotal;
+
+            document.getElementById("totalVisual").textContent =
+                formatarEuro(total);
+
+            document.getElementById("CustoTotal").value =
+                total.toFixed(2);
+        }
+
+        atualizarMecanicos();
+        atualizarPecas();
+    </script>
+}
