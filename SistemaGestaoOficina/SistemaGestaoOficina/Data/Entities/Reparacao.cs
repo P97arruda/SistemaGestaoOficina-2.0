@@ -15,6 +15,8 @@ namespace SistemaGestaoOficina.Data.Entities
 
         public bool Concluida { get; set; }
 
+        public decimal CustoMaoDeObra { get; set; }
+
         [Required]
         [MaxLength(50)]
         public string TipoServico { get; set; }

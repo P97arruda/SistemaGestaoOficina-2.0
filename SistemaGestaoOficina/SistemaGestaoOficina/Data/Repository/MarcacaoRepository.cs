@@ -72,12 +72,7 @@ namespace SistemaGestaoOficina.Data.Repository
 
         public async Task<bool> ExisteMarcacaoDuplicadaAsync(Marcacao marcacao)
         {
-            return await GetAll().AnyAsync(m =>
-                m.UserId == marcacao.UserId &&
-                m.VeiculoId == marcacao.VeiculoId &&
-                m.TipoServico == marcacao.TipoServico &&
-                m.Estado == "Agendada" &&
-                m.Id != marcacao.Id);
+            return await GetAll().AnyAsync(m => m.VeiculoId == marcacao.VeiculoId && m.Estado == "Agendada" && m.Id != marcacao.Id);
         }
     }
 }

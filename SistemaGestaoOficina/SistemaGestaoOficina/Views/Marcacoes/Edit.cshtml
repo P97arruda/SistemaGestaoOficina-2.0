@@ -1,5 +1,5 @@
 ﻿
-@model SistemaGestaoOficina.Data.Entities.Marcacao
+@model SistemaGestaoOficina.Models.MarcacaoViewModel
 
 @{
     Layout = "_InternalLayout";
@@ -66,7 +66,6 @@
 
                 <input type="hidden" asp-for="Id" />
                 <input type="hidden" asp-for="UserId" />
-                <input type="hidden" asp-for="Estado" />
 
                 <div asp-validation-summary="All"
                      class="text-danger mb-3"></div>
@@ -221,7 +220,7 @@
                     <input asp-for="DataHora"
                            type="hidden"
                            id="DataHora"
-                           value="@Model.DataHora.ToString("yyyy-MM-ddTHH:mm")" />
+                           value="@(Model.DataHora?.ToString("yyyy-MM-ddTHH:mm") ?? "")" />
 
                     <span asp-validation-for="DataHora"
                           class="text-danger"></span>
@@ -280,7 +279,7 @@
                 maxDate: "2030-12-31",
                 disableMobile: true,
 
-                defaultDate: dataOriginal,
+                defaultDate: dataOriginal || null,
 
                 disable: [
                     function (date) {

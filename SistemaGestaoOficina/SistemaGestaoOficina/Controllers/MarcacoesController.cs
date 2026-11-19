@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SistemaGestaoOficina.Data.Entities;
 using SistemaGestaoOficina.Data.Repository;
+using SistemaGestaoOficina.Models;
 
 namespace SistemaGestaoOficina.Controllers
 {
@@ -19,7 +20,7 @@ namespace SistemaGestaoOficina.Controllers
         }
 
         // GET: Marcacoes
-        public async Task<ActionResult> Index()
+        public async Task<IActionResult> Index()
         {
             var marcacoes = await _marcacaoRepository.GetAll()
                 .Include(m => m.User)
@@ -55,116 +56,44 @@ namespace SistemaGestaoOficina.Controllers
         // GET: Marcacoes/Create
         public async Task<IActionResult> Create()
         {
-            var clientes = await _marcacaoRepository.GetClientesAsync();
+            await CarregarListasAsync();
 
-            var veiculos = await _marcacaoRepository.GetVeiculosAsync();
-
-            var mecanicos = await _marcacaoRepository.GetMecanicosAsync();
-
-            var tiposReparacao = await _marcacaoRepository.GetTiposReparacaoAsync();
-
-
-            ViewBag.Clientes = new SelectList(clientes, "Id", "FullName");
-
-            ViewBag.Veiculos = new SelectList(
-                veiculos.Select(v => new
-                {
-                    v.Id,
-                    Descricao = $"{v.Marca} - {v.Modelo} - {v.Matricula}"
-                }),
-                "Id",
-                "Descricao"
-                );
-
-            ViewBag.Mecanicos = new SelectList(mecanicos, "Id", "Nome");
-
-            ViewBag.TiposServico = new SelectList(tiposReparacao, "Nome", "Nome");
-
-            return View();
-        
+            return View(new MarcacaoViewModel());
         }
 
         // POST: Marcacoes/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Marcacao marcacao)
+        public async Task<IActionResult> Create(MarcacaoViewModel model)
         {
-            marcacao.Estado = "Agendada";
-
             if (ModelState.IsValid)
             {
-                if (!await _marcacaoRepository.DadosValidosAsync(marcacao))
+                // Mapeamento manual: ViewModel -> Entity
+                var marcacao = new Marcacao
                 {
-                    ModelState.AddModelError(
-                        "",
-                        "Cliente, veículo ou mecânico inválido.");
-                }
-                else if (marcacao.DataHora <= DateTime.Now)
-                {
-                    ModelState.AddModelError(
-                        nameof(Marcacao.DataHora),
-                        "A data deve ser futura.");
-                }
-                else if (marcacao.DataHora.DayOfWeek == DayOfWeek.Sunday ||
-                         marcacao.DataHora.Minute != 0 ||
-                         marcacao.DataHora.Second != 0 ||
-                         marcacao.DataHora.Hour < 9 ||
-                         marcacao.DataHora.Hour >=
-                            (marcacao.DataHora.DayOfWeek == DayOfWeek.Saturday ? 13 : 18))
-                {
-                    ModelState.AddModelError(
-                        nameof(Marcacao.DataHora),
-                        "Selecione um horário válido da oficina.");
-                }
-                else if (await _marcacaoRepository.ExisteConflitoAsync(marcacao))
-                {
-                    ModelState.AddModelError(
-                        nameof(Marcacao.DataHora),
-                        "O mecânico já tem uma marcação neste horário.");
-                }
-                else if (await _marcacaoRepository.ExisteMarcacaoDuplicadaAsync(marcacao))
-                {
-                    ModelState.AddModelError(
-                        "",
-                        "Este cliente já possui uma marcação agendada para este veículo e serviço. Cancele a marcação anterior antes de criar outra.");
-                }
-                else
+                    UserId = model.UserId,
+                    VeiculoId = model.VeiculoId!.Value,
+                    MecanicoId = model.MecanicoId!.Value,
+                    TipoServico = model.TipoServico,
+                    DataHora = model.DataHora!.Value,
+                    Estado = "Agendada"
+                };
+
+                await ValidarMarcacaoAsync(marcacao);
+
+                if (ModelState.IsValid)
                 {
                     await _marcacaoRepository.CreateAsync(marcacao);
 
-                    TempData["SuccessMessage"] =
-                        "Marcação criada com sucesso!";
+                    TempData["SuccessMessage"] = "Marcação criada com sucesso!";
 
                     return RedirectToAction(nameof(Index));
                 }
             }
 
-            // Recarregar os dados do formulário
-            var clientes = await _marcacaoRepository.GetClientesAsync();
-            var veiculos = await _marcacaoRepository.GetVeiculosAsync();
-            var mecanicos = await _marcacaoRepository.GetMecanicosAsync();
-            var tiposReparacao = await _marcacaoRepository.GetTiposReparacaoAsync();
+            await CarregarListasAsync(model);
 
-            ViewBag.Clientes = new SelectList(
-                clientes, "Id", "FullName", marcacao.UserId);
-
-            ViewBag.Veiculos = new SelectList(
-                veiculos.Select(v => new
-                {
-                    v.Id,
-                    Descricao = $"{v.Marca} - {v.Modelo} - {v.Matricula}"
-                }),
-                "Id",
-                "Descricao",
-                marcacao.VeiculoId);
-
-            ViewBag.Mecanicos = new SelectList(
-                mecanicos, "Id", "Nome", marcacao.MecanicoId);
-
-            ViewBag.TiposServico = new SelectList(
-                tiposReparacao, "Nome", "Nome", marcacao.TipoServico);
-
-            return View(marcacao);
+            return View(model);
         }
 
         // GET: Marcacoes/Edit/5
@@ -189,36 +118,29 @@ namespace SistemaGestaoOficina.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            var clientes = await _marcacaoRepository.GetClientesAsync();
-            var veiculos = await _marcacaoRepository.GetVeiculosAsync();
-            var mecanicos = await _marcacaoRepository.GetMecanicosAsync();
-            var tiposReparacao = await _marcacaoRepository.GetTiposReparacaoAsync();
+            // Mapeamento manual: Entity -> ViewModel
+            var model = new MarcacaoViewModel
+            {
+                Id = marcacao.Id,
+                UserId = marcacao.UserId,
+                VeiculoId = marcacao.VeiculoId,
+                MecanicoId = marcacao.MecanicoId,
+                TipoServico = marcacao.TipoServico,
+                DataHora = marcacao.DataHora
+            };
 
-            ViewBag.Clientes = new SelectList(clientes, "Id", "FullName", marcacao.UserId);
+            await CarregarListasAsync(model);
 
-            ViewBag.Veiculos = new SelectList(veiculos.Select(v => new
-                {
-                    v.Id,
-                    Descricao = $"{v.Marca} - {v.Modelo} - {v.Matricula}"
-                }),
-
-                "Id", "Descricao", marcacao.VeiculoId);
-
-            ViewBag.Mecanicos = new SelectList(mecanicos, "Id", "Nome", marcacao.MecanicoId);
-
-            ViewBag.TiposServico = new SelectList(tiposReparacao, "Nome", "Nome", marcacao.TipoServico);
-
-            return View(marcacao);
+            return View(model);
         }
-
 
         // POST: Marcacoes/Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Marcacao marcacao)
+        public async Task<IActionResult> Edit(MarcacaoViewModel model)
         {
             var marcacaoExistente =
-               await _marcacaoRepository.GetByIdAsync(marcacao.Id);
+                await _marcacaoRepository.GetByIdAsync(model.Id);
 
             if (marcacaoExistente == null)
             {
@@ -227,48 +149,41 @@ namespace SistemaGestaoOficina.Controllers
 
             if (marcacaoExistente.Estado != "Agendada")
             {
-                TempData["ErrorMessage"] =
-                    "Apenas marcações agendadas podem ser editadas.";
+                TempData["ErrorMessage"] = "Apenas marcações agendadas podem ser editadas.";
 
                 return RedirectToAction(nameof(Index));
             }
 
-            // Manter o cliente e o estado originais
-            marcacao.UserId = marcacaoExistente.UserId;
-            marcacao.Estado = marcacaoExistente.Estado;
+            // O cliente não pode ser alterado na edição.
+            model.UserId = marcacaoExistente.UserId;
+            ModelState.Remove(nameof(MarcacaoViewModel.UserId));
 
             if (ModelState.IsValid)
             {
-                if (!await _marcacaoRepository.DadosValidosAsync(marcacao))
+                // Criar uma entidade temporária para validar
+                // sem alterar o registo original.
+                var dados = new Marcacao
                 {
-                    ModelState.AddModelError("", "Cliente, veículo ou mecânico inválido.");
-                }
-                else if (marcacao.DataHora <= DateTime.Now)
+                    Id = marcacaoExistente.Id,
+                    UserId = marcacaoExistente.UserId,
+                    VeiculoId = model.VeiculoId!.Value,
+                    MecanicoId = model.MecanicoId!.Value,
+                    TipoServico = model.TipoServico,
+                    DataHora = model.DataHora!.Value,
+                    Estado = marcacaoExistente.Estado
+                };
+
+                await ValidarMarcacaoAsync(dados);
+
+                if (ModelState.IsValid)
                 {
-                    ModelState.AddModelError(nameof(Marcacao.DataHora), "A data deve ser futura.");
-                }
-                else if (marcacao.DataHora.DayOfWeek == DayOfWeek.Sunday ||
-                         marcacao.DataHora.Minute != 0 ||
-                         marcacao.DataHora.Second != 0 ||
-                         marcacao.DataHora.Hour < 9 ||
-                         marcacao.DataHora.Hour >=
-                            (marcacao.DataHora.DayOfWeek == DayOfWeek.Saturday ? 13 : 18))
-                {
-                    ModelState.AddModelError(nameof(Marcacao.DataHora), "Selecione um horário válido da oficina.");
-                }
-                else if (await _marcacaoRepository.ExisteConflitoAsync(marcacao))
-                {
-                    ModelState.AddModelError(nameof(Marcacao.DataHora), "O mecânico já tem uma marcação neste horário.");
-                }
-                else if (await _marcacaoRepository.ExisteMarcacaoDuplicadaAsync(marcacao))
-                {
-                    ModelState.AddModelError(
-                        "",
-                        "Este cliente já possui uma marcação agendada para este veículo e serviço. Cancele a marcação anterior antes de criar outra.");
-                }
-                else
-                {
-                    await _marcacaoRepository.UpdateAsync(marcacao);
+                    // Atualizar somente os campos permitidos.
+                    marcacaoExistente.VeiculoId = dados.VeiculoId;
+                    marcacaoExistente.MecanicoId = dados.MecanicoId;
+                    marcacaoExistente.TipoServico = dados.TipoServico;
+                    marcacaoExistente.DataHora = dados.DataHora;
+
+                    await _marcacaoRepository.UpdateAsync(marcacaoExistente);
 
                     TempData["SuccessMessage"] = "Marcação atualizada com sucesso!";
 
@@ -276,33 +191,10 @@ namespace SistemaGestaoOficina.Controllers
                 }
             }
 
-            // Recarregar os dados do formulário
-            var clientes = await _marcacaoRepository.GetClientesAsync();
-            var veiculos = await _marcacaoRepository.GetVeiculosAsync();
-            var mecanicos = await _marcacaoRepository.GetMecanicosAsync();
-            var tiposReparacao = await _marcacaoRepository.GetTiposReparacaoAsync();
+            await CarregarListasAsync(model);
 
-            ViewBag.Clientes = new SelectList(clientes, "Id", "FullName", marcacao.UserId);
-
-            // Apenas veículos pertencentes ao cliente
-            ViewBag.Veiculos = new SelectList(veiculos
-                    .Where(v => v.UserId == marcacao.UserId)
-                    .Select(v => new
-                    {
-                        v.Id,
-                        Descricao = $"{v.Marca} - {v.Modelo} - {v.Matricula}"
-                    }),
-                "Id",
-                "Descricao",
-                marcacao.VeiculoId);
-
-            ViewBag.Mecanicos = new SelectList(mecanicos, "Id", "Nome", marcacao.MecanicoId);
-
-            ViewBag.TiposServico = new SelectList(tiposReparacao, "Nome", "Nome", marcacao.TipoServico);
-
-            return View(marcacao);
+            return View(model);
         }
-
 
         // POST: Marcacoes/Cancelar/5
         [HttpPost]
@@ -332,7 +224,6 @@ namespace SistemaGestaoOficina.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-
         // GET: Marcacoes/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
@@ -350,7 +241,6 @@ namespace SistemaGestaoOficina.Controllers
 
             return View(marcacao);
         }
-
 
         // POST: Marcacoes/Delete/5
         [HttpPost, ActionName("Delete")]
@@ -375,7 +265,8 @@ namespace SistemaGestaoOficina.Controllers
             {
                 await _marcacaoRepository.DeleteAsync(marcacao);
 
-                TempData["SuccessMessage"] = "Marcação apagada com sucesso!";
+                TempData["SuccessMessage"] =
+                    "Marcação apagada com sucesso!";
             }
             catch (DbUpdateException)
             {
@@ -383,6 +274,76 @@ namespace SistemaGestaoOficina.Controllers
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+        // Validações de negócio
+        private async Task ValidarMarcacaoAsync(Marcacao marcacao)
+        {
+            if (!await _marcacaoRepository.DadosValidosAsync(marcacao))
+            {
+                ModelState.AddModelError("", "Cliente, veículo ou mecânico inválido.");
+
+                return;
+            }
+
+            if (marcacao.DataHora <= DateTime.Now)
+            {
+                ModelState.AddModelError(nameof(MarcacaoViewModel.DataHora), "A data deve ser futura.");
+
+                return;
+            }
+
+            if (marcacao.DataHora.DayOfWeek == DayOfWeek.Sunday ||
+                marcacao.DataHora.Minute != 0 ||
+                marcacao.DataHora.Second != 0 ||
+                marcacao.DataHora.Hour < 9 ||
+                marcacao.DataHora.Hour >=
+                    (marcacao.DataHora.DayOfWeek == DayOfWeek.Saturday ? 13 : 18))
+            {
+                ModelState.AddModelError(nameof(MarcacaoViewModel.DataHora), "Selecione um horário válido da oficina.");
+
+                return;
+            }
+
+            if (await _marcacaoRepository.ExisteConflitoAsync(marcacao))
+            {
+                ModelState.AddModelError(nameof(MarcacaoViewModel.DataHora), "O mecânico já tem uma marcação neste horário.");
+
+                return;
+            }
+
+            if (await _marcacaoRepository.ExisteMarcacaoDuplicadaAsync(marcacao))
+            {
+                ModelState.AddModelError("", "Este cliente já possui uma marcação agendada para este veículo e serviço. Cancele a marcação anterior antes de criar outra.");
+            }
+        }
+
+        // Carregar opções dos formulários
+        private async Task CarregarListasAsync(MarcacaoViewModel? model = null)
+        {
+            var clientes = await _marcacaoRepository.GetClientesAsync();
+            var veiculos = await _marcacaoRepository.GetVeiculosAsync();
+            var mecanicos = await _marcacaoRepository.GetMecanicosAsync();
+            var tiposReparacao =
+                await _marcacaoRepository.GetTiposReparacaoAsync();
+
+            ViewBag.Clientes = new SelectList(clientes, "Id", "FullName", model?.UserId);
+
+            var veiculosDisponiveis = model != null && !string.IsNullOrEmpty(model.UserId) ? veiculos.Where(v => v.UserId == model.UserId) : veiculos;
+
+            ViewBag.Veiculos = new SelectList(veiculosDisponiveis.Select(v => new
+                {
+                    v.Id,
+                    Descricao =
+                        $"{v.Marca} - {v.Modelo} - {v.Matricula}"
+                }),
+                "Id",
+                "Descricao",
+                model?.VeiculoId);
+
+            ViewBag.Mecanicos = new SelectList( mecanicos,"Id", "Nome", model?.MecanicoId);
+
+            ViewBag.TiposServico = new SelectList(tiposReparacao, "Nome", "Nome", model?.TipoServico);
         }
     }
 }

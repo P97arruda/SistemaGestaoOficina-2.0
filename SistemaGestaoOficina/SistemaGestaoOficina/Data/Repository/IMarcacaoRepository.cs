@@ -16,5 +16,7 @@ namespace SistemaGestaoOficina.Data.Repository
         Task<List<TipoReparacao>> GetTiposReparacaoAsync();
 
         Task<bool> ExisteMarcacaoDuplicadaAsync(Marcacao marcacao);
+
+
     }
 }

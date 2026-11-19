@@ -1,4 +1,5 @@
-﻿@model SistemaGestaoOficina.Data.Entities.Marcacao
+﻿
+@model SistemaGestaoOficina.Models.MarcacaoViewModel
 
 @{
     Layout = "_InternalLayout";
@@ -38,10 +39,10 @@
         position: relative;
     }
 
-        .campo-calendario .form-control {
-            padding-right: 45px;
-            cursor: pointer;
-        }
+    .campo-calendario .form-control {
+        padding-right: 45px;
+        cursor: pointer;
+    }
 
     .icone-calendario {
         position: absolute;
@@ -63,7 +64,6 @@
 
 <div class="container py-4">
 
-    <!-- Cabeçalho -->
     <div class="mb-4">
         <h2 class="fw-bold mb-1">Nova Marcação</h2>
 
@@ -72,28 +72,24 @@
         </p>
     </div>
 
-    <!-- Formulário -->
     <div class="card shadow-sm border-0">
         <div class="card-body p-4">
 
             <form asp-controller="Marcacoes"
                   asp-action="Create"
-                  method="post">
+                  method="post"
+                  id="formMarcacao">
 
                 @Html.AntiForgeryToken()
-
-                <!-- Estado inicial da marcação -->
-                <input type="hidden"
-                       asp-for="Estado"
-                       value="Agendada" />
 
                 <div asp-validation-summary="All"
                      class="text-danger mb-3"></div>
 
                 <div class="row">
 
-                    <!-- Cliente -->
+                    <!-- CLIENTE -->
                     <div class="col-md-6 mb-3">
+
                         <label asp-for="UserId"
                                class="form-label">
                             Cliente
@@ -111,8 +107,9 @@
                               class="text-danger"></span>
                     </div>
 
-                    <!-- Veículo -->
+                    <!-- VEÍCULO -->
                     <div class="col-md-6 mb-3">
+
                         <label asp-for="VeiculoId"
                                class="form-label">
                             Veículo
@@ -130,8 +127,9 @@
                               class="text-danger"></span>
                     </div>
 
-                    <!-- Mecânico -->
+                    <!-- MECÂNICO -->
                     <div class="col-md-6 mb-3">
+
                         <label asp-for="MecanicoId"
                                class="form-label">
                             Mecânico
@@ -149,8 +147,9 @@
                               class="text-danger"></span>
                     </div>
 
-                    <!-- Tipo de Serviço -->
+                    <!-- TIPO DE SERVIÇO -->
                     <div class="col-md-6 mb-3">
+
                         <label asp-for="TipoServico"
                                class="form-label">
                             Tipo de Serviço
@@ -170,7 +169,7 @@
 
                 </div>
 
-                <!-- Calendário e Horários -->
+                <!-- CALENDÁRIO E HORÁRIOS -->
                 <div class="mt-3 mb-4">
 
                     <h5 class="fw-bold mb-3">
@@ -179,7 +178,7 @@
 
                     <div class="row">
 
-                        <!-- Data -->
+                        <!-- DATA -->
                         <div class="col-md-5 mb-3">
 
                             <label for="dataMarcacao"
@@ -197,7 +196,6 @@
                                        readonly
                                        required />
 
-                                <!-- Ícone do calendário -->
                                 <span id="iconeCalendario"
                                       class="icone-calendario"
                                       title="Abrir calendário">
@@ -231,10 +229,9 @@
                             <small class="text-muted">
                                 Escolha uma data no calendário.
                             </small>
-
                         </div>
 
-                        <!-- Horários -->
+                        <!-- HORÁRIOS -->
                         <div class="col-md-7 mb-3">
 
                             <label class="form-label">
@@ -249,12 +246,11 @@
                                 </p>
 
                             </div>
-
                         </div>
 
                     </div>
 
-                    <!-- Data e hora enviadas ao Controller -->
+                    <!-- CAMPO ENVIADO AO CONTROLLER -->
                     <input asp-for="DataHora"
                            type="hidden"
                            id="DataHora" />
@@ -264,7 +260,6 @@
 
                 </div>
 
-                <!-- Botões -->
                 <div class="d-flex gap-2 mt-3">
 
                     <button type="submit"
@@ -281,17 +276,13 @@
                 </div>
 
             </form>
-
         </div>
     </div>
-
 </div>
 
 @section Scripts {
 
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <partial name="_ValidationScriptsPartial" />
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
@@ -309,29 +300,21 @@
                 document.getElementById("DataHora");
 
             const formulario =
-                dataInput.closest("form");
+                document.getElementById("formMarcacao");
 
             const iconeCalendario =
                 document.getElementById("iconeCalendario");
 
-            // Configuração do calendário
             const calendario = flatpickr(dataInput, {
 
                 locale: "pt",
-
                 dateFormat: "Y-m-d",
-
                 altInput: true,
-
                 altFormat: "d/m/Y",
-
                 minDate: "today",
-
                 maxDate: "2030-12-31",
-
                 disableMobile: true,
 
-                // Não permitir domingos
                 disable: [
                     function (date) {
                         return date.getDay() === 0;
@@ -343,16 +326,13 @@
                 }
             });
 
-            // Abrir calendário ao clicar no ícone
             iconeCalendario.addEventListener("click", function () {
                 calendario.open();
             });
 
-            // Apresentar horários conforme a data
             function mostrarHorarios() {
 
                 horariosContainer.innerHTML = "";
-
                 dataHoraInput.value = "";
 
                 if (!dataInput.value) {
@@ -369,7 +349,6 @@
 
                 const diaSemana = data.getDay();
 
-                // Domingo encerrado
                 if (diaSemana === 0) {
 
                     horariosContainer.innerHTML =
@@ -393,7 +372,6 @@
                         dataInput.value + "T" + horario + ":00"
                     );
 
-                    // Não mostrar horários que já passaram
                     if (dataHorario <= new Date()) {
                         continue;
                     }
@@ -407,34 +385,26 @@
 
                     botao.textContent = horario;
 
-                    // Selecionar horário
                     botao.addEventListener("click", function () {
 
                         const botoes =
                             horariosContainer.querySelectorAll("button");
 
-                        // Remover seleção anterior
                         botoes.forEach(function (btn) {
 
                             btn.classList.remove("btn-primary");
-
                             btn.classList.add("btn-outline-primary");
 
                         });
 
-                        // Destacar horário selecionado
                         botao.classList.remove("btn-outline-primary");
-
                         botao.classList.add("btn-primary");
 
-                        // Guardar data e hora no Model
                         dataHoraInput.value =
                             dataInput.value + "T" + horario;
-
                     });
 
                     horariosContainer.appendChild(botao);
-
                     horariosAdicionados++;
                 }
 
@@ -445,7 +415,6 @@
                 }
             }
 
-            // Validar antes de enviar
             formulario.addEventListener("submit", function (event) {
 
                 if (!dataHoraInput.value) {
@@ -471,7 +440,6 @@
                         "A data e o horário devem ser futuros."
                     );
                 }
-
             });
 
         });

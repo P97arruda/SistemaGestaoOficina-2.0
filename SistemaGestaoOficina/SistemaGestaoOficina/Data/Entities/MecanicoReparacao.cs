@@ -4,8 +4,10 @@
     {
         public int Id { get; set; }
 
-        public Mecanico Mecanico { get; set; }
+        public int MecanicoId { get; set; }
+        public Mecanico? Mecanico { get; set; }
 
-        public Reparacao Reparacao { get; set; }
+        public int ReparacaoId { get; set; }
+        public Reparacao? Reparacao { get; set; }
     }
 }

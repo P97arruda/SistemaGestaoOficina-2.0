@@ -446,27 +446,22 @@
                  Marcações
                  </a>
 
-                <!-- SERVIÇOS E REPARAÇÕES - FUTURO -->
+                <!-- SERVIÇOS E REPARAÇÕES -->
 
-                <span class="sidebar-link disabled" aria-disabled="true">
+                <!-- SERVIÇOS E REPARAÇÕES -->
 
-                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M14 6a5 5 0 0 0-6 6l-5 5a2.1 2.1 0 0 0 3 3l5-5a5 5 0 0 0 6-6l-3 3-3-3 3-3Z" />
+                    <a asp-controller="Reparacoes"
+                    asp-action="Index"
+                    class="sidebar-link @(currentController == "Reparacoes" ? "active" : "")">
+
+                    <svg class="sidebar-icon"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true">
+                    <path d="M14 6a5 5 0 0 0-6 6l-5 5a2.1 2.1 0 0 0 3 3l5-5a5 5 0 0 0 6-6l-3 3-3-3 3-3Z" />
                     </svg>
 
-                    Serviços e Reparações
-                </span>
-
-                <!-- FATURAÇÃO - FUTURO -->
-
-                <span class="sidebar-link disabled" aria-disabled="true">
-
-                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3Zm3 5h6m-6 4h6m-6 4h3" />
-                    </svg>
-
-                    Faturação
-                </span>
+                    Reparações
+                </a>
             }
 
             <!-- CONTA -->

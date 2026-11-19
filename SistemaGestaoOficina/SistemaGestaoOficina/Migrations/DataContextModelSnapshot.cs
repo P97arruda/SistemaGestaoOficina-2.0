@@ -17,7 +17,7 @@ namespace SistemaGestaoOficina.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.31")
+                .HasAnnotation("ProductVersion", "10.0.15")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -290,6 +290,9 @@ namespace SistemaGestaoOficina.Migrations
 
                     b.Property<bool>("Concluida")
                         .HasColumnType("bit");
+
+                    b.Property<decimal>("CustoMaoDeObra")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("CustoTotal")
                         .HasColumnType("decimal(18,2)");
