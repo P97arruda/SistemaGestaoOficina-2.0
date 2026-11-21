@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemaGestaoOficina.Data.Entities;
@@ -12,15 +13,15 @@ namespace SistemaGestaoOficina.Controllers
     {
         private readonly IReparacaoRepository _reparacaoRepository;
         private readonly IMarcacaoRepository _marcacaoRepository;
-
         private readonly IMecanicoRepository _mecanicoRepository;
         private readonly IPecaRepository _pecaRepository;
-        
+
+        private const decimal ValorPorMecanico = 45.00m;
 
         public ReparacoesController(
             IReparacaoRepository reparacaoRepository,
             IMarcacaoRepository marcacaoRepository,
-            IPecaRepository pecaRepository, 
+            IPecaRepository pecaRepository,
             IMecanicoRepository mecanicoRepository)
         {
             _reparacaoRepository = reparacaoRepository;
@@ -29,11 +30,19 @@ namespace SistemaGestaoOficina.Controllers
             _mecanicoRepository = mecanicoRepository;
         }
 
+        // GET: Reparacoes
         public async Task<IActionResult> Index()
         {
-            var reparacoes = await _reparacaoRepository.
-                GetAll().
-                ToListAsync();
+            var reparacoes = await _reparacaoRepository
+                .GetAll()
+                .Include(r => r.Marcacao)
+                    .ThenInclude(m => m.User)
+                .Include(r => r.Marcacao)
+                    .ThenInclude(m => m.Veiculo)
+                .Include(r => r.MecanicoReparacaos)
+                    .ThenInclude(mr => mr.Mecanico)
+                .OrderByDescending(r => r.DataInicio)
+                .ToListAsync();
 
             return View(reparacoes);
         }
@@ -46,7 +55,17 @@ namespace SistemaGestaoOficina.Controllers
                 return NotFound();
             }
 
-            var reparacao = await _reparacaoRepository.GetByIdAsync(id.Value);
+            var reparacao = await _reparacaoRepository
+                .GetAll()
+                .Include(r => r.Marcacao)
+                    .ThenInclude(m => m.User)
+                .Include(r => r.Marcacao)
+                    .ThenInclude(m => m.Veiculo)
+                .Include(r => r.MecanicoReparacaos)
+                    .ThenInclude(mr => mr.Mecanico)
+                .Include(r => r.ReparacaoPecas)
+                    .ThenInclude(rp => rp.Peca)
+                .FirstOrDefaultAsync(r => r.Id == id.Value);
 
             if (reparacao == null)
             {
@@ -57,89 +76,79 @@ namespace SistemaGestaoOficina.Controllers
         }
 
         // GET: Reparacoes/Create
-        // GET: Reparacoes/Create
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            // 1. Carregar as marcações com os dados do cliente e veículo
-            var marcacoes = await _marcacaoRepository
-                .GetAll()
-                .Include(m => m.User)
-                .Include(m => m.Veiculo)
-                .OrderByDescending(m => m.DataHora)
-                .ToListAsync();
+            await CarregarListasAsync();
 
-            // 2. Carregar os mecânicos ativos
-            var mecanicos = await _mecanicoRepository
-                .GetAll()
-                .Where(m => m.Ativo)
-                .OrderBy(m => m.Nome)
-                .ToListAsync();
-
-            // 3. Carregar as peças ativas
-            var pecas = await _pecaRepository
-                .GetAll()
-                .Where(p => p.Ativa)
-                .OrderBy(p => p.Nome)
-                .ToListAsync();
-
-            // 4. Enviar os dados para a View
-            ViewBag.Marcacoes = marcacoes;
-            ViewBag.Mecanicos = mecanicos;
-            ViewBag.Pecas = pecas;
-
-            // 5. Abrir o formulário com a data atual
             return View(new ReparacaoViewModel
             {
                 DataInicio = DateTime.Now
             });
         }
 
-
+        // POST: Reparacoes/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ReparacaoViewModel model, List<int> pecaIds, List<int> quantidades)
         {
-            // Validar peças e quantidades
-            if (pecaIds.Count != quantidades.Count)
-            {
-                ModelState.AddModelError("", "Os dados das peças são inválidos."
-                );
-            }
+            pecaIds ??= new List<int>();
+            quantidades ??= new List<int>();
 
-            // Validar mecânicos
-            if (model.MecanicoIds == null || model.MecanicoIds.Count == 0)
-            {
-                ModelState.AddModelError("", "Selecione pelo menos um mecânico."
-                );
-            }
+            // 1. VALIDAR A MARCAÇÃO
+            Marcacao? marcacao = null;
 
-            // Validar marcação
             if (!model.MarcacaoId.HasValue)
             {
-                ModelState.AddModelError(nameof(model.MarcacaoId), "Selecione uma marcação."
-                );
+                ModelState.AddModelError(nameof(model.MarcacaoId), "Selecione uma marcação.");
             }
             else
             {
-                var marcacao = await _marcacaoRepository.GetByIdAsync(model.MarcacaoId.Value);
+                marcacao = await _marcacaoRepository.GetByIdAsync(model.MarcacaoId.Value);
 
                 if (marcacao == null)
                 {
-                    ModelState.AddModelError(nameof(model.MarcacaoId), "A marcação selecionada não existe."
-                    );
+                    ModelState.AddModelError(nameof(model.MarcacaoId),"A marcação selecionada não existe.");
+                }
+                else
+                {
+                    if (marcacao.Estado != "Pendente")
+                    {
+                        ModelState.AddModelError(nameof(model.MarcacaoId), "Apenas marcações pendentes podem receber reparações.");
+                    }
+
+                    bool jaExiste = await _reparacaoRepository.GetAll().AnyAsync(r => r.MarcacaoId == marcacao.Id);
+
+                    if (jaExiste)
+                    {
+                        ModelState.AddModelError(nameof(model.MarcacaoId), "Esta marcação já possui uma reparação.");
+                    }
                 }
             }
 
-            // Validar datas
-            if (model.DataFim.HasValue && model.DataInicio.HasValue && model.DataFim.Value < model.DataInicio.Value)
+            // 2. VALIDAR AS DATAS
+            if (!model.DataInicio.HasValue)
             {
-                ModelState.AddModelError(nameof(model.DataFim), "A data de fim não pode ser anterior à data de início."
-                );
+                ModelState.AddModelError(nameof(model.DataInicio),"Informe a data de início.");
             }
 
-            // Validar os mecânicos selecionados
+            if (!model.DataFim.HasValue)
+            {
+                ModelState.AddModelError(nameof(model.DataFim), "Informe a data de fim.");
+            }
+
+            if (model.DataInicio.HasValue && model.DataFim.HasValue && model.DataFim.Value < model.DataInicio.Value)
+            {
+                ModelState.AddModelError(nameof(model.DataFim), "A data de fim não pode ser anterior à data de início.");
+            }
+
+            // 3. VALIDAR OS MECÂNICOS
             var mecanicoIds = model.MecanicoIds?.Distinct().ToList() ?? new List<int>();
+
+            if (mecanicoIds.Count == 0)
+            {
+                ModelState.AddModelError("", "Selecione pelo menos um mecânico.");
+            }
 
             foreach (var mecanicoId in mecanicoIds)
             {
@@ -147,33 +156,50 @@ namespace SistemaGestaoOficina.Controllers
 
                 if (mecanico == null || !mecanico.Ativo)
                 {
-                    ModelState.AddModelError("", "Um dos mecânicos selecionados é inválido."
-                    );
+                    ModelState.AddModelError("", "Um dos mecânicos selecionados é inválido.");
                 }
             }
 
-            // Valor fixo por mecânico
-            const decimal valorPorMecanico = 45.00m;
+            // 4. VALIDAR AS PEÇAS
+            if (pecaIds.Count == 0)
+            {
+                ModelState.AddModelError("", "Adicione pelo menos uma peça à reparação.");
+            }
 
-            // Calcular mão de obra
-            decimal custoMaoDeObra = mecanicoIds.Count * valorPorMecanico;
+            if (pecaIds.Count != quantidades.Count)
+            {
+                ModelState.AddModelError("", "Os dados das peças e quantidades são inválidos.");
+            }
 
-            // Começar o total com a mão de obra
+            if (pecaIds.Count != pecaIds.Distinct().Count())
+            {
+                ModelState.AddModelError("", "A mesma peça não pode ser adicionada duas vezes.");
+            }
+
+            // 5. CALCULAR OS CUSTOS
+            decimal custoMaoDeObra =
+                mecanicoIds.Count * ValorPorMecanico;
+
             decimal custoTotal = custoMaoDeObra;
 
             var reparacaoPecas = new List<ReparacaoPeca>();
 
-            // Calcular o valor das peças
             if (pecaIds.Count == quantidades.Count)
             {
                 for (int i = 0; i < pecaIds.Count; i++)
                 {
                     var peca = await _pecaRepository.GetByIdAsync(pecaIds[i]);
 
-                    if (peca == null || !peca.Ativa || quantidades[i] <= 0)
+                    if (peca == null || !peca.Ativa)
                     {
-                        ModelState.AddModelError("", "Uma das peças selecionadas é inválida."
-                        );
+                        ModelState.AddModelError("", "Uma das peças selecionadas é inválida.");
+
+                        continue;
+                    }
+
+                    if (quantidades[i] <= 0)
+                    {
+                        ModelState.AddModelError("", "A quantidade deve ser maior que zero.");
 
                         continue;
                     }
@@ -189,127 +215,80 @@ namespace SistemaGestaoOficina.Controllers
                 }
             }
 
-            // Guardar reparação
-            if (ModelState.IsValid)
-            {
-                var reparacao = new Reparacao
-                {
-                    MarcacaoId = model.MarcacaoId!.Value,
-                    TipoServico = model.TipoServico,
-                    DataInicio = model.DataInicio!.Value,
-                    DataFim = model.DataFim,
-                    Concluida = model.Concluida,
-
-                    // Custos
-                    CustoMaoDeObra = custoMaoDeObra,
-                    CustoTotal = custoTotal,
-
-                    // Peças
-                    ReparacaoPecas = reparacaoPecas,
-
-                    // Mecânicos
-                    MecanicoReparacaos = mecanicoIds.Select(id => new MecanicoReparacao
-                        {
-                            MecanicoId = id
-                        })
-                        .ToList()
-                };
-
-                await _reparacaoRepository.CreateAsync(reparacao);
-
-                TempData["SuccessMessage"] ="Reparação criada com sucesso!";
-
-                return RedirectToAction(nameof(Index));
-            }
-
-            // Recarregar as listas em caso de erro
-            ViewBag.Marcacoes = await _marcacaoRepository.GetAll().OrderByDescending(m => m.DataHora).ToListAsync();
-
-            ViewBag.Mecanicos = await _mecanicoRepository.GetAll().Where(m => m.Ativo).OrderBy(m => m.Nome).ToListAsync();
-
-            ViewBag.Pecas = await _pecaRepository.GetAll().Where(p => p.Ativa).OrderBy(p => p.Nome).ToListAsync();
-
-            return View(model);
-        }
-
-
-
-        // GET: Reparacoes/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var reparacao = await _reparacaoRepository.GetByIdAsync(id.Value);
-
-            if (reparacao == null)
-            {
-                return NotFound();
-            }
-
-            return View(reparacao);
-        }
-
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Reparacao dados)
-        {
-            if (id != dados.Id)
-            {
-                return NotFound();
-            }
-
+            // 6. VERIFICAR SE EXISTEM ERROS
             if (!ModelState.IsValid)
             {
-                return View(dados);
+                await CarregarListasAsync();
+
+                return View(model);
             }
 
-            var reparacao = await _reparacaoRepository.GetByIdAsync(id);
-
-            if (reparacao == null)
+            // 7. CRIAR A REPARAÇÃO
+            var reparacao = new Reparacao
             {
-                return NotFound();
-            }
+                MarcacaoId = marcacao!.Id,
+                TipoServico = marcacao.TipoServico,
 
-            reparacao.TipoServico = dados.TipoServico;
-            reparacao.DataInicio = dados.DataInicio;
-            reparacao.DataFim = dados.DataFim;
-            reparacao.CustoTotal = dados.CustoTotal;
-            reparacao.Concluida = dados.Concluida;
+                DataInicio = model.DataInicio!.Value,
+                DataFim = model.DataFim,
 
-            await _reparacaoRepository.UpdateAsync(reparacao);
+                Concluida = true,
 
-            TempData["SuccessMessage"] = "Reparação atualizada com sucesso!";
+                CustoMaoDeObra = custoMaoDeObra,
+                CustoTotal = custoTotal,
+
+                ReparacaoPecas = reparacaoPecas,
+
+                MecanicoReparacaos = mecanicoIds
+                    .Select(id => new MecanicoReparacao
+                    {
+                        MecanicoId = id
+                    })
+                    .ToList()
+            };
+
+            // 8. CONCLUIR A MARCAÇÃO
+            marcacao.Estado = "Concluida";
+
+            // 9. GUARDAR OS DADOS
+            await _reparacaoRepository.CreateAsync(reparacao);
+
+            await _marcacaoRepository.UpdateAsync(marcacao);
+
+            TempData["SuccessMessage"] =
+                "Reparação concluída com sucesso!";
 
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id)
+        // CARREGAR AS LISTAS DO FORMULÁRIO
+        private async Task CarregarListasAsync()
         {
-            var reparacao = await _reparacaoRepository.GetByIdAsync(id);
+            // MARCAÇÕES PENDENTES SEM REPARAÇÃO
+            ViewBag.Marcacoes = await _marcacaoRepository
+                .GetAll()
+                .Include(m => m.User)
+                .Include(m => m.Veiculo)
+                .Where(m => m.Estado == "Pendente")
+                .Where(m => !_reparacaoRepository
+                    .GetAll()
+                    .Any(r => r.MarcacaoId == m.Id))
+                .OrderByDescending(m => m.DataHora)
+                .ToListAsync();
 
-            if (reparacao == null)
-            {
-                return NotFound();
-            }
+            // MECÂNICOS ATIVOS
+            ViewBag.Mecanicos = await _mecanicoRepository
+                .GetAll()
+                .Where(m => m.Ativo)
+                .OrderBy(m => m.Nome)
+                .ToListAsync();
 
-            try
-            {
-                await _reparacaoRepository.DeleteAsync(reparacao);
-
-                TempData["SuccessMessage"] = "Reparação eliminada com sucesso!";
-            }
-            catch (DbUpdateException)
-            {
-                TempData["ErrorMessage"] = "Não é possível eliminar esta reparação porque possui registos associados.";
-            }
-
-            return RedirectToAction(nameof(Index));
+            // PEÇAS ATIVAS
+            ViewBag.Pecas = await _pecaRepository
+                .GetAll()
+                .Where(p => p.Ativa)
+                .OrderBy(p => p.Nome)
+                .ToListAsync();
         }
     }
 }

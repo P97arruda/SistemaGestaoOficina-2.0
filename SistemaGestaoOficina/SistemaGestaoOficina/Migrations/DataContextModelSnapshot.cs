@@ -288,6 +288,9 @@ namespace SistemaGestaoOficina.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("Cancelada")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("Concluida")
                         .HasColumnType("bit");
 

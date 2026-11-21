@@ -61,27 +61,24 @@ namespace SistemaGestaoOficina.Controllers
 
             var cliente = await _userHelper.GetUserByIdAsync(id);
 
-            if (cliente == null)
+            if (cliente == null ||
+                !await _userHelper.IsUserInRoleAsync(cliente, "Cliente"))
             {
                 return NotFound();
             }
 
-            if (!await _userHelper.IsUserInRoleAsync(cliente, "Cliente"))
+            var model = new CriarVeiculoViewModel
             {
-                return NotFound();
-            }
+                UserId = cliente.Id
+            };
 
-            ViewBag.ClienteId = id;
-
-            return View();
+            return View(model);
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(VeiculoViewModel model)
+        public async Task<IActionResult> Create(CriarVeiculoViewModel model)
         {
-
             if (string.IsNullOrEmpty(model.UserId))
             {
                 return NotFound();
@@ -89,47 +86,33 @@ namespace SistemaGestaoOficina.Controllers
 
             var cliente = await _userHelper.GetUserByIdAsync(model.UserId);
 
-            if (cliente == null)
+            if (cliente == null ||
+                !await _userHelper.IsUserInRoleAsync(cliente, "Cliente"))
             {
                 return NotFound();
             }
 
-            if (!await _userHelper.IsUserInRoleAsync(cliente, "Cliente"))
+            if (!ModelState.IsValid)
             {
-                return NotFound();
+                return View(model);
             }
 
-            if (ModelState.IsValid)
+            var veiculo = new Veiculo
             {
-                var veiculo = new Veiculo
-                {
-                    Marca = model.Marca,
-                    Modelo = model.Modelo,
-                    Matricula = model.Matricula,
-                    Ano = model.Ano,
-                    Quilometragem = model.Quilometragem,
-                    Combustivel = model.Combustivel,
-                    UserId = cliente.Id
-                };
+                Marca = model.Marca,
+                Modelo = model.Modelo,
+                Matricula = model.Matricula,
+                Ano = model.Ano,
+                Quilometragem = model.Quilometragem,
+                Combustivel = model.Combustivel,
+                UserId = cliente.Id
+            };
 
-                await _veiculoRepository.CreateAsync(veiculo);
+            await _veiculoRepository.CreateAsync(veiculo);
 
-                return RedirectToAction(nameof(Index), new { id = cliente.Id });
-            }
-
-            // TEMPORÁRIO: mostrar os erros de validação
-            foreach (var item in ModelState)
-            {
-                foreach (var erro in item.Value.Errors)
-                {
-                    Console.WriteLine($"Campo: {item.Key} | Erro: {erro.ErrorMessage}");
-                }
-            }
-
-            ViewBag.ClienteId = model.UserId;
-
-            return View(model);
+            return RedirectToAction(nameof(Index), new { id = cliente.Id });
         }
+
 
         [HttpGet]
         public IActionResult TodosVeiculos()

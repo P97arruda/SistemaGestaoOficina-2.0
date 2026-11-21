@@ -15,6 +15,8 @@ namespace SistemaGestaoOficina.Data.Entities
 
         public bool Concluida { get; set; }
 
+        public bool Cancelada { get; set; } = false;
+
         public decimal CustoMaoDeObra { get; set; }
 
         [Required]

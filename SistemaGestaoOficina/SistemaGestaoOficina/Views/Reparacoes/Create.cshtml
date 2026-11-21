@@ -1,4 +1,5 @@
-﻿@model SistemaGestaoOficina.Models.ReparacaoViewModel
+﻿
+@model SistemaGestaoOficina.Models.ReparacaoViewModel
 
 @{
     ViewData["Title"] = "Nova Reparação";
@@ -14,15 +15,29 @@
         margin-bottom: 20px;
     }
 
-        .repair-heading h2 {
-            font-size: 23px;
-            font-weight: 700;
-        }
+    .repair-heading h2 {
+        font-size: 23px;
+        font-weight: 700;
+    }
 
-        .repair-heading p {
-            font-size: 13px;
-            color: #667085;
-        }
+    .repair-heading p {
+        font-size: 13px;
+        color: #667085;
+    }
+
+    .repair-navigation {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        flex-wrap: wrap;
+    }
+
+    .repair-navigation .btn {
+        font-size: 12px;
+        font-weight: 600;
+        border-radius: 8px;
+        padding: 9px 15px;
+    }
 
     .repair-card {
         background: #fff;
@@ -41,16 +56,16 @@
         border-bottom: 1px solid #edf0f4;
     }
 
-        .repair-card-header i {
-            color: #2563eb;
-            font-size: 18px;
-        }
+    .repair-card-header i {
+        color: #2563eb;
+        font-size: 18px;
+    }
 
-        .repair-card-header h5 {
-            margin: 0;
-            font-size: 14px;
-            font-weight: 700;
-        }
+    .repair-card-header h5 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 700;
+    }
 
     .repair-card-body {
         padding: 17px;
@@ -117,18 +132,18 @@
         margin: 0;
     }
 
-        .repair-table th {
-            background: #f8fafc;
-            font-size: 11px;
-            color: #667085;
-            white-space: nowrap;
-        }
+    .repair-table th {
+        background: #f8fafc;
+        font-size: 11px;
+        color: #667085;
+        white-space: nowrap;
+    }
 
-        .repair-table td,
-        .repair-table th {
-            padding: 10px 8px;
-            vertical-align: middle;
-        }
+    .repair-table td,
+    .repair-table th {
+        padding: 10px 8px;
+        vertical-align: middle;
+    }
 
     .repair-summary-row {
         display: flex;
@@ -139,13 +154,13 @@
         font-size: 13px;
     }
 
-        .repair-summary-row span {
-            color: #667085;
-        }
+    .repair-summary-row span {
+        color: #667085;
+    }
 
-        .repair-summary-row strong {
-            font-weight: 700;
-        }
+    .repair-summary-row strong {
+        font-weight: 700;
+    }
 
     .repair-summary-divider {
         border: 0;
@@ -160,9 +175,9 @@
         background: #f8fafc;
     }
 
-        .repair-labor-row strong {
-            color: #2563eb;
-        }
+    .repair-labor-row strong {
+        color: #2563eb;
+    }
 
     .repair-total-box {
         background: #eff6ff;
@@ -224,13 +239,18 @@
         .repair-heading h2 {
             font-size: 20px;
         }
+
+        .repair-navigation {
+            width: 100%;
+        }
     }
 </style>
 
 <div class="container-fluid repair-page">
 
     <!-- CABEÇALHO -->
-    <div class="repair-heading d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div class="repair-heading d-flex justify-content-between align-items-center flex-wrap gap-3">
+
         <div>
             <h2>
                 <i class="bi bi-wrench-adjustable text-primary me-2"></i>
@@ -243,14 +263,25 @@
             </p>
         </div>
 
-        <a asp-action="Index"
-           class="btn btn-sm btn-outline-secondary">
-            <i class="bi bi-arrow-left me-1"></i>
-            Voltar
-        </a>
+        <!-- BOTÃO DE NAVEGAÇÃO -->
+        <div class="repair-navigation">
+
+            <a asp-controller="Reparacoes"
+               asp-action="Index"
+               class="btn btn-outline-primary">
+
+                <i class="bi bi-list-check me-1"></i>
+                Ver Reparações
+
+            </a>
+
+        </div>
+
     </div>
 
-    <form asp-action="Create"
+    <!-- FORMULÁRIO -->
+    <form asp-controller="Reparacoes"
+          asp-action="Create"
           method="post"
           id="repairForm">
 
@@ -293,15 +324,12 @@
                                 {
                                     @foreach (var marcacao in ViewBag.Marcacoes)
                                     {
-                                        // Nome completo do cliente
                                         var cliente = marcacao.User?.FullName
                                             ?? "Cliente não identificado";
 
-                                        // Matrícula do veículo
                                         var matricula = marcacao.Veiculo?.Matricula
                                             ?? "Sem matrícula";
 
-                                        // Data e hora da marcação
                                         var horario = marcacao.DataHora
                                             .ToString("dd/MM/yyyy HH:mm");
 
@@ -644,16 +672,14 @@
                         <span asp-validation-for="CustoTotal"
                               class="text-danger small"></span>
 
-                        <button type="submit"
-                                class="btn btn-primary w-100 mb-2">
-                            <i class="bi bi-check-lg me-1"></i>
-                            Guardar Reparação
-                        </button>
-
-                        <a asp-action="Index"
-                           class="btn btn-outline-secondary w-100">
-                            Cancelar
-                        </a>
+                        <!-- BOTÃO CONCLUIR REPARAÇÃO -->
+                        <div class="d-flex justify-content-center mt-4 pt-2">
+                            <button type="submit"
+                                    class="btn btn-primary px-4 py-2">
+                                <i class="bi bi-check-lg me-2"></i>
+                                Concluir Reparação
+                            </button>
+                        </div>
 
                     </div>
                 </div>
@@ -1011,8 +1037,7 @@
             document.getElementById("totalVisual")
                 .textContent = formatarEuro(custoTotal);
 
-            // CORREÇÃO DO ERRO DE VALIDAÇÃO DECIMAL
-            // Exemplo: 57.50 -> 57,50
+            // FORMATO DECIMAL PARA PT-PT
             document.getElementById("CustoTotal")
                 .value = custoTotal.toFixed(2).replace(".", ",");
         }
@@ -1030,8 +1055,26 @@
                     return;
                 }
 
+                // EXIGIR PELO MENOS UMA PEÇA
+                if (pecas.length === 0) {
+
+                    event.preventDefault();
+
+                    alert("Adicione pelo menos uma peça à reparação.");
+                    return;
+                }
+
                 const inicio = dataInicioInput.value;
                 const fim = dataFimInput.value;
+
+                // EXIGIR DATA DE FIM
+                if (!fim) {
+
+                    event.preventDefault();
+
+                    alert("Informe a data de fim da reparação.");
+                    return;
+                }
 
                 // VALIDAR AS DATAS
                 if (inicio && fim && fim < inicio) {
@@ -1041,6 +1084,7 @@
                     alert(
                         "A data de fim não pode ser anterior à data de início."
                     );
+                    return;
                 }
             });
 
