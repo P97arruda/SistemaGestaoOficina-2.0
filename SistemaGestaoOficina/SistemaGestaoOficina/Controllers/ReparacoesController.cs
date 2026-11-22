@@ -79,7 +79,20 @@ namespace SistemaGestaoOficina.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            await CarregarListasAsync();
+            ViewBag.Marcacoes = await _marcacaoRepository
+                .GetMarcacoesDisponiveisAsync();
+
+            ViewBag.Mecanicos = await _mecanicoRepository
+                .GetAll()
+                .Where(m => m.Ativo)
+                .OrderBy(m => m.Nome)
+                .ToListAsync();
+
+            ViewBag.Pecas = await _pecaRepository
+                .GetAll()
+                .Where(p => p.Ativa)
+                .OrderBy(p => p.Nome)
+                .ToListAsync();
 
             return View(new ReparacaoViewModel
             {
@@ -90,7 +103,10 @@ namespace SistemaGestaoOficina.Controllers
         // POST: Reparacoes/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ReparacaoViewModel model, List<int> pecaIds, List<int> quantidades)
+        public async Task<IActionResult> Create(
+            ReparacaoViewModel model,
+            List<int> pecaIds,
+            List<int> quantidades)
         {
             pecaIds ??= new List<int>();
             quantidades ??= new List<int>();
@@ -100,28 +116,40 @@ namespace SistemaGestaoOficina.Controllers
 
             if (!model.MarcacaoId.HasValue)
             {
-                ModelState.AddModelError(nameof(model.MarcacaoId), "Selecione uma marcação.");
+                ModelState.AddModelError(
+                    nameof(model.MarcacaoId),
+                    "Selecione uma marcação.");
             }
             else
             {
-                marcacao = await _marcacaoRepository.GetByIdAsync(model.MarcacaoId.Value);
+                marcacao = await _marcacaoRepository
+                    .GetByIdAsync(model.MarcacaoId.Value);
 
                 if (marcacao == null)
                 {
-                    ModelState.AddModelError(nameof(model.MarcacaoId),"A marcação selecionada não existe.");
+                    ModelState.AddModelError(
+                        nameof(model.MarcacaoId),
+                        "A marcação selecionada não existe.");
                 }
                 else
                 {
-                    if (marcacao.Estado != "Pendente")
+                    if (marcacao.Estado != "Pendente" &&
+                        marcacao.Estado != "Agendada")
                     {
-                        ModelState.AddModelError(nameof(model.MarcacaoId), "Apenas marcações pendentes podem receber reparações.");
+                        ModelState.AddModelError(
+                            nameof(model.MarcacaoId),
+                            "Apenas marcações pendentes ou agendadas podem receber reparações.");
                     }
 
-                    bool jaExiste = await _reparacaoRepository.GetAll().AnyAsync(r => r.MarcacaoId == marcacao.Id);
+                    bool jaExiste = await _reparacaoRepository
+                        .GetAll()
+                        .AnyAsync(r => r.MarcacaoId == marcacao.Id);
 
                     if (jaExiste)
                     {
-                        ModelState.AddModelError(nameof(model.MarcacaoId), "Esta marcação já possui uma reparação.");
+                        ModelState.AddModelError(
+                            nameof(model.MarcacaoId),
+                            "Esta marcação já possui uma reparação.");
                     }
                 }
             }
@@ -129,51 +157,72 @@ namespace SistemaGestaoOficina.Controllers
             // 2. VALIDAR AS DATAS
             if (!model.DataInicio.HasValue)
             {
-                ModelState.AddModelError(nameof(model.DataInicio),"Informe a data de início.");
+                ModelState.AddModelError(
+                    nameof(model.DataInicio),
+                    "Informe a data de início.");
             }
 
             if (!model.DataFim.HasValue)
             {
-                ModelState.AddModelError(nameof(model.DataFim), "Informe a data de fim.");
+                ModelState.AddModelError(
+                    nameof(model.DataFim),
+                    "Informe a data de fim.");
             }
 
-            if (model.DataInicio.HasValue && model.DataFim.HasValue && model.DataFim.Value < model.DataInicio.Value)
+            if (model.DataInicio.HasValue &&
+                model.DataFim.HasValue &&
+                model.DataFim.Value < model.DataInicio.Value)
             {
-                ModelState.AddModelError(nameof(model.DataFim), "A data de fim não pode ser anterior à data de início.");
+                ModelState.AddModelError(
+                    nameof(model.DataFim),
+                    "A data de fim não pode ser anterior à data de início.");
             }
 
             // 3. VALIDAR OS MECÂNICOS
-            var mecanicoIds = model.MecanicoIds?.Distinct().ToList() ?? new List<int>();
+            var mecanicoIds = model.MecanicoIds?
+                .Distinct()
+                .ToList() ?? new List<int>();
 
             if (mecanicoIds.Count == 0)
             {
-                ModelState.AddModelError("", "Selecione pelo menos um mecânico.");
+                ModelState.AddModelError(
+                    "",
+                    "Selecione pelo menos um mecânico.");
             }
 
             foreach (var mecanicoId in mecanicoIds)
             {
-                var mecanico = await _mecanicoRepository.GetByIdAsync(mecanicoId);
+                var mecanico = await _mecanicoRepository
+                    .GetByIdAsync(mecanicoId);
 
                 if (mecanico == null || !mecanico.Ativo)
                 {
-                    ModelState.AddModelError("", "Um dos mecânicos selecionados é inválido.");
+                    ModelState.AddModelError(
+                        "",
+                        "Um dos mecânicos selecionados é inválido.");
                 }
             }
 
             // 4. VALIDAR AS PEÇAS
             if (pecaIds.Count == 0)
             {
-                ModelState.AddModelError("", "Adicione pelo menos uma peça à reparação.");
+                ModelState.AddModelError(
+                    "",
+                    "Adicione pelo menos uma peça à reparação.");
             }
 
             if (pecaIds.Count != quantidades.Count)
             {
-                ModelState.AddModelError("", "Os dados das peças e quantidades são inválidos.");
+                ModelState.AddModelError(
+                    "",
+                    "Os dados das peças e quantidades são inválidos.");
             }
 
             if (pecaIds.Count != pecaIds.Distinct().Count())
             {
-                ModelState.AddModelError("", "A mesma peça não pode ser adicionada duas vezes.");
+                ModelState.AddModelError(
+                    "",
+                    "A mesma peça não pode ser adicionada duas vezes.");
             }
 
             // 5. CALCULAR OS CUSTOS
@@ -188,18 +237,23 @@ namespace SistemaGestaoOficina.Controllers
             {
                 for (int i = 0; i < pecaIds.Count; i++)
                 {
-                    var peca = await _pecaRepository.GetByIdAsync(pecaIds[i]);
+                    var peca = await _pecaRepository
+                        .GetByIdAsync(pecaIds[i]);
 
                     if (peca == null || !peca.Ativa)
                     {
-                        ModelState.AddModelError("", "Uma das peças selecionadas é inválida.");
+                        ModelState.AddModelError(
+                            "",
+                            "Uma das peças selecionadas é inválida.");
 
                         continue;
                     }
 
                     if (quantidades[i] <= 0)
                     {
-                        ModelState.AddModelError("", "A quantidade deve ser maior que zero.");
+                        ModelState.AddModelError(
+                            "",
+                            "A quantidade deve ser maior que zero.");
 
                         continue;
                     }
@@ -215,10 +269,23 @@ namespace SistemaGestaoOficina.Controllers
                 }
             }
 
-            // 6. VERIFICAR SE EXISTEM ERROS
+            // 6. VERIFICAR ERROS
             if (!ModelState.IsValid)
             {
-                await CarregarListasAsync();
+                ViewBag.Marcacoes = await _marcacaoRepository
+                    .GetMarcacoesDisponiveisAsync();
+
+                ViewBag.Mecanicos = await _mecanicoRepository
+                    .GetAll()
+                    .Where(m => m.Ativo)
+                    .OrderBy(m => m.Nome)
+                    .ToListAsync();
+
+                ViewBag.Pecas = await _pecaRepository
+                    .GetAll()
+                    .Where(p => p.Ativa)
+                    .OrderBy(p => p.Nome)
+                    .ToListAsync();
 
                 return View(model);
             }
@@ -259,36 +326,6 @@ namespace SistemaGestaoOficina.Controllers
                 "Reparação concluída com sucesso!";
 
             return RedirectToAction(nameof(Index));
-        }
-
-        // CARREGAR AS LISTAS DO FORMULÁRIO
-        private async Task CarregarListasAsync()
-        {
-            // MARCAÇÕES PENDENTES SEM REPARAÇÃO
-            ViewBag.Marcacoes = await _marcacaoRepository
-                .GetAll()
-                .Include(m => m.User)
-                .Include(m => m.Veiculo)
-                .Where(m => m.Estado == "Pendente")
-                .Where(m => !_reparacaoRepository
-                    .GetAll()
-                    .Any(r => r.MarcacaoId == m.Id))
-                .OrderByDescending(m => m.DataHora)
-                .ToListAsync();
-
-            // MECÂNICOS ATIVOS
-            ViewBag.Mecanicos = await _mecanicoRepository
-                .GetAll()
-                .Where(m => m.Ativo)
-                .OrderBy(m => m.Nome)
-                .ToListAsync();
-
-            // PEÇAS ATIVAS
-            ViewBag.Pecas = await _pecaRepository
-                .GetAll()
-                .Where(p => p.Ativa)
-                .OrderBy(p => p.Nome)
-                .ToListAsync();
         }
     }
 }

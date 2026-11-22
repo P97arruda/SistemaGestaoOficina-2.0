@@ -1,5 +1,4 @@
-﻿
-@model IEnumerable<SistemaGestaoOficina.Data.Entities.Marcacao>
+﻿@model IEnumerable<SistemaGestaoOficina.Data.Entities.Marcacao>
 
 @{
     Layout = "_InternalLayout";
@@ -12,8 +11,9 @@
         .Where(m => m.Estado == "Agendada")
         .ToList();
 
+    // Corrigido: estado guardado sem acento
     var concluidas = marcacoes
-        .Where(m => m.Estado == "Concluída")
+        .Where(m => m.Estado == "Concluida")
         .ToList();
 
     var canceladas = marcacoes
@@ -49,7 +49,9 @@
     <!-- MENSAGENS -->
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <div class="alert alert-success alert-dismissible fade show"
+             role="alert">
+
             @TempData["SuccessMessage"]
 
             <button type="button"
@@ -62,7 +64,9 @@
 
     @if (TempData["ErrorMessage"] != null)
     {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <div class="alert alert-danger alert-dismissible fade show"
+             role="alert">
+
             @TempData["ErrorMessage"]
 
             <button type="button"

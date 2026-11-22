@@ -9,6 +9,7 @@ namespace SistemaGestaoOficina.Data.Repository
         Task<bool> DadosValidosAsync(Marcacao marcacao);
 
         Task<List<User>> GetClientesAsync();
+
         Task<List<Veiculo>> GetVeiculosAsync();
 
         Task<List<Mecanico>> GetMecanicosAsync();
@@ -17,6 +18,14 @@ namespace SistemaGestaoOficina.Data.Repository
 
         Task<bool> ExisteMarcacaoDuplicadaAsync(Marcacao marcacao);
 
+        Task<List<Marcacao>> GetMarcacoesDisponiveisAsync();
 
+        bool DataFutura(DateTime dataHora);
+
+        bool HorarioValido(DateTime dataHora);
+
+        Task<List<string>> ValidarMarcacaoAsync(Marcacao marcacao);
+
+        Task<List<Veiculo>> GetVeiculosPorClienteAsync(string? userId);
     }
 }
