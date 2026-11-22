@@ -25,6 +25,7 @@ namespace SistemaGestaoOficina.Data
             // Criar Roles
             await _userHelper.CheckRoleAsync("Admin");
             await _userHelper.CheckRoleAsync("Rececionista");
+            await _userHelper.CheckRoleAsync("Mecanico");
             await _userHelper.CheckRoleAsync("Cliente");
 
             // Procurar o Admin

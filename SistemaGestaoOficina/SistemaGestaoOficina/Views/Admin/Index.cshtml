@@ -1,3 +1,4 @@
+
 @using SistemaGestaoOficina.Data.Entities
 @using System.Collections.Generic
 @using System.Linq
@@ -186,7 +187,33 @@
                                     {
                                         <tr>
                                             <td class="py-3 ps-3 fw-semibold">
-                                                @rececionista.FullName
+
+                                                <div class="d-flex align-items-center gap-2">
+
+                                                    @if (rececionista.ImageId != Guid.Empty)
+                                                    {
+                                                        <img src="@rececionista.ImageFullPath"
+                                                             alt="Fotografia de @rececionista.FullName"
+                                                             style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover; flex-shrink: 0;" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="d-flex align-items-center justify-content-center text-white fw-bold"
+                                                             style="width: 38px; height: 38px; min-width: 38px; border-radius: 50%; background-color: #1683ff;">
+
+                                                            @(string.IsNullOrWhiteSpace(rececionista.FirstName)
+                                                                ? "U"
+                                                                : rececionista.FirstName.Substring(0, 1).ToUpper())
+
+                                                        </div>
+                                                    }
+
+                                                    <span>
+                                                        @rececionista.FullName
+                                                    </span>
+
+                                                </div>
+
                                             </td>
 
                                             <td class="py-3 text-muted">
@@ -253,7 +280,34 @@
                                     {
                                         <tr>
                                             <td class="py-3 ps-3 fw-semibold">
-                                                @mecanico.Nome
+
+                                                <div class="d-flex align-items-center gap-2">
+
+                                                    @if (mecanico.User != null &&
+                                                         mecanico.User.ImageId != Guid.Empty)
+                                                    {
+                                                        <img src="@mecanico.User.ImageFullPath"
+                                                             alt="Fotografia de @mecanico.Nome"
+                                                             style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover; flex-shrink: 0;" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="d-flex align-items-center justify-content-center text-white fw-bold"
+                                                             style="width: 38px; height: 38px; min-width: 38px; border-radius: 50%; background-color: #1683ff;">
+
+                                                            @(string.IsNullOrWhiteSpace(mecanico.Nome)
+                                                                ? "M"
+                                                                : mecanico.Nome.Substring(0, 1).ToUpper())
+
+                                                        </div>
+                                                    }
+
+                                                    <span>
+                                                        @mecanico.Nome
+                                                    </span>
+
+                                                </div>
+
                                             </td>
 
                                             <td class="py-3 text-muted">

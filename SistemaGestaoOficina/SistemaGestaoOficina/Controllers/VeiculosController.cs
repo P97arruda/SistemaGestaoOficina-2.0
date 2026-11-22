@@ -7,7 +7,7 @@ using SistemaGestaoOficina.Models;
 
 namespace SistemaGestaoOficina.Controllers
 {
-    [Authorize(Roles = "Rececionista")]
+    [Authorize(Roles = "Rececionista, Mecanico")]
     public class VeiculosController : Controller
     {
         private readonly IUserHelper _userHelper;

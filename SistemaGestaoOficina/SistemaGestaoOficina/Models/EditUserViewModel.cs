@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace SistemaGestaoOficina.Models
 {
@@ -28,5 +30,20 @@ namespace SistemaGestaoOficina.Models
         public string? NIF { get; set; }
 
         public string Role { get; set; } = string.Empty;
+
+        // Especialidade utilizada apenas para mecânicos
+        [Display(Name = "Especialidade")]
+        public int? TipoReparacaoId { get; set; }
+
+        // Estado utilizado apenas para mecânicos
+        [Display(Name = "Ativo")]
+        public bool Ativo { get; set; } = true;
+
+        // Nova fotografia selecionada pelo administrador
+        [Display(Name = "Fotografia")]
+        public IFormFile? ImageFile { get; set; }
+
+        // URL da fotografia atual
+        public string? ImageUrl { get; set; }
     }
 }

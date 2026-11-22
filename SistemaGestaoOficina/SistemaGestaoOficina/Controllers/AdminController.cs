@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using SistemaGestaoOficina.Data.Entities;
 using SistemaGestaoOficina.Data.Repository;
 using SistemaGestaoOficina.Helpers;
@@ -13,13 +16,13 @@ namespace SistemaGestaoOficina.Controllers
         private readonly IUserHelper _userHelper;
         private readonly IMailHelper _mailHelper;
         private readonly IBlobHelper _blobHelper;
-
         private readonly IMecanicoRepository _mecanicoRepository;
         private readonly ITipoReparacaoRepository _tipoReparacaoRepository;
 
-        public AdminController(IUserHelper userHelper, 
-            IMailHelper mailHelper, 
-            IBlobHelper blobHelper, 
+        public AdminController(
+            IUserHelper userHelper,
+            IMailHelper mailHelper,
+            IBlobHelper blobHelper,
             ITipoReparacaoRepository tipoReparacaoRepository,
             IMecanicoRepository mecanicoRepository)
         {
@@ -30,63 +33,99 @@ namespace SistemaGestaoOficina.Controllers
             _mecanicoRepository = mecanicoRepository;
         }
 
-
         public async Task<IActionResult> Index()
         {
-            // Buscar os rececionistas registados
-            var rececionistas = await _userHelper.GetUsersInRoleAsync("Rececionista");
+            var rececionistas =
+                await _userHelper.GetUsersInRoleAsync("Rececionista");
 
-            // Quantidade de rececionistas
             ViewBag.TotalRececionistas = rececionistas.Count();
-
-            // Lista de rececionistas
             ViewBag.Rececionistas = rececionistas;
 
-            // Quantidade total de utilizadores
             ViewBag.TotalUtilizadores = _userHelper.GetUsers().Count();
 
-            // Mecânicos registados
-            var mecanicos = _mecanicoRepository.GetAll().ToList();
+            var mecanicos = await _mecanicoRepository
+                .GetAll()
+                .Include(m => m.User)
+                .ToListAsync();
 
             ViewBag.TotalMecanicos = mecanicos.Count;
             ViewBag.Mecanicos = mecanicos;
 
-            // Quantidade de tipos de reparações
-            ViewBag.TotalTiposReparacoes = _tipoReparacaoRepository.GetAll().Count();
+            ViewBag.TotalTiposReparacoes =
+                _tipoReparacaoRepository.GetAll().Count();
 
             return View();
         }
 
-
+        // GET: Admin/CreateUser
         public IActionResult CreateUser()
         {
-            var model = new CreateUserViewModel();
+            ViewBag.TiposReparacao = new SelectList(
+                _tipoReparacaoRepository.GetAll()
+                    .OrderBy(t => t.Nome),
+                "Id",
+                "Nome");
 
-            return View(model);
+            return View(new CreateUserViewModel());
         }
 
-
+        // POST: Admin/CreateUser
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateUser(CreateUserViewModel model)
+        public async Task<IActionResult> CreateUser(
+            CreateUserViewModel model)
         {
-            // O Administrador só pode criar Rececionistas por enquanto
-            if (model.Role != "Rececionista")
+            ViewBag.TiposReparacao = new SelectList(
+                _tipoReparacaoRepository.GetAll()
+                    .OrderBy(t => t.Nome),
+                "Id",
+                "Nome",
+                model.TipoReparacaoId);
+
+            // Validar função
+            if (model.Role != "Rececionista" &&
+                model.Role != "Mecanico")
             {
                 ModelState.AddModelError(
                     nameof(model.Role),
-                    "O Administrador só pode criar contas de funcionários.");
+                    "Selecione uma função válida: Rececionista ou Mecânico.");
             }
 
-            // Validar a fotografia
+            // Validar especialidade
+            if (model.Role == "Mecanico")
+            {
+                if (!model.TipoReparacaoId.HasValue)
+                {
+                    ModelState.AddModelError(
+                        nameof(model.TipoReparacaoId),
+                        "Selecione uma especialidade.");
+                }
+                else
+                {
+                    var especialidade =
+                        _tipoReparacaoRepository.GetAll()
+                            .FirstOrDefault(t =>
+                                t.Id == model.TipoReparacaoId.Value);
+
+                    if (especialidade == null)
+                    {
+                        ModelState.AddModelError(
+                            nameof(model.TipoReparacaoId),
+                            "A especialidade selecionada não existe.");
+                    }
+                }
+            }
+
+            // Validar fotografia
             if (model.ImageFile != null)
             {
-                var extensao = Path.GetExtension(model.ImageFile.FileName).ToLowerInvariant();
+                var extensao = Path.GetExtension(
+                    model.ImageFile.FileName).ToLowerInvariant();
 
                 var extensoesPermitidas = new[]
                 {
-            ".jpg", ".jpeg", ".png", ".webp"
-        };
+                    ".jpg", ".jpeg", ".png", ".webp"
+                };
 
                 if (!extensoesPermitidas.Contains(extensao))
                 {
@@ -104,242 +143,441 @@ namespace SistemaGestaoOficina.Controllers
                 }
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
+                return View(model);
+
+            // Verificar email duplicado
+            var userByEmail =
+                await _userHelper.GetUserByEmailAsync(model.Email);
+
+            if (userByEmail != null)
             {
-                // Verificar se o email já existe
-                var userByEmail = await _userHelper.GetUserByEmailAsync(model.Email);
+                ModelState.AddModelError(
+                    nameof(model.Email),
+                    "Já existe um utilizador com este email.");
 
-                if (userByEmail != null)
-                {
-                    ModelState.AddModelError(
-                        nameof(model.Email),
-                        "Já existe um utilizador com este email.");
+                return View(model);
+            }
 
-                    return View(model);
-                }
+            // Verificar contacto duplicado
+            var userByPhone =
+                await _userHelper.GetUserByPhoneNumberAsync(
+                    model.PhoneNumber);
 
-                // Verificar se o contacto já existe
-                var userByPhone = await _userHelper.GetUserByPhoneNumberAsync(model.PhoneNumber);
+            if (userByPhone != null)
+            {
+                ModelState.AddModelError(
+                    nameof(model.PhoneNumber),
+                    "Já existe um utilizador com este contacto.");
 
-                if (userByPhone != null)
-                {
-                    ModelState.AddModelError(
-                        nameof(model.PhoneNumber),
-                        "Já existe um utilizador com este contacto.");
+                return View(model);
+            }
 
-                    return View(model);
-                }
+            // Criar conta Identity
+            var user = new User
+            {
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Email = model.Email,
+                UserName = model.Email,
+                PhoneNumber = model.PhoneNumber
+            };
 
-                // Criar o Rececionista
-                var user = new User
-                {
-                    FirstName = model.FirstName,
-                    LastName = model.LastName,
-                    Email = model.Email,
-                    UserName = model.Email,
-                    PhoneNumber = model.PhoneNumber
-                };
+            // Guardar fotografia no Azure
+            if (model.ImageFile != null)
+            {
+                user.ImageId = await _blobHelper.UploadBlobAsync(
+                    model.ImageFile, "profile");
+            }
 
-                // Guardar fotografia, caso exista
-                if (model.ImageFile != null)
-                {
-                    user.ImageId = await _blobHelper.UploadBlobAsync(
-                        model.ImageFile, "profile");
-                }
+            var result = await _userHelper.AddUserAsync(
+                user, "Temp123!");
 
-                // Criar a conta com password temporária
-                var result = await _userHelper.AddUserAsync(user, "Temp123!");
-
-                if (result.Succeeded)
-                {
-                    // Atribuir a Role de Rececionista
-                    await _userHelper.AddUserToRoleAsync(user, "Rececionista");
-
-                    // Gerar token para definir a password
-                    var token = await _userHelper.GeneratePasswordResetTokenAsync(user);
-
-                    var link = Url.Action(
-                        "ResetPassword",
-                        "Account",
-                        new
-                        {
-                            userName = user.Email,
-                            token = token
-                        },
-                        protocol: HttpContext.Request.Scheme);
-
-                    // Enviar email ao novo Rececionista
-                    var response = _mailHelper.SendEmail(
-                        user.Email!,
-                        "Criação de Conta - OficinaCET107",
-                        $"<h2>Bem-vindo à OficinaCET107</h2>" +
-                        $"<p>A sua conta foi criada.</p>" +
-                        $"<p>Para definir a sua password, clique no link abaixo:</p>" +
-                        $"<a href=\"{link}\">Definir Password</a>");
-
-                    if (!response.IsSuccess)
-                    {
-                        ModelState.AddModelError(
-                            string.Empty,
-                            response.Message);
-
-                        return View(model);
-                    }
-
-                    // Voltar à lista de Rececionistas
-                    return RedirectToAction(nameof(Rececionistas));
-                }
-
+            if (!result.Succeeded)
+            {
                 ModelState.AddModelError(
                     string.Empty,
                     result.Errors.FirstOrDefault()?.Description
-                    ?? "Erro ao criar o rececionista.");
+                    ?? "Erro ao criar o funcionário.");
+
+                return View(model);
             }
 
-            return View(model);
+            // Atribuir função
+            await _userHelper.AddUserToRoleAsync(
+                user, model.Role);
+
+            // Criar registo profissional
+            if (model.Role == "Mecanico")
+            {
+                var tipoReparacao =
+                    _tipoReparacaoRepository.GetAll()
+                        .First(t =>
+                            t.Id == model.TipoReparacaoId!.Value);
+
+                var mecanico = new Mecanico
+                {
+                    Nome = $"{model.FirstName} {model.LastName}",
+                    Especialidade = tipoReparacao.Nome,
+                    Horario = "09:00 às 18:00",
+                    Contacto = model.PhoneNumber,
+                    Ativo = model.Ativo,
+                    UserId = user.Id
+                };
+
+                await _mecanicoRepository.CreateAsync(mecanico);
+            }
+
+            // Gerar link para definir password
+            var token =
+                await _userHelper.GeneratePasswordResetTokenAsync(user);
+
+            var link = Url.Action(
+                "ResetPassword",
+                "Account",
+                new
+                {
+                    userName = user.Email,
+                    token = token
+                },
+                protocol: HttpContext.Request.Scheme);
+
+            // Enviar email
+            var response = _mailHelper.SendEmail(
+                user.Email!,
+                "Criação de Conta - OficinaCET107",
+                $"<h2>Bem-vindo à OficinaCET107</h2>" +
+                $"<p>A sua conta foi criada.</p>" +
+                $"<p>Para definir a sua password, clique no link abaixo:</p>" +
+                $"<a href=\"{link}\">Definir Password</a>");
+
+            if (!response.IsSuccess)
+            {
+                ModelState.AddModelError(
+                    string.Empty,
+                    response.Message);
+
+                return View(model);
+            }
+
+            if (model.Role == "Mecanico")
+                return RedirectToAction("Index", "Mecanicos");
+
+            return RedirectToAction(nameof(Rececionistas));
         }
 
-
+        // LISTA DE RECECIONISTAS
         public async Task<IActionResult> Rececionistas()
         {
-            var rececionistas = await _userHelper.GetUsersInRoleAsync("Rececionista");
+            var rececionistas =
+                await _userHelper.GetUsersInRoleAsync("Rececionista");
 
             return View(rececionistas);
         }
 
-
+        // GET: Admin/EditUser
+        [HttpGet]
         public async Task<IActionResult> EditUser(string id)
         {
             if (string.IsNullOrEmpty(id))
-            {
                 return NotFound();
-            }
 
             var user = await _userHelper.GetUserByIdAsync(id);
 
             if (user == null)
-            {
                 return NotFound();
-            }
 
-            // O Administrador só pode editar Rececionistas
-            if (!await _userHelper.IsUserInRoleAsync(user, "Rececionista"))
-            {
+            bool isMecanico = await _userHelper
+                .IsUserInRoleAsync(user, "Mecanico");
+
+            bool isRececionista = await _userHelper
+                .IsUserInRoleAsync(user, "Rececionista");
+
+            if (!isMecanico && !isRececionista)
                 return Forbid();
-            }
 
             var model = new EditUserViewModel
             {
                 Id = user.Id,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                Email = user.Email!,
-                PhoneNumber = user.PhoneNumber!,
-                Role = "Rececionista"
+                Email = user.Email ?? "",
+                PhoneNumber = user.PhoneNumber ?? "",
+                NIF = user.NIF,
+                Role = isMecanico ? "Mecanico" : "Rececionista",
+
+                // Mostrar fotografia atual do Azure
+                ImageUrl = user.ImageFullPath
             };
+
+            if (isMecanico)
+            {
+                var mecanico = _mecanicoRepository.GetAll()
+                    .FirstOrDefault(m => m.UserId == user.Id);
+
+                if (mecanico == null)
+                    return NotFound();
+
+                var tipoReparacao =
+                    _tipoReparacaoRepository.GetAll()
+                        .FirstOrDefault(t =>
+                            t.Nome == mecanico.Especialidade);
+
+                model.TipoReparacaoId = tipoReparacao?.Id;
+
+                // Carregar estado atual
+                model.Ativo = mecanico.Ativo;
+
+                ViewBag.TiposReparacao = new SelectList(
+                    _tipoReparacaoRepository.GetAll()
+                        .OrderBy(t => t.Nome),
+                    "Id",
+                    "Nome",
+                    model.TipoReparacaoId);
+            }
 
             return View(model);
         }
 
-
+        // POST: Admin/EditUser
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditUser(EditUserViewModel model)
+        public async Task<IActionResult> EditUser(
+            EditUserViewModel model)
         {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
-            var user = await _userHelper.GetUserByIdAsync(model.Id);
+            var user =
+                await _userHelper.GetUserByIdAsync(model.Id);
 
             if (user == null)
-            {
                 return NotFound();
-            }
 
-            // O Admin só pode editar Rececionistas
-            if (!await _userHelper.IsUserInRoleAsync(user, "Rececionista"))
-            {
+            bool isMecanico = await _userHelper
+                .IsUserInRoleAsync(user, "Mecanico");
+
+            bool isRececionista = await _userHelper
+                .IsUserInRoleAsync(user, "Rececionista");
+
+            if (!isMecanico && !isRececionista)
                 return Forbid();
+
+            // A função verdadeira vem do Identity
+            model.Role = isMecanico
+                ? "Mecanico"
+                : "Rececionista";
+
+            ModelState.Remove(nameof(model.Role));
+
+            // Manter a fotografia atual nos erros de validação
+            model.ImageUrl = user.ImageFullPath;
+
+            Mecanico? mecanico = null;
+            TipoReparacao? especialidade = null;
+
+            if (isMecanico)
+            {
+                mecanico = _mecanicoRepository.GetAll()
+                    .FirstOrDefault(m => m.UserId == user.Id);
+
+                if (mecanico == null)
+                    return NotFound();
+
+                if (model.TipoReparacaoId.HasValue)
+                {
+                    especialidade =
+                        _tipoReparacaoRepository.GetAll()
+                            .FirstOrDefault(t =>
+                                t.Id == model.TipoReparacaoId.Value);
+                }
+
+                if (especialidade == null)
+                {
+                    ModelState.AddModelError(
+                        nameof(model.TipoReparacaoId),
+                        "Selecione uma especialidade válida.");
+                }
+
+                ViewBag.TiposReparacao = new SelectList(
+                    _tipoReparacaoRepository.GetAll()
+                        .OrderBy(t => t.Nome),
+                    "Id",
+                    "Nome",
+                    model.TipoReparacaoId);
+
+                // Impedir desativação com marcações agendadas
+                if (mecanico.Ativo && !model.Ativo)
+                {
+                    bool temMarcacoesAgendadas =
+                        await _mecanicoRepository.GetAll()
+                            .Where(m => m.Id == mecanico.Id)
+                            .SelectMany(m => m.Marcacaos)
+                            .AnyAsync(m => m.Estado == "Agendada");
+
+                    if (temMarcacoesAgendadas)
+                    {
+                        ModelState.AddModelError(
+                            nameof(model.Ativo),
+                            "Não é possível desativar este mecânico porque possui marcações agendadas.");
+                    }
+                }
             }
 
-            // Verificar se o email pertence a outro utilizador
-            var userByEmail =
-                await _userHelper.GetUserByEmailAsync(model.Email);
-
-            if (userByEmail != null && userByEmail.Id != user.Id)
+            // Validar nova fotografia
+            if (model.ImageFile != null)
             {
-                ModelState.AddModelError(nameof(model.Email),"Já existe um utilizador com este email.");
+                var extensao = Path.GetExtension(
+                    model.ImageFile.FileName).ToLowerInvariant();
+
+                var extensoesPermitidas = new[]
+                {
+                    ".jpg", ".jpeg", ".png", ".webp"
+                };
+
+                if (!extensoesPermitidas.Contains(extensao))
+                {
+                    ModelState.AddModelError(
+                        nameof(model.ImageFile),
+                        "A fotografia deve ser JPG, PNG ou WebP.");
+                }
+
+                if (model.ImageFile.Length == 0 ||
+                    model.ImageFile.Length > 2 * 1024 * 1024)
+                {
+                    ModelState.AddModelError(
+                        nameof(model.ImageFile),
+                        "A fotografia deve ter no máximo 2 MB.");
+                }
+            }
+
+            if (!ModelState.IsValid)
+                return View(model);
+
+            // Verificar email duplicado
+            var userByEmail = await _userHelper
+                .GetUserByEmailAsync(model.Email);
+
+            if (userByEmail != null &&
+                userByEmail.Id != user.Id)
+            {
+                ModelState.AddModelError(
+                    nameof(model.Email),
+                    "Já existe um utilizador com este email.");
 
                 return View(model);
             }
 
-            // Verificar se o contacto pertence a outro utilizador
-            var userByPhone = await _userHelper.GetUserByPhoneNumberAsync(model.PhoneNumber);
+            // Verificar contacto duplicado
+            var userByPhone = await _userHelper
+                .GetUserByPhoneNumberAsync(model.PhoneNumber);
 
-            if (userByPhone != null && userByPhone.Id != user.Id)
+            if (userByPhone != null &&
+                userByPhone.Id != user.Id)
             {
-                ModelState.AddModelError(nameof(model.PhoneNumber), "Já existe um utilizador com este contacto.");
+                ModelState.AddModelError(
+                    nameof(model.PhoneNumber),
+                    "Já existe um utilizador com este contacto.");
 
                 return View(model);
             }
 
-            // Atualizar dados do Rececionista
+            // Atualizar dados Identity
             user.FirstName = model.FirstName;
             user.LastName = model.LastName;
             user.Email = model.Email;
             user.UserName = model.Email;
             user.PhoneNumber = model.PhoneNumber;
 
+            // Guardar nova fotografia no Azure Blob Storage
+            if (model.ImageFile != null)
+            {
+                try
+                {
+                    user.ImageId = await _blobHelper.UploadBlobAsync(
+                        model.ImageFile, "profile");
+                }
+                catch
+                {
+                    ModelState.AddModelError(
+                        nameof(model.ImageFile),
+                        "Não foi possível guardar a fotografia no Azure. Tente novamente.");
+
+                    return View(model);
+                }
+            }
+
+            // Guardar alterações no Identity
             var result = await _userHelper.UpdateUserAsync(user);
 
             if (!result.Succeeded)
             {
-                ModelState.AddModelError(string.Empty, result.Errors.FirstOrDefault()?.Description ?? "Erro ao atualizar o rececionista.");
+                ModelState.AddModelError(
+                    string.Empty,
+                    result.Errors.FirstOrDefault()?.Description
+                    ?? "Erro ao atualizar o funcionário.");
 
                 return View(model);
             }
 
+            // Atualizar registo profissional
+            if (isMecanico &&
+                mecanico != null &&
+                especialidade != null)
+            {
+                mecanico.Nome =
+                    $"{model.FirstName} {model.LastName}";
+
+                mecanico.Contacto = model.PhoneNumber;
+                mecanico.Especialidade = especialidade.Nome;
+
+                // Guardar novo estado
+                mecanico.Ativo = model.Ativo;
+
+                await _mecanicoRepository.UpdateAsync(mecanico);
+            }
+
+            TempData["SuccessMessage"] =
+                "Funcionário atualizado com sucesso.";
+
+            if (isMecanico)
+                return RedirectToAction("Index", "Mecanicos");
+
             return RedirectToAction(nameof(Rececionistas));
         }
 
-
+        // POST: DeleteUser
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteUser(string id)
         {
             if (string.IsNullOrEmpty(id))
-            {
                 return NotFound();
-            }
 
-            var user = await _userHelper.GetUserByIdAsync(id);
+            var user =
+                await _userHelper.GetUserByIdAsync(id);
 
             if (user == null)
-            {
                 return NotFound();
-            }
 
-
-            // O Admin só pode apagar Rececionistas
-            if (!await _userHelper.IsUserInRoleAsync(user, "Rececionista"))
+            if (!await _userHelper.IsUserInRoleAsync(
+                user, "Rececionista"))
             {
                 return Forbid();
             }
 
-            var result = await _userHelper.DeleteUserAsync(user);
+            var result =
+                await _userHelper.DeleteUserAsync(user);
 
             if (!result.Succeeded)
             {
-                TempData["ErrorMessage"] = "Não foi possível apagar o rececionista.";
+                TempData["ErrorMessage"] =
+                    "Não foi possível apagar o rececionista.";
+
                 return RedirectToAction(nameof(Rececionistas));
             }
 
-            TempData["SuccessMessage"] = "Rececionista apagado com sucesso.";
+            TempData["SuccessMessage"] =
+                "Rececionista apagado com sucesso.";
 
             return RedirectToAction(nameof(Rececionistas));
         }
-
     }
 }

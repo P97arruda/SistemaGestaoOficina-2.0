@@ -9,7 +9,7 @@ using SistemaGestaoOficina.Models;
 
 namespace SistemaGestaoOficina.Controllers
 {
-    [Authorize(Roles = "Rececionista")]
+    [Authorize(Roles = "Rececionista, Mecanico")]
     public class MarcacoesController : Controller
     {
         private readonly IMarcacaoRepository _marcacaoRepository;
@@ -29,6 +29,25 @@ namespace SistemaGestaoOficina.Controllers
                 .ToListAsync();
 
             return View(marcacoes);
+        }
+
+        // GET: Marcacoes/GetVeiculosPorCliente
+        [HttpGet]
+        public async Task<IActionResult> GetVeiculosPorCliente(string userId)
+        {
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return Json(Array.Empty<object>());
+            }
+
+            var veiculos = await _marcacaoRepository
+                .GetVeiculosPorClienteAsync(userId);
+
+            return Json(veiculos.Select(v => new
+            {
+                id = v.Id,
+                texto = $"{v.Marca} - {v.Modelo} - {v.Matricula}"
+            }));
         }
 
         // GET: Marcacoes/Details/5

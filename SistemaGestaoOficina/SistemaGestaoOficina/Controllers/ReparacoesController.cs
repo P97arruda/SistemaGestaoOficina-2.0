@@ -8,7 +8,7 @@ using SistemaGestaoOficina.Models;
 
 namespace SistemaGestaoOficina.Controllers
 {
-    [Authorize(Roles = "Rececionista")]
+    [Authorize(Roles = "Rececionista,Mecanico")]
     public class ReparacoesController : Controller
     {
         private readonly IReparacaoRepository _reparacaoRepository;

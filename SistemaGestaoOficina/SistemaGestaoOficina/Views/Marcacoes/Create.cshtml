@@ -97,10 +97,13 @@
 
                         <select asp-for="UserId"
                                 asp-items="ViewBag.Clientes"
-                                class="form-select">
+                                class="form-select"
+                                id="UserId">
+
                             <option value="">
                                 Selecione o cliente
                             </option>
+
                         </select>
 
                         <span asp-validation-for="UserId"
@@ -116,11 +119,15 @@
                         </label>
 
                         <select asp-for="VeiculoId"
-                                asp-items="ViewBag.Veiculos"
-                                class="form-select">
+                                class="form-select"
+                                id="VeiculoId"
+                                data-selected="@Model?.VeiculoId"
+                                disabled>
+
                             <option value="">
-                                Selecione o veículo
+                                Selecione primeiro um cliente
                             </option>
+
                         </select>
 
                         <span asp-validation-for="VeiculoId"
@@ -138,9 +145,11 @@
                         <select asp-for="MecanicoId"
                                 asp-items="ViewBag.Mecanicos"
                                 class="form-select">
+
                             <option value="">
                                 Selecione o mecânico
                             </option>
+
                         </select>
 
                         <span asp-validation-for="MecanicoId"
@@ -158,9 +167,11 @@
                         <select asp-for="TipoServico"
                                 asp-items="ViewBag.TiposServico"
                                 class="form-select">
+
                             <option value="">
                                 Selecione o tipo de serviço
                             </option>
+
                         </select>
 
                         <span asp-validation-for="TipoServico"
@@ -210,10 +221,8 @@
                                          stroke-linecap="round"
                                          stroke-linejoin="round">
 
-                                        <rect x="3"
-                                              y="5"
-                                              width="18"
-                                              height="16"
+                                        <rect x="3" y="5"
+                                              width="18" height="16"
                                               rx="2" />
 
                                         <path d="M16 3v4" />
@@ -223,7 +232,6 @@
                                     </svg>
 
                                 </span>
-
                             </div>
 
                             <small class="text-muted">
@@ -247,7 +255,6 @@
 
                             </div>
                         </div>
-
                     </div>
 
                     <!-- CAMPO ENVIADO AO CONTROLLER -->
@@ -290,6 +297,105 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
 
+            // CLIENTE E VEÍCULOS
+            const clienteSelect =
+                document.getElementById("UserId");
+
+            const veiculoSelect =
+                document.getElementById("VeiculoId");
+
+            const veiculoInicial =
+                veiculoSelect.dataset.selected;
+
+            let pedidoVeiculos = 0;
+
+            async function carregarVeiculos(clienteId, veiculoSelecionado = "") {
+
+                const pedidoAtual = ++pedidoVeiculos;
+
+                veiculoSelect.disabled = true;
+                veiculoSelect.innerHTML = "";
+
+                const opcao = document.createElement("option");
+                opcao.value = "";
+                opcao.textContent = clienteId
+                    ? "A carregar veículos..."
+                    : "Selecione primeiro um cliente";
+
+                veiculoSelect.appendChild(opcao);
+
+                if (!clienteId) {
+                    return;
+                }
+
+                try {
+                    const url =
+                        '@Url.Action("GetVeiculosPorCliente", "Marcacoes")'
+                        + "?userId=" + encodeURIComponent(clienteId);
+
+                    const response = await fetch(url);
+
+                    if (!response.ok) {
+                        throw new Error("Erro ao carregar veículos.");
+                    }
+
+                    const veiculos = await response.json();
+
+                    if (pedidoAtual !== pedidoVeiculos) {
+                        return;
+                    }
+
+                    veiculoSelect.innerHTML = "";
+
+                    const primeiraOpcao = document.createElement("option");
+                    primeiraOpcao.value = "";
+
+                    primeiraOpcao.textContent = veiculos.length > 0
+                        ? "Selecione o veículo"
+                        : "Este cliente não possui veículos registados";
+
+                    veiculoSelect.appendChild(primeiraOpcao);
+
+                    veiculos.forEach(function (veiculo) {
+
+                        const option = document.createElement("option");
+
+                        option.value = veiculo.id;
+                        option.textContent = veiculo.texto;
+
+                        if (String(veiculo.id) === String(veiculoSelecionado)) {
+                            option.selected = true;
+                        }
+
+                        veiculoSelect.appendChild(option);
+                    });
+
+                    veiculoSelect.disabled = veiculos.length === 0;
+
+                } catch (error) {
+
+                    if (pedidoAtual !== pedidoVeiculos) {
+                        return;
+                    }
+
+                    veiculoSelect.innerHTML =
+                        '<option value="">Erro ao carregar veículos</option>';
+
+                    veiculoSelect.disabled = true;
+
+                    console.error(error);
+                }
+            }
+
+            clienteSelect.addEventListener("change", function () {
+                carregarVeiculos(this.value);
+            });
+
+            if (clienteSelect.value) {
+                carregarVeiculos(clienteSelect.value, veiculoInicial);
+            }
+
+            // CALENDÁRIO
             const dataInput =
                 document.getElementById("dataMarcacao");
 
@@ -416,6 +522,15 @@
             }
 
             formulario.addEventListener("submit", function (event) {
+
+                if (!clienteSelect.value || !veiculoSelect.value) {
+
+                    event.preventDefault();
+
+                    alert("Selecione um cliente e um veículo.");
+
+                    return;
+                }
 
                 if (!dataHoraInput.value) {
 

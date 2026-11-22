@@ -320,7 +320,7 @@
                         <path d="M3 21v-2a6 6 0 0 1 12 0v2M19 8v6m-3-3h6" />
                     </svg>
 
-                    Criar Rececionistas
+                    Criar Funcionário
                 </a>
 
                 <a asp-controller="Admin"
@@ -337,51 +337,51 @@
 
                 <!-- MECÂNICOS -->
 
-               <a asp-controller="Mecanicos"
-                  asp-action="Index"
-                  class="sidebar-link @(currentController == "Mecanicos" ? "active" : "")">
+                <a asp-controller="Mecanicos"
+                   asp-action="Index"
+                   class="sidebar-link @(currentController == "Mecanicos" ? "active" : "")">
 
-                  <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M14 6a5 5 0 0 0-6 6l-5 5a2.1 2.1 0 0 0 3 3l5-5a5 5 0 0 0 6-6l-3 3-3-3 3-3Z" />
-                  </svg>
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M14 6a5 5 0 0 0-6 6l-5 5a2.1 2.1 0 0 0 3 3l5-5a5 5 0 0 0 6-6l-3 3-3-3 3-3Z" />
+                    </svg>
 
-                  Mecânicos
-               </a>
+                    Mecânicos
+                </a>
 
-               <!-- CONFIGURAÇÃO DA OFICINA -->
+                <!-- CONFIGURAÇÃO DA OFICINA -->
 
                 <div class="sidebar-title">
-                Configuração da Oficina
+                    Configuração da Oficina
                 </div>
 
                 <!-- TIPOS DE REPARAÇÕES -->
 
                 <a asp-controller="TiposReparacoes"
-                asp-action="Index"
-                class="sidebar-link @(currentController == "TiposReparacoes" ? "active" : "")">
+                   asp-action="Index"
+                   class="sidebar-link @(currentController == "TiposReparacoes" ? "active" : "")">
 
-                <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="m14 4 6 6M3 21l9-9M15 3l6 6-3 3-6-6 3-3Z" />
-                </svg>
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="m14 4 6 6M3 21l9-9M15 3l6 6-3 3-6-6 3-3Z" />
+                    </svg>
 
-                Tipos de Reparações
+                    Tipos de Reparações
                 </a>
 
                 <!-- PEÇAS -->
 
                 <a asp-controller="Pecas"
-                asp-action="Index"
-                class="sidebar-link @(currentController == "Pecas" ? "active" : "")">
+                   asp-action="Index"
+                   class="sidebar-link @(currentController == "Pecas" ? "active" : "")">
 
-                <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M4 7h16v13H4zM4 7l4-4h8l4 4M9 12h6m-6 4h6" />
-                </svg>
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M4 7h16v13H4zM4 7l4-4h8l4 4M9 12h6m-6 4h6" />
+                    </svg>
 
-                Peças
+                    Peças
                 </a>
             }
 
-            @if (User.IsInRole("Rececionista"))
+            @if (User.IsInRole("Rececionista") || User.IsInRole("Mecanico"))
             {
                 <!-- GESTÃO DA OFICINA -->
 
@@ -432,7 +432,7 @@
                     Veículos
                 </a>
 
-                <!-- MARCAÇÕES  -->
+                <!-- MARCAÇÕES -->
 
                 <a asp-controller="Marcacoes"
                    asp-action="Index"
@@ -446,20 +446,18 @@
                     Marcações
                 </a>
 
-                
+                <!-- REPARAÇÕES -->
 
-                <!--REPARAÇÕES -->
                 <a asp-controller="Reparacoes"
-                 asp-action="Create"
-                 class="sidebar-link @(currentController == "Reparacoes" ? "active" : "")">
+                   asp-action="Create"
+                   class="sidebar-link @(currentController == "Reparacoes" ? "active" : "")">
 
-                <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M14.7 6.3a5 5 0 0 0-6.4 6.4L3 18l3 3 5.3-5.3a5 5 0 0 0 6.4-6.4L14 13l-3-3 3.7-3.7Z" />
-                </svg>
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M14.7 6.3a5 5 0 0 0-6.4 6.4L3 18l3 3 5.3-5.3a5 5 0 0 0 6.4-6.4L14 13l-3-3 3.7-3.7Z" />
+                    </svg>
 
-                Reparações e Faturação
+                    Reparações e Faturação
                 </a>
-
             }
 
             <!-- CONTA -->
@@ -481,7 +479,6 @@
 
                 Meu Perfil
             </a>
-
 
             <a asp-controller="Home"
                asp-action="Index"
@@ -528,6 +525,10 @@
                     {
                         <span>Rececionista</span>
                     }
+                    else if (User.IsInRole("Mecanico"))
+                    {
+                        <span>Mecânico</span>
+                    }
 
                 </div>
             </div>
@@ -569,6 +570,10 @@
                         else if (User.IsInRole("Rececionista"))
                         {
                             <span>Rececionista</span>
+                        }
+                        else if (User.IsInRole("Mecanico"))
+                        {
+                            <span>Mecânico</span>
                         }
 
                     </div>

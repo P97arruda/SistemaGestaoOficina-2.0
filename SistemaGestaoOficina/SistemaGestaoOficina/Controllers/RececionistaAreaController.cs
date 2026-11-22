@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace SistemaGestaoOficina.Controllers
 {
-    [Authorize(Roles = "Rececionista")]
+    [Authorize(Roles = "Rececionista, Mecanico")]
     public class RececionistaAreaController : Controller
     {
         private readonly IUserHelper _userHelper;

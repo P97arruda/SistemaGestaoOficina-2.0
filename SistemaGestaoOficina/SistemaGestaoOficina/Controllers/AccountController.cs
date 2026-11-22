@@ -55,7 +55,7 @@ namespace SistemaGestaoOficina.Controllers
                             return RedirectToAction("Index", "ClienteArea");
                         }
 
-                        if (await _userHelper.IsUserInRoleAsync(user, "Rececionista"))
+                        if (await _userHelper.IsUserInRoleAsync(user, "Rececionista") || await _userHelper.IsUserInRoleAsync(user, "Mecanico"))
                         {
                             return RedirectToAction("Index", "RececionistaArea");
                         }
@@ -310,7 +310,7 @@ namespace SistemaGestaoOficina.Controllers
                 return RedirectToAction("Index", "Admin");
             }
 
-            if (await _userHelper.IsUserInRoleAsync(user, "Rececionista"))
+            if (await _userHelper.IsUserInRoleAsync(user, "Rececionista") || await _userHelper.IsUserInRoleAsync(user, "Mecanico"))
             {
                 return RedirectToAction("Index", "RececionistaArea");
             }
@@ -408,7 +408,7 @@ namespace SistemaGestaoOficina.Controllers
                 return RedirectToAction("Index", "Admin");
             }
 
-            if (await _userHelper.IsUserInRoleAsync(user, "Rececionista"))
+            if (await _userHelper.IsUserInRoleAsync(user, "Rececionista") || await _userHelper.IsUserInRoleAsync(user, "Mecanico"))
             {
                 return RedirectToAction("Index", "RececionistaArea");
             }

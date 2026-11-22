@@ -345,6 +345,10 @@
                                             {
                                                 <text>Rececionista</text>
                                             }
+                                            else if (User.IsInRole("Mecanico"))
+                                            {
+                                                <text>Mecânico</text>
+                                            }
                                             else if (User.IsInRole("Cliente"))
                                             {
                                                 <text>Cliente</text>
@@ -370,9 +374,9 @@
                                 </li>
                             }
 
-                            <!-- ÁREA DO RECECIONISTA -->
+                            <!-- ÁREA DO RECECIONISTA E MECÂNICO -->
 
-                            @if (User.IsInRole("Rececionista"))
+                            @if (User.IsInRole("Rececionista") || User.IsInRole("Mecanico"))
                             {
                                 <li class="nav-item">
                                     <a class="navbar-dashboard-link"

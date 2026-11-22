@@ -62,6 +62,13 @@ namespace SistemaGestaoOficina.Data
                 .WithMany(v => v.Marcacaos)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // MECÂNICO - UTILIZADOR (IDENTITY)
+            modelBuilder.Entity<Mecanico>()
+                .HasOne(m => m.User)
+                .WithOne()
+                .HasForeignKey<Mecanico>(m => m.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             // MARCAÇÃO - UTILIZADOR
             modelBuilder.Entity<Marcacao>()
                 .HasOne(m => m.User)

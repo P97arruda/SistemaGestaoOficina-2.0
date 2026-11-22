@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿
+using System.ComponentModel.DataAnnotations;
 
 namespace SistemaGestaoOficina.Models
 {
@@ -24,6 +25,14 @@ namespace SistemaGestaoOficina.Models
         [Required]
         [Display(Name = "Tipo de Utilizador")]
         public string Role { get; set; }
+
+        // Especialidade do mecânico
+        [Display(Name = "Especialidade")]
+        public int? TipoReparacaoId { get; set; }
+
+        // Estado utilizado apenas para mecânicos
+        [Display(Name = "Ativo")]
+        public bool Ativo { get; set; } = true;
 
         [Display(Name = "NIF")]
         [MaxLength(9, ErrorMessage = "O campo {0} pode conter no máximo {1} caracteres.")]

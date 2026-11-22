@@ -17,8 +17,8 @@
             </p>
         </div>
 
-        <a asp-controller="Mecanicos"
-           asp-action="Create"
+        <a asp-controller="Admin"
+           asp-action="CreateUser"
            class="btn btn-primary">
             + Criar Mecânico
         </a>
@@ -61,9 +61,47 @@
                             @foreach (var mecanico in Model)
                             {
                                 <tr>
-                                    <td>@mecanico.Nome</td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+
+                                            @if (mecanico.User != null &&
+                                                 mecanico.User.ImageId != Guid.Empty)
+                                            {
+                                                <img src="@mecanico.User.ImageFullPath"
+                                                     alt="Fotografia de @mecanico.Nome"
+                                                     style="width: 38px;
+                                                            height: 38px;
+                                                            border-radius: 50%;
+                                                            object-fit: cover;
+                                                            flex-shrink: 0;" />
+                                            }
+                                            else
+                                            {
+                                                <div class="d-flex align-items-center justify-content-center text-white fw-bold"
+                                                     style="width: 38px;
+                                                            height: 38px;
+                                                            min-width: 38px;
+                                                            border-radius: 50%;
+                                                            background-color: #1683ff;">
+
+                                                    @(string.IsNullOrWhiteSpace(mecanico.Nome)
+                                                        ? "M"
+                                                        : mecanico.Nome.Substring(0, 1).ToUpper())
+
+                                                </div>
+                                            }
+
+                                            <span>
+                                                @mecanico.Nome
+                                            </span>
+
+                                        </div>
+                                    </td>
+
                                     <td>@mecanico.Especialidade</td>
+
                                     <td>@mecanico.Horario</td>
+
                                     <td>@mecanico.Contacto</td>
 
                                     <td>
@@ -89,27 +127,21 @@
                                             Detalhes
                                         </a>
 
-                                        <a asp-controller="Mecanicos"
-                                           asp-action="Edit"
-                                           asp-route-id="@mecanico.Id"
-                                           class="btn btn-sm btn-warning">
-                                            Editar
-                                        </a>
-
-                                        <form asp-controller="Mecanicos"
-                                              asp-action="Delete"
-                                              asp-route-id="@mecanico.Id"
-                                              method="post"
-                                              class="d-inline"
-                                              onsubmit="return confirm('Tem a certeza de que deseja apagar este mecânico?');">
-
-                                            @Html.AntiForgeryToken()
-
-                                            <button type="submit"
-                                                    class="btn btn-sm btn-danger">
-                                                Apagar
-                                            </button>
-                                        </form>
+                                        @if (!string.IsNullOrEmpty(mecanico.UserId))
+                                        {
+                                            <a asp-controller="Admin"
+                                               asp-action="EditUser"
+                                               asp-route-id="@mecanico.UserId"
+                                               class="btn btn-sm btn-warning">
+                                                Editar
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small">
+                                                Sem conta associada
+                                            </span>
+                                        }
                                     </td>
                                 </tr>
                             }

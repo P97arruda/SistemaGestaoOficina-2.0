@@ -142,8 +142,15 @@ namespace SistemaGestaoOficina.Data.Repository
 
         public async Task<List<Veiculo>> GetVeiculosPorClienteAsync(string? userId)
         {
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return new List<Veiculo>();
+            }
+
             return await _context.Set<Veiculo>()
-                .Where(v => string.IsNullOrEmpty(userId) || v.UserId == userId)
+                .Where(v => v.UserId == userId)
+                .OrderBy(v => v.Marca)
+                .ThenBy(v => v.Modelo)
                 .ToListAsync();
         }
     }

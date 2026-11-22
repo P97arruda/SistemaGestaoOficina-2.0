@@ -46,6 +46,8 @@
                           method="post"
                           enctype="multipart/form-data">
 
+                        @Html.AntiForgeryToken()
+
                         <div asp-validation-summary="ModelOnly"
                              class="text-danger mb-3">
                         </div>
@@ -114,12 +116,70 @@
 
                                 <option value="">Selecione...</option>
                                 <option value="Rececionista">Rececionista</option>
+                                <option value="Mecanico">Mecânico</option>
 
                             </select>
 
                             <span asp-validation-for="Role"
                                   class="text-danger">
                             </span>
+
+                        </div>
+
+                        <!-- Especialidade do Mecânico -->
+                        <div class="mb-3 d-none"
+                             id="especialidadeContainer">
+
+                            <label asp-for="TipoReparacaoId"
+                                   class="form-label">
+                            </label>
+
+                            <select asp-for="TipoReparacaoId"
+                                    asp-items="ViewBag.TiposReparacao"
+                                    class="form-select"
+                                    id="especialidadeSelect">
+
+                                <option value="">
+                                    Selecione uma especialidade...
+                                </option>
+
+                            </select>
+
+                            <span asp-validation-for="TipoReparacaoId"
+                                  class="text-danger">
+                            </span>
+
+                            <small class="text-muted">
+                                As especialidades são obtidas dos tipos de reparação registados.
+                            </small>
+
+                        </div>
+
+                        <!-- Estado do Mecânico -->
+                        <div class="mb-3 d-none"
+                             id="estadoMecanicoContainer">
+
+                            <label asp-for="Ativo"
+                                   class="form-label d-block">
+                                Estado do Mecânico
+                            </label>
+
+                            <select asp-for="Ativo"
+                                    class="form-select"
+                                    id="estadoMecanicoSelect">
+
+                                <option value="true">Ativo</option>
+                                <option value="false">Inativo</option>
+
+                            </select>
+
+                            <span asp-validation-for="Ativo"
+                                  class="text-danger">
+                            </span>
+
+                            <small class="text-muted">
+                                Mecânicos inativos não devem ficar disponíveis para novas marcações.
+                            </small>
 
                         </div>
 
@@ -219,6 +279,45 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
 
+            // Mostrar especialidade e estado apenas para Mecânicos
+            const roleSelect = document.getElementById("roleSelect");
+
+            const especialidadeContainer =
+                document.getElementById("especialidadeContainer");
+
+            const especialidadeSelect =
+                document.getElementById("especialidadeSelect");
+
+            const estadoMecanicoContainer =
+                document.getElementById("estadoMecanicoContainer");
+
+            const estadoMecanicoSelect =
+                document.getElementById("estadoMecanicoSelect");
+
+            function atualizarEspecialidade() {
+                const isMecanico = roleSelect.value === "Mecanico";
+
+                especialidadeContainer.classList.toggle(
+                    "d-none", !isMecanico);
+
+                especialidadeSelect.required = isMecanico;
+                especialidadeSelect.disabled = !isMecanico;
+
+                estadoMecanicoContainer.classList.toggle(
+                    "d-none", !isMecanico);
+
+                estadoMecanicoSelect.disabled = !isMecanico;
+
+                if (!isMecanico) {
+                    especialidadeSelect.value = "";
+                }
+            }
+
+            roleSelect.addEventListener(
+                "change", atualizarEspecialidade);
+
+            atualizarEspecialidade();
+
             // Pré-visualização da fotografia
             const inputFoto = document.getElementById("ImageFile");
             const previewFoto = document.getElementById("photoPreview");
@@ -285,7 +384,6 @@
                     successAlert.remove();
                 }, 4000);
             }
-
         });
     </script>
 }

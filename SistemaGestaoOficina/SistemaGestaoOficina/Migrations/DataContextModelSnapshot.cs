@@ -228,7 +228,14 @@ namespace SistemaGestaoOficina.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
 
                     b.ToTable("Mecanicos");
                 });
@@ -608,6 +615,16 @@ namespace SistemaGestaoOficina.Migrations
                     b.Navigation("User");
 
                     b.Navigation("Veiculo");
+                });
+
+            modelBuilder.Entity("SistemaGestaoOficina.Data.Entities.Mecanico", b =>
+                {
+                    b.HasOne("SistemaGestaoOficina.Data.Entities.User", "User")
+                        .WithOne()
+                        .HasForeignKey("SistemaGestaoOficina.Data.Entities.Mecanico", "UserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SistemaGestaoOficina.Data.Entities.MecanicoReparacao", b =>

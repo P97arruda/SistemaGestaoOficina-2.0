@@ -64,8 +64,44 @@
                             @foreach (var rececionista in Model)
                             {
                                 <tr>
-                                    <td>@rececionista.FullName</td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+
+                                            @if (rececionista.ImageId != Guid.Empty)
+                                            {
+                                                <img src="@rececionista.ImageFullPath"
+                                                     alt="Fotografia de @rececionista.FullName"
+                                                     style="width: 38px;
+                                                            height: 38px;
+                                                            border-radius: 50%;
+                                                            object-fit: cover;
+                                                            flex-shrink: 0;" />
+                                            }
+                                            else
+                                            {
+                                                <div class="d-flex align-items-center justify-content-center text-white fw-bold"
+                                                     style="width: 38px;
+                                                            height: 38px;
+                                                            min-width: 38px;
+                                                            border-radius: 50%;
+                                                            background-color: #1683ff;">
+
+                                                    @(string.IsNullOrWhiteSpace(rececionista.FirstName)
+                                                        ? "U"
+                                                        : rececionista.FirstName.Substring(0, 1).ToUpper())
+
+                                                </div>
+                                            }
+
+                                            <span>
+                                                @rececionista.FullName
+                                            </span>
+
+                                        </div>
+                                    </td>
+
                                     <td>@rececionista.Email</td>
+
                                     <td>@rececionista.PhoneNumber</td>
 
                                     <td>
@@ -98,7 +134,8 @@
                         else
                         {
                             <tr>
-                                <td colspan="4" class="text-center text-muted py-4">
+                                <td colspan="4"
+                                    class="text-center text-muted py-4">
                                     Ainda não existem rececionistas registados.
                                 </td>
                             </tr>
