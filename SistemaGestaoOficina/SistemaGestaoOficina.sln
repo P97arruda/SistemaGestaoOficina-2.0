@@ -5,6 +5,8 @@ VisualStudioVersion = 18.10.12217.157
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SistemaGestaoOficina", "SistemaGestaoOficina\SistemaGestaoOficina.csproj", "{670392AA-0588-4B79-A726-7A00A80562E2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OficinaCET107.Mobile", "OficinaCET107.Mobile\OficinaCET107.Mobile.csproj", "{FBF52EF4-9920-4D3F-A1DA-91AD09F4FAB4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{670392AA-0588-4B79-A726-7A00A80562E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{670392AA-0588-4B79-A726-7A00A80562E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{670392AA-0588-4B79-A726-7A00A80562E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBF52EF4-9920-4D3F-A1DA-91AD09F4FAB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBF52EF4-9920-4D3F-A1DA-91AD09F4FAB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBF52EF4-9920-4D3F-A1DA-91AD09F4FAB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBF52EF4-9920-4D3F-A1DA-91AD09F4FAB4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
