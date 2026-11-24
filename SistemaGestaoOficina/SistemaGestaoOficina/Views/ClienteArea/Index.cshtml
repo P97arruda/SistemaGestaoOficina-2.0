@@ -1,4 +1,5 @@
-﻿@model IEnumerable<SistemaGestaoOficina.Data.Entities.Veiculo>
+﻿
+@model IEnumerable<SistemaGestaoOficina.Data.Entities.Veiculo>
 
 @{
     ViewData["Title"] = "Área do Cliente";
@@ -6,23 +7,22 @@
 
 <div class="container mt-4 mb-5">
 
-    <!-- Boas-vindas -->
+    <!-- CABEÇALHO -->
     <div class="mb-4">
-        <h2 class="fw-bold">Bem-vindo à sua oficina!</h2>
+        <h2 class="fw-bold mb-1">Bem-vindo à sua oficina!</h2>
 
-        <p class="text-muted">
+        <p class="text-muted mb-0">
             Faça a gestão dos seus veículos, consulte os seus dados
             e acompanhe os serviços da nossa oficina.
         </p>
     </div>
 
-    <!-- Resumo do Cliente -->
+    <!-- RESUMO -->
     <div class="row g-3 mb-4">
 
-        <!-- Total de Veículos -->
         <div class="col-md-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-body">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body p-4">
                     <h6 class="text-muted">Meus Veículos</h6>
 
                     <h2 class="fw-bold text-primary">
@@ -36,14 +36,11 @@
             </div>
         </div>
 
-        <!-- Marcações -->
         <div class="col-md-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-body">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body p-4">
                     <h6 class="text-muted">Marcações</h6>
-
                     <h2 class="fw-bold">—</h2>
-
                     <p class="mb-0 text-muted">
                         Disponível em breve
                     </p>
@@ -51,14 +48,11 @@
             </div>
         </div>
 
-        <!-- Serviços Realizados -->
         <div class="col-md-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-body">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body p-4">
                     <h6 class="text-muted">Serviços Realizados</h6>
-
                     <h2 class="fw-bold">—</h2>
-
                     <p class="mb-0 text-muted">
                         Disponível em breve
                     </p>
@@ -68,23 +62,24 @@
 
     </div>
 
-    <!-- Funcionalidades do Cliente -->
+    <!-- MENU DO CLIENTE -->
     <div id="menuCliente">
 
         <h5 class="fw-bold mb-3">O que deseja fazer?</h5>
 
         <div class="row g-3">
 
-            <!-- Meus Veículos -->
+            <!-- 1. MEUS VEÍCULOS -->
             <div class="col-md-6">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body d-flex flex-column">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body p-4 d-flex flex-column">
 
-                        <h5 class="card-title fw-bold">
+                        <h5 class="fw-bold">
+                            <i class="bi bi-car-front text-primary me-2"></i>
                             Meus Veículos
                         </h5>
 
-                        <p class="card-text text-muted">
+                        <p class="text-muted">
                             Consulte e edite os veículos associados
                             à sua conta.
                         </p>
@@ -101,44 +96,18 @@
                 </div>
             </div>
 
-            <!-- Meu Perfil -->
+            <!-- 2. MARCAÇÕES -->
             <div class="col-md-6">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body d-flex flex-column">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body p-4 d-flex flex-column">
 
-                        <h5 class="card-title fw-bold">
-                            Meu Perfil
-                        </h5>
-
-                        <p class="card-text text-muted">
-                            Consulte e atualize os seus dados pessoais
-                            e informações de contacto.
-                        </p>
-
-                        <div class="mt-auto">
-                            <a asp-controller="ClienteArea"
-                               asp-action="EditarPerfil"
-                               class="btn btn-primary">
-                                Editar Perfil
-                            </a>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-
-            <!-- Marcações -->
-            <div class="col-md-6">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body d-flex flex-column">
-
-                        <h5 class="card-title fw-bold">
+                        <h5 class="fw-bold">
+                            <i class="bi bi-calendar-check text-primary me-2"></i>
                             Marcações
                         </h5>
 
-                        <p class="card-text text-muted">
-                            Consulte as suas marcações
-                            na oficina.
+                        <p class="text-muted">
+                            Consulte as suas marcações na oficina.
                         </p>
 
                         <div class="mt-auto">
@@ -153,16 +122,17 @@
                 </div>
             </div>
 
-            <!-- Histórico -->
+            <!-- 3. HISTÓRICO -->
             <div class="col-md-6">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body d-flex flex-column">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body p-4 d-flex flex-column">
 
-                        <h5 class="card-title fw-bold">
+                        <h5 class="fw-bold">
+                            <i class="bi bi-clock-history text-primary me-2"></i>
                             Histórico de Serviços
                         </h5>
 
-                        <p class="card-text text-muted">
+                        <p class="text-muted">
                             Consulte o histórico dos serviços
                             realizados nos seus veículos.
                         </p>
@@ -179,22 +149,50 @@
                 </div>
             </div>
 
+            <!-- 4. MEU PERFIL -->
+            <div class="col-md-6">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body p-4 d-flex flex-column">
+
+                        <h5 class="fw-bold">
+                            <i class="bi bi-person-circle text-primary me-2"></i>
+                            Meu Perfil
+                        </h5>
+
+                        <p class="text-muted">
+                            Consulte e atualize os seus dados pessoais
+                            e informações de contacto.
+                        </p>
+
+                        <div class="mt-auto">
+                            <a asp-controller="ClienteArea"
+                               asp-action="EditarPerfil"
+                               class="btn btn-primary">
+                                Editar Perfil
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
-    <!-- Secção dos Veículos -->
+    <!-- SECÇÃO DOS VEÍCULOS -->
     <div id="secaoVeiculos" class="mt-4" style="display: none;">
 
-        <div class="mb-3">
-            <h4 class="fw-bold">Os Meus Veículos</h4>
+        <div class="mb-4">
+            <h4 class="fw-bold mb-1">Os Meus Veículos</h4>
 
-            <p class="text-muted">
+            <p class="text-muted mb-0">
                 Consulte e atualize as informações dos seus veículos.
             </p>
         </div>
 
-        <div class="card shadow-sm">
-            <div class="card-body">
+        <div class="card shadow-sm border-0">
+
+            <div class="card-body p-3">
 
                 @if (Model == null || !Model.Any())
                 {
@@ -217,7 +215,7 @@
                                     <th>Ano</th>
                                     <th>Quilometragem</th>
                                     <th>Combustível</th>
-                                    <th>Ações</th>
+                                    <th class="text-end">Ações</th>
                                 </tr>
                             </thead>
 
@@ -232,11 +230,11 @@
                                         <td>@veiculo.Quilometragem</td>
                                         <td>@veiculo.Combustivel</td>
 
-                                        <td>
+                                        <td class="text-end">
                                             <a asp-controller="ClienteArea"
                                                asp-action="EditarVeiculo"
                                                asp-route-id="@veiculo.Id"
-                                               class="btn btn-sm btn-outline-primary">
+                                               class="btn btn-sm btn-warning">
                                                 Editar
                                             </a>
                                         </td>
@@ -253,7 +251,7 @@
         </div>
 
         <button type="button"
-                class="btn btn-outline-secondary mt-3"
+                class="btn btn-secondary mt-3"
                 onclick="fecharSecao()">
             Voltar
         </button>
@@ -265,18 +263,13 @@
 @section Scripts {
     <script>
         function mostrarSecao(id) {
-
             document.getElementById("menuCliente").style.display = "none";
-
             document.getElementById("secaoVeiculos").style.display = "none";
-
             document.getElementById(id).style.display = "block";
         }
 
         function fecharSecao() {
-
             document.getElementById("secaoVeiculos").style.display = "none";
-
             document.getElementById("menuCliente").style.display = "block";
         }
     </script>

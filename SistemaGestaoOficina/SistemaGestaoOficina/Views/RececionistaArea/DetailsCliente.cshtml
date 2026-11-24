@@ -1,0 +1,128 @@
+﻿
+@model SistemaGestaoOficina.Data.Entities.User
+
+@{
+    ViewData["Title"] = "Detalhes do Cliente";
+    Layout = "~/Views/Shared/_InternalLayout.cshtml";
+
+    int totalVeiculos = ViewBag.TotalVeiculos ?? 0;
+}
+
+<div class="container-fluid py-4">
+
+    <!-- CABEÇALHO -->
+    <div class="mb-4">
+        <h2 class="fw-bold mb-1">Detalhes do Cliente</h2>
+
+        <p class="text-muted mb-0">
+            Consulte as informações do cliente registado na OficinaCET107.
+        </p>
+    </div>
+
+    <!-- CARTÃO PRINCIPAL -->
+    <div class="card shadow-sm border-0 rounded-3"
+         style="max-width: 900px;">
+
+        <div class="card-body p-4">
+
+            <!-- FOTOGRAFIA E NOME -->
+            <div class="d-flex align-items-center gap-3 mb-4">
+
+                @if (Model.ImageId != Guid.Empty)
+                {
+                    <img src="@Model.ImageFullPath"
+                         alt="Fotografia de @Model.FullName"
+                         class="rounded-circle"
+                         style="width: 85px;
+                                height: 85px;
+                                object-fit: cover;
+                                flex-shrink: 0;" />
+                }
+                else
+                {
+                    <div class="rounded-circle bg-primary text-white
+                                d-flex align-items-center justify-content-center
+                                fw-bold fs-3"
+                         style="width: 85px;
+                                height: 85px;
+                                min-width: 85px;">
+
+                        @(string.IsNullOrWhiteSpace(Model.FirstName)
+                            ? "C"
+                            : Model.FirstName.Substring(0, 1).ToUpper())
+                    </div>
+                }
+
+                <div>
+                    <h4 class="fw-bold mb-1">
+                        @Model.FullName
+                    </h4>
+
+                    <span class="badge bg-primary">
+                        Cliente
+                    </span>
+                </div>
+
+            </div>
+
+            <hr class="mb-4" />
+
+            <!-- INFORMAÇÕES -->
+            <h5 class="fw-bold mb-3">
+                Informações do Cliente
+            </h5>
+
+            <dl class="row mb-4">
+
+                <dt class="col-sm-3">Primeiro Nome</dt>
+                <dd class="col-sm-9">@Model.FirstName</dd>
+
+                <dt class="col-sm-3">Último Nome</dt>
+                <dd class="col-sm-9">@Model.LastName</dd>
+
+                <dt class="col-sm-3">Email</dt>
+                <dd class="col-sm-9 text-break">@Model.Email</dd>
+
+                <dt class="col-sm-3">Contacto</dt>
+                <dd class="col-sm-9">@Model.PhoneNumber</dd>
+
+                <dt class="col-sm-3">NIF</dt>
+                <dd class="col-sm-9">
+                    @(string.IsNullOrWhiteSpace(Model.NIF)
+                        ? "Não informado"
+                        : Model.NIF)
+                </dd>
+
+                <dt class="col-sm-3">Total de Veículos</dt>
+                <dd class="col-sm-9">
+                    <span class="badge bg-primary">
+                        @totalVeiculos
+                    </span>
+                </dd>
+
+            </dl>
+
+            <hr />
+
+            <!-- BOTÕES -->
+            <div class="d-flex gap-2 mt-3">
+
+                <a asp-controller="RececionistaArea"
+                   asp-action="EditCliente"
+                   asp-route-id="@Model.Id"
+                   class="btn btn-warning">
+                    Editar
+                </a>
+
+                <a asp-controller="RececionistaArea"
+                   asp-action="Clientes"
+                   class="btn btn-secondary">
+                    Voltar
+                </a>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>

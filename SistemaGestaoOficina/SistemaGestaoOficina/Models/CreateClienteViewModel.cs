@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace SistemaGestaoOficina.Models
 {
@@ -24,5 +26,9 @@ namespace SistemaGestaoOficina.Models
         [Required]
         [Display(Name = "Contacto")]
         public string PhoneNumber { get; set; } = string.Empty;
+
+        // Fotografia do cliente (opcional)
+        [Display(Name = "Fotografia")]
+        public IFormFile? ImageFile { get; set; }
     }
 }

@@ -1,0 +1,202 @@
+﻿
+@model SistemaGestaoOficina.Data.Entities.Reparacao
+
+@using System.Linq
+
+@{
+    Layout = "~/Views/Shared/_InternalLayout.cshtml";
+    ViewData["Title"] = "Detalhes da Reparação";
+}
+
+<div class="container-fluid py-4">
+
+    <!-- CABEÇALHO -->
+    <div class="mb-4">
+        <h2 class="fw-bold mb-1">Detalhes da Reparação</h2>
+
+        <p class="text-muted mb-0">
+            Consulte os serviços, peças e custos desta reparação.
+        </p>
+    </div>
+
+    <!-- CARTÃO PRINCIPAL -->
+    <div class="card shadow-sm border-0 rounded-3"
+         style="max-width: 900px;">
+
+        <div class="card-body p-4">
+
+            <!-- IDENTIFICAÇÃO -->
+            <div class="d-flex justify-content-between
+                        align-items-center flex-wrap gap-2 mb-3">
+
+                <div>
+                    <h4 class="fw-bold mb-1">
+                        @Model.TipoServico
+                    </h4>
+
+                    <span class="text-muted small">
+                        Reparação #@Model.Id
+                    </span>
+                </div>
+
+                @if (Model.Cancelada)
+                {
+                    <span class="badge bg-danger">Cancelada</span>
+                }
+                else if (Model.Concluida)
+                {
+                    <span class="badge bg-success">Concluída</span>
+                }
+                else
+                {
+                    <span class="badge bg-warning text-dark">
+                        Em Curso
+                    </span>
+                }
+
+            </div>
+
+            <hr class="mb-4" />
+
+            <!-- DADOS DA REPARAÇÃO -->
+            <h5 class="fw-bold mb-3">
+                Informações da Reparação
+            </h5>
+
+            <dl class="row mb-4">
+
+                <dt class="col-sm-4">Tipo de Serviço</dt>
+                <dd class="col-sm-8">@Model.TipoServico</dd>
+
+                <dt class="col-sm-4">Data de Início</dt>
+                <dd class="col-sm-8">
+                    @Model.DataInicio.ToString("dd/MM/yyyy")
+                </dd>
+
+                <dt class="col-sm-4">Data de Conclusão</dt>
+                <dd class="col-sm-8">
+
+                    @if (Model.DataFim.HasValue)
+                    {
+                        @Model.DataFim.Value.ToString("dd/MM/yyyy")
+                    }
+                    else
+                    {
+                        <span class="text-muted">
+                            Ainda não concluída
+                        </span>
+                    }
+
+                </dd>
+
+            </dl>
+
+            <!-- PEÇAS UTILIZADAS -->
+            <h5 class="fw-bold mb-3">
+                Peças Utilizadas
+            </h5>
+
+            @if (Model.ReparacaoPecas != null &&
+                 Model.ReparacaoPecas.Any())
+            {
+                <div class="table-responsive mb-4">
+
+                    <table class="table table-bordered
+                                  table-hover align-middle mb-0">
+
+                        <thead class="table-light">
+                            <tr>
+                                <th>Descrição da Peça</th>
+                                <th class="text-center">Qtd.</th>
+                                <th class="text-end">Preço Unitário</th>
+                                <th class="text-end">Subtotal</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var item in Model.ReparacaoPecas)
+                            {
+                                var subtotal = item.Quantidade *
+                                               item.PrecoUnitario;
+
+                                <tr>
+                                    <td>
+                                        @(item.Peca?.Nome
+                                            ?? "Peça não identificada")
+                                    </td>
+
+                                    <td class="text-center">
+                                        @item.Quantidade
+                                    </td>
+
+                                    <td class="text-end">
+                                        @item.PrecoUnitario.ToString("N2") €
+                                    </td>
+
+                                    <td class="text-end fw-semibold">
+                                        @subtotal.ToString("N2") €
+                                    </td>
+                                </tr>
+                            }
+
+                        </tbody>
+                    </table>
+
+                </div>
+            }
+            else
+            {
+                <div class="bg-light rounded p-3 mb-4">
+                    <span class="text-muted">
+                        Nenhuma peça registada nesta reparação.
+                    </span>
+                </div>
+            }
+
+            <!-- CUSTOS -->
+            <div class="border-top pt-3">
+
+                <div class="d-flex justify-content-between mb-3">
+
+                    <span class="text-muted">
+                        Mão de Obra
+                    </span>
+
+                    <span class="fw-semibold">
+                        @Model.CustoMaoDeObra.ToString("N2") €
+                    </span>
+
+                </div>
+
+                <div class="d-flex justify-content-between
+                            align-items-center flex-wrap gap-2">
+
+                    <span class="fw-bold">
+                        Valor Final da Reparação
+                    </span>
+
+                    <h5 class="fw-bold text-success mb-0">
+                        @Model.CustoTotal.ToString("N2") €
+                    </h5>
+
+                </div>
+
+            </div>
+
+            <hr class="my-4" />
+
+            <!-- VOLTAR -->
+            <a asp-controller="Reparacoes"
+               asp-action="Index"
+               class="btn btn-secondary">
+
+                <i class="bi bi-arrow-left me-1"></i>
+                Voltar
+
+            </a>
+
+        </div>
+    </div>
+
+</div>

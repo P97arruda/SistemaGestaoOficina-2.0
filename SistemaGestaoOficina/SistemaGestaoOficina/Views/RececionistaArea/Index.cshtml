@@ -7,164 +7,160 @@
     Layout = "_InternalLayout";
     ViewData["Title"] = "Painel do Rececionista";
 
-    var ultimosVeiculos = ViewBag.UltimosVeiculos as List<Veiculo>
-        ?? new List<Veiculo>();
+    var ultimosVeiculos = ViewBag.UltimosVeiculos as IEnumerable<Veiculo>
+        ?? Enumerable.Empty<Veiculo>();
+
+    var marcacoesHoje = ViewBag.MarcacoesHoje as IEnumerable<Marcacao>
+        ?? Enumerable.Empty<Marcacao>();
+
+    var totalMarcacoesHoje = marcacoesHoje.Count();
 }
 
 <div class="container-fluid px-4 py-4">
 
-    <!-- Cabeçalho -->
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <!-- CABEÇALHO -->
+    <div class="d-flex justify-content-between align-items-center
+                flex-wrap gap-3 mb-4">
 
         <div>
-            <h2 class="fw-bold mb-1">Painel do Rececionista</h2>
+            <h2 class="fw-bold mb-1">
+                Painel do Rececionista
+            </h2>
+
             <p class="text-muted mb-0">
-                Acompanhe a atividade e os atendimentos da oficina.
+                Visão geral dos clientes, veículos e marcações da oficina.
             </p>
         </div>
 
         <div class="bg-white border rounded px-3 py-2 shadow-sm">
+            <i class="bi bi-calendar3 me-2 text-secondary"></i>
             <span class="text-muted">
-                📅 @DateTime.Today.ToString("dd/MM/yyyy")
+                @DateTime.Today.ToString("dd/MM/yyyy")
             </span>
         </div>
 
     </div>
 
-    <!-- Indicadores -->
-    <div class="row g-4 mb-4">
+    <!-- INDICADORES -->
+    <div class="row g-3 mb-4">
 
-        <!-- Clientes -->
-        <div class="col-md-6 col-xl-3">
-            <div class="card border-0 shadow-sm h-100"
-                 style="border-radius: 12px;">
+        <!-- CLIENTES -->
+        <div class="col-md-4">
+
+            <div class="card shadow-sm border-0 h-100">
 
                 <div class="card-body p-4">
 
                     <div class="d-flex justify-content-between align-items-center">
 
                         <div>
-                            <p class="text-muted mb-2">Clientes</p>
+                            <p class="text-muted mb-2">
+                                Clientes
+                            </p>
 
                             <h2 class="fw-bold mb-0">
-                                @ViewBag.TotalClientes
+                                @(ViewBag.TotalClientes ?? 0)
                             </h2>
                         </div>
 
-                        <div class="rounded p-3 fs-3"
+                        <div class="rounded p-3"
                              style="background-color: #e8f2ff;">
-                            👥
+
+                            <i class="bi bi-people-fill fs-3 text-primary"></i>
+
                         </div>
 
                     </div>
 
                 </div>
+
             </div>
         </div>
 
-        <!-- Veículos -->
-        <div class="col-md-6 col-xl-3">
-            <div class="card border-0 shadow-sm h-100"
-                 style="border-radius: 12px;">
+        <!-- VEÍCULOS -->
+        <div class="col-md-4">
+
+            <div class="card shadow-sm border-0 h-100">
 
                 <div class="card-body p-4">
 
                     <div class="d-flex justify-content-between align-items-center">
 
                         <div>
-                            <p class="text-muted mb-2">Veículos</p>
+                            <p class="text-muted mb-2">
+                                Veículos
+                            </p>
 
                             <h2 class="fw-bold mb-0">
-                                @ViewBag.TotalVeiculos
+                                @(ViewBag.TotalVeiculos ?? 0)
                             </h2>
                         </div>
 
-                        <div class="rounded p-3 fs-3"
+                        <div class="rounded p-3"
                              style="background-color: #e5f7ef;">
-                            🚘
+
+                            <i class="bi bi-car-front-fill fs-3 text-success"></i>
+
                         </div>
 
                     </div>
 
                 </div>
+
             </div>
         </div>
 
-        <!-- Marcações de Hoje -->
-        <div class="col-md-6 col-xl-3">
-            <div class="card border-0 shadow-sm h-100"
-                 style="border-radius: 12px;">
+        <!-- MARCAÇÕES DE HOJE -->
+        <div class="col-md-4">
+
+            <div class="card shadow-sm border-0 h-100">
 
                 <div class="card-body p-4">
 
                     <div class="d-flex justify-content-between align-items-center">
 
                         <div>
-                            <p class="text-muted mb-2">Marcações de Hoje</p>
+                            <p class="text-muted mb-2">
+                                Marcações de Hoje
+                            </p>
 
                             <h2 class="fw-bold mb-0">
-                                —
+                                @totalMarcacoesHoje
                             </h2>
                         </div>
 
-                        <div class="rounded p-3 fs-3"
+                        <div class="rounded p-3"
                              style="background-color: #fff2e6;">
-                            📅
+
+                            <i class="bi bi-calendar-check fs-3 text-warning"></i>
+
                         </div>
 
                     </div>
 
                 </div>
-            </div>
-        </div>
 
-        <!-- Serviços em Curso -->
-        <div class="col-md-6 col-xl-3">
-            <div class="card border-0 shadow-sm h-100"
-                 style="border-radius: 12px;">
-
-                <div class="card-body p-4">
-
-                    <div class="d-flex justify-content-between align-items-center">
-
-                        <div>
-                            <p class="text-muted mb-2">Serviços em Curso</p>
-
-                            <h2 class="fw-bold mb-0">
-                                —
-                            </h2>
-                        </div>
-
-                        <div class="rounded p-3 fs-3"
-                             style="background-color: #f1eaff;">
-                            🔧
-                        </div>
-
-                    </div>
-
-                </div>
             </div>
         </div>
 
     </div>
 
-    <!-- Tabelas -->
-    <div class="row g-4">
+    <!-- INFORMAÇÕES PRINCIPAIS -->
+    <div class="row g-3">
 
-        <!-- Marcações de Hoje -->
-        <div class="col-lg-6">
+        <!-- MARCAÇÕES DE HOJE -->
+        <div class="col-xl-7">
 
-            <div class="card border-0 shadow-sm h-100"
-                 style="border-radius: 12px;">
+            <div class="card shadow-sm border-0 h-100">
 
-                <!-- Cabeçalho com botão Ver Marcações -->
-                <div class="card-header bg-white border-0 px-4 pt-4 pb-2">
+                <div class="card-header bg-white border-0 p-4 pb-2">
 
-                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div class="d-flex justify-content-between align-items-center
+                                flex-wrap gap-2">
 
                         <div>
                             <h5 class="fw-bold mb-1">
-                                📅 Marcações de Hoje
+                                Marcações de Hoje
                             </h5>
 
                             <p class="text-muted small mb-0">
@@ -175,6 +171,7 @@
                         <a asp-controller="Marcacoes"
                            asp-action="Index"
                            class="btn btn-primary btn-sm">
+
                             Ver Marcações
                         </a>
 
@@ -182,11 +179,11 @@
 
                 </div>
 
-                <div class="card-body px-4">
+                <div class="card-body px-4 pt-3">
 
                     <div class="table-responsive">
 
-                        <table class="table table-hover align-middle">
+                        <table class="table table-hover align-middle mb-0">
 
                             <thead class="table-light">
                                 <tr>
@@ -199,15 +196,94 @@
                             </thead>
 
                             <tbody>
-                                <tr>
-                                    <td colspan="5"
-                                        class="text-center text-muted py-4">
 
-                                        As marcações serão apresentadas aqui
-                                        quando este módulo estiver disponível.
+                                @if (marcacoesHoje.Any())
+                                {
+                                    foreach (var marcacao in marcacoesHoje
+                                        .OrderBy(m => m.DataHora))
+                                    {
+                                        <tr>
 
-                                    </td>
-                                </tr>
+                                            <td class="text-nowrap">
+                                                @marcacao.DataHora.ToString("HH:mm")
+                                            </td>
+
+                                            <td class="fw-semibold">
+                                                @(marcacao.User?.FullName
+                                                    ?? "Não informado")
+                                            </td>
+
+                                            <td>
+                                                @if (marcacao.Veiculo != null)
+                                                {
+                                                    <div>
+                                                        @marcacao.Veiculo.Marca
+                                                        @marcacao.Veiculo.Modelo
+                                                    </div>
+
+                                                    <small class="text-muted">
+                                                        @marcacao.Veiculo.Matricula
+                                                    </small>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">
+                                                        Não informado
+                                                    </span>
+                                                }
+                                            </td>
+
+                                            <td>
+                                                @marcacao.TipoServico
+                                            </td>
+
+                                            <td>
+
+                                                @if (marcacao.Estado == "Agendada")
+                                                {
+                                                    <span class="badge bg-primary">
+                                                        Agendada
+                                                    </span>
+                                                }
+                                                else if (marcacao.Estado == "Concluida" ||
+                                                         marcacao.Estado == "Concluída")
+                                                {
+                                                    <span class="badge bg-success">
+                                                        Concluída
+                                                    </span>
+                                                }
+                                                else if (marcacao.Estado == "Cancelada")
+                                                {
+                                                    <span class="badge bg-danger">
+                                                        Cancelada
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">
+                                                        @marcacao.Estado
+                                                    </span>
+                                                }
+
+                                            </td>
+
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="5"
+                                            class="text-center text-muted py-4">
+
+                                            <i class="bi bi-calendar-x d-block fs-4 mb-2"></i>
+
+                                            Nenhuma marcação registada para hoje.
+
+                                        </td>
+                                    </tr>
+                                }
+
                             </tbody>
 
                         </table>
@@ -215,40 +291,39 @@
                     </div>
 
                 </div>
+
             </div>
 
         </div>
 
-        <!-- Últimos Veículos Registados -->
-        <div class="col-lg-6">
+        <!-- ÚLTIMOS VEÍCULOS -->
+        <div class="col-xl-5">
 
-            <div class="card border-0 shadow-sm h-100"
-                 style="border-radius: 12px;">
+            <div class="card shadow-sm border-0 h-100">
 
-                <div class="card-header bg-white border-0 px-4 pt-4 pb-2">
+                <div class="card-header bg-white border-0 p-4 pb-2">
 
                     <h5 class="fw-bold mb-1">
-                        🚘 Últimos Veículos Registados
+                        Últimos Veículos Registados
                     </h5>
 
                     <p class="text-muted small mb-0">
-                        Veículos adicionados recentemente à oficina.
+                        Veículos adicionados à oficina.
                     </p>
 
                 </div>
 
-                <div class="card-body px-4">
+                <div class="card-body px-4 pt-3">
 
                     <div class="table-responsive">
 
-                        <table class="table table-hover align-middle">
+                        <table class="table table-hover align-middle mb-0">
 
                             <thead class="table-light">
                                 <tr>
                                     <th>Matrícula</th>
-                                    <th>Marca / Modelo</th>
+                                    <th>Veículo</th>
                                     <th>Proprietário</th>
-                                    <th>Data</th>
                                 </tr>
                             </thead>
 
@@ -259,7 +334,8 @@
                                     foreach (var veiculo in ultimosVeiculos)
                                     {
                                         <tr>
-                                            <td>
+
+                                            <td class="fw-semibold text-nowrap">
                                                 @veiculo.Matricula
                                             </td>
 
@@ -268,19 +344,17 @@
                                             </td>
 
                                             <td>
-                                                @veiculo.User?.FullName
+                                                @(veiculo.User?.FullName
+                                                    ?? "Não informado")
                                             </td>
 
-                                            <td>
-                                                —
-                                            </td>
                                         </tr>
                                     }
                                 }
                                 else
                                 {
                                     <tr>
-                                        <td colspan="4"
+                                        <td colspan="3"
                                             class="text-center text-muted py-4">
 
                                             Nenhum veículo registado.
@@ -296,6 +370,7 @@
                     </div>
 
                 </div>
+
             </div>
 
         </div>

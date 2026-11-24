@@ -57,6 +57,24 @@ namespace SistemaGestaoOficina.Controllers
             return View();
         }
 
+        [HttpGet]
+        public async Task<IActionResult> DetailsUser(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return NotFound();
+            }
+
+            var user = await _userHelper.GetUserByIdAsync(id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return View(user);
+        }
+
         // GET: Admin/CreateUser
         public IActionResult CreateUser()
         {
@@ -543,41 +561,72 @@ namespace SistemaGestaoOficina.Controllers
             return RedirectToAction(nameof(Rececionistas));
         }
 
-        // POST: DeleteUser
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteUser(string id)
         {
-            if (string.IsNullOrEmpty(id))
+            if (string.IsNullOrWhiteSpace(id))
                 return NotFound();
 
-            var user =
-                await _userHelper.GetUserByIdAsync(id);
+            var user = await _userHelper.GetUserByIdAsync(id);
 
             if (user == null)
                 return NotFound();
 
-            if (!await _userHelper.IsUserInRoleAsync(
-                user, "Rececionista"))
-            {
+            bool isMecanico = await _userHelper
+                .IsUserInRoleAsync(user, "Mecanico");
+
+            bool isRececionista = await _userHelper
+                .IsUserInRoleAsync(user, "Rececionista");
+
+            if (!isMecanico && !isRececionista)
                 return Forbid();
+
+            if (isMecanico)
+            {
+                var mecanico = await _mecanicoRepository.GetAll()
+                    .Include(m => m.Marcacaos)
+                    .Include(m => m.MecanicoReparacaoes)
+                    .FirstOrDefaultAsync(m => m.UserId == user.Id);
+
+                if (mecanico == null)
+                    return NotFound();
+
+                // Impedir eliminação se tiver marcações ou reparações
+                if ((mecanico.Marcacaos?.Any() ?? false) ||
+                    (mecanico.MecanicoReparacaoes?.Any() ?? false))
+                {
+                    TempData["ErrorMessage"] =
+                        "Não é possível apagar este mecânico porque possui marcações ou histórico de reparações.";
+
+                    return RedirectToAction("Index", "Mecanicos");
+                }
+
+                // Eliminar o registo profissional
+                await _mecanicoRepository.DeleteAsync(mecanico);
             }
 
-            var result =
-                await _userHelper.DeleteUserAsync(user);
+            // Eliminar a conta Identity
+            var result = await _userHelper.DeleteUserAsync(user);
 
             if (!result.Succeeded)
             {
                 TempData["ErrorMessage"] =
-                    "Não foi possível apagar o rececionista.";
+                    "Não foi possível apagar o funcionário.";
 
-                return RedirectToAction(nameof(Rececionistas));
+                return isMecanico
+                    ? RedirectToAction("Index", "Mecanicos")
+                    : RedirectToAction(nameof(Rececionistas));
             }
 
             TempData["SuccessMessage"] =
-                "Rececionista apagado com sucesso.";
+                isMecanico
+                    ? "Mecânico apagado com sucesso."
+                    : "Rececionista apagado com sucesso.";
 
-            return RedirectToAction(nameof(Rececionistas));
+            return isMecanico
+                ? RedirectToAction("Index", "Mecanicos")
+                : RedirectToAction(nameof(Rececionistas));
         }
     }
 }

@@ -103,10 +103,7 @@ namespace SistemaGestaoOficina.Controllers
         // POST: Reparacoes/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(
-            ReparacaoViewModel model,
-            List<int> pecaIds,
-            List<int> quantidades)
+        public async Task<IActionResult> Create(ReparacaoViewModel model, List<int> pecaIds, List<int> quantidades)
         {
             pecaIds ??= new List<int>();
             quantidades ??= new List<int>();

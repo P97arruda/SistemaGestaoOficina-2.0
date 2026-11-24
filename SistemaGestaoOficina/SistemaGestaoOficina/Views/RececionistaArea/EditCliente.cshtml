@@ -2,71 +2,187 @@
 @model SistemaGestaoOficina.Models.EditClienteViewModel
 
 @{
-    Layout = "_InternalLayout";
     ViewData["Title"] = "Editar Cliente";
+    Layout = "~/Views/Shared/_InternalLayout.cshtml";
 }
 
-<div class="container mt-4">
-    <h2>Editar Cliente</h2>
+<div class="container-fluid py-4">
 
-    <hr />
+    <!-- CABEÇALHO -->
+    <div class="mb-4">
+        <h2 class="fw-bold mb-1">Editar Cliente</h2>
 
-    <form asp-controller="RececionistaArea"
-          asp-action="EditCliente"
-          method="post">
+        <p class="text-muted mb-0">
+            Atualize os dados pessoais e a fotografia do cliente.
+        </p>
+    </div>
 
-        @Html.AntiForgeryToken()
+    <!-- CARTÃO PRINCIPAL -->
+    <div class="card shadow-sm border-0 rounded-3"
+         style="max-width: 900px;">
 
-        <div asp-validation-summary="ModelOnly"
-             class="text-danger mb-3">
+        <div class="card-body p-4">
+
+            <form asp-controller="RececionistaArea"
+                  asp-action="EditCliente"
+                  method="post"
+                  enctype="multipart/form-data">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" asp-for="Id" />
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3">
+                </div>
+
+                <!-- FOTOGRAFIA -->
+                <h5 class="fw-bold mb-3">
+                    Fotografia do Cliente
+                </h5>
+
+                <div class="d-flex align-items-center gap-4 mb-4">
+
+                    @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+                    {
+                        <img src="@Model.ImageUrl"
+                             alt="Fotografia atual do cliente"
+                             class="rounded-circle"
+                             style="width: 90px;
+                                    height: 90px;
+                                    object-fit: cover;
+                                    flex-shrink: 0;" />
+                    }
+                    else
+                    {
+                        <div class="rounded-circle bg-light text-secondary
+                                    d-flex align-items-center justify-content-center"
+                             style="width: 90px;
+                                    height: 90px;
+                                    min-width: 90px;">
+                            <i class="bi bi-person fs-1"></i>
+                        </div>
+                    }
+
+                    <div class="flex-grow-1">
+
+                        <label asp-for="ImageFile" class="form-label">
+                            Alterar Fotografia
+                        </label>
+
+                        <input asp-for="ImageFile"
+                               type="file"
+                               accept=".jpg,.jpeg,.png,.webp"
+                               class="form-control" />
+
+                        <span asp-validation-for="ImageFile"
+                              class="text-danger"></span>
+
+                        <small class="text-muted">
+                            Formatos permitidos: JPG, PNG e WebP.
+                            Tamanho máximo: 2 MB.
+                        </small>
+
+                    </div>
+
+                </div>
+
+                <hr class="mb-4" />
+
+                <!-- DADOS PESSOAIS -->
+                <h5 class="fw-bold mb-3">
+                    Informações do Cliente
+                </h5>
+
+                <div class="row g-3">
+
+                    <!-- NOME -->
+                    <div class="col-md-6">
+                        <label asp-for="FirstName" class="form-label"></label>
+
+                        <input asp-for="FirstName"
+                               class="form-control" />
+
+                        <span asp-validation-for="FirstName"
+                              class="text-danger"></span>
+                    </div>
+
+                    <!-- APELIDO -->
+                    <div class="col-md-6">
+                        <label asp-for="LastName" class="form-label"></label>
+
+                        <input asp-for="LastName"
+                               class="form-control" />
+
+                        <span asp-validation-for="LastName"
+                              class="text-danger"></span>
+                    </div>
+
+                    <!-- NIF -->
+                    <div class="col-md-6">
+                        <label asp-for="NIF" class="form-label"></label>
+
+                        <input asp-for="NIF"
+                               class="form-control"
+                               maxlength="9" />
+
+                        <span asp-validation-for="NIF"
+                              class="text-danger"></span>
+                    </div>
+
+                    <!-- CONTACTO -->
+                    <div class="col-md-6">
+                        <label asp-for="PhoneNumber" class="form-label"></label>
+
+                        <input asp-for="PhoneNumber"
+                               class="form-control" />
+
+                        <span asp-validation-for="PhoneNumber"
+                              class="text-danger"></span>
+                    </div>
+
+                    <!-- EMAIL -->
+                    <div class="col-12">
+                        <label asp-for="Email" class="form-label"></label>
+
+                        <input asp-for="Email"
+                               class="form-control"
+                               readonly />
+
+                        <span asp-validation-for="Email"
+                              class="text-danger"></span>
+
+                        <small class="text-muted">
+                            O email não pode ser alterado nesta página.
+                        </small>
+                    </div>
+
+                </div>
+
+                <hr class="my-4" />
+
+                <!-- BOTÕES -->
+                <div class="d-flex gap-2">
+
+                    <button type="submit" class="btn btn-primary">
+                        Guardar Alterações
+                    </button>
+
+                    <a asp-controller="RececionistaArea"
+                       asp-action="Clientes"
+                       class="btn btn-secondary">
+                        Cancelar
+                    </a>
+
+                </div>
+
+            </form>
+
         </div>
+    </div>
 
-        <input type="hidden" asp-for="Id" />
-
-        <div class="mb-3">
-            <label asp-for="FirstName" class="form-label"></label>
-            <input asp-for="FirstName" class="form-control" />
-            <span asp-validation-for="FirstName" class="text-danger"></span>
-        </div>
-
-        <div class="mb-3">
-            <label asp-for="LastName" class="form-label"></label>
-            <input asp-for="LastName" class="form-control" />
-            <span asp-validation-for="LastName" class="text-danger"></span>
-        </div>
-
-        <div class="mb-3">
-            <label asp-for="NIF" class="form-label"></label>
-            <input asp-for="NIF" class="form-control" />
-            <span asp-validation-for="NIF" class="text-danger"></span>
-        </div>
-
-        <div class="mb-3">
-            <label asp-for="Email" class="form-label"></label>
-            <input asp-for="Email" class="form-control" />
-            <span asp-validation-for="Email" class="text-danger"></span>
-        </div>
-
-        <div class="mb-3">
-            <label asp-for="PhoneNumber" class="form-label"></label>
-            <input asp-for="PhoneNumber" class="form-control" />
-            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-        </div>
-
-        <button type="submit" class="btn btn-primary">
-            Guardar
-        </button>
-
-        <a asp-controller="RececionistaArea"
-           asp-action="Clientes"
-           class="btn btn-secondary">
-            Voltar
-        </a>
-    </form>
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <partial name="_ValidationScriptsPartial" />
 }

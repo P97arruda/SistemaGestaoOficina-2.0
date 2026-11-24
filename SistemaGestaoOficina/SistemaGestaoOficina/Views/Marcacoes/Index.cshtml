@@ -1,39 +1,61 @@
-﻿@model IEnumerable<SistemaGestaoOficina.Data.Entities.Marcacao>
+﻿
+@model IEnumerable<SistemaGestaoOficina.Data.Entities.Marcacao>
+
+@using System.Linq
+@using SistemaGestaoOficina.Data.Entities
 
 @{
-    Layout = "_InternalLayout";
+    Layout = "~/Views/Shared/_InternalLayout.cshtml";
     ViewData["Title"] = "Marcações";
 
-    var marcacoes = Model?.ToList()
-        ?? new List<SistemaGestaoOficina.Data.Entities.Marcacao>();
+    var marcacoes = Model?.ToList() ?? new List<Marcacao>();
 
     var emCurso = marcacoes
         .Where(m => m.Estado == "Agendada")
         .ToList();
 
-    // Corrigido: estado guardado sem acento
     var concluidas = marcacoes
-        .Where(m => m.Estado == "Concluida")
+        .Where(m => m.Estado == "Concluida" || m.Estado == "Concluída")
         .ToList();
 
     var canceladas = marcacoes
         .Where(m => m.Estado == "Cancelada")
         .ToList();
+
+    var grupos = new[]
+    {
+        new
+        {
+            Chave = "curso",
+            Titulo = "Agendada",
+            Registos = emCurso
+        },
+        new
+        {
+            Chave = "concluida",
+            Titulo = "Concluída",
+            Registos = concluidas
+        },
+        new
+        {
+            Chave = "cancelada",
+            Titulo = "Cancelada",
+            Registos = canceladas
+        }
+    };
 }
 
 <div class="container-fluid py-4">
 
     <!-- CABEÇALHO -->
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div class="d-flex justify-content-between align-items-center
+                flex-wrap gap-3 mb-4">
 
         <div>
-            <h2 class="fw-bold mb-1">
-                <i class="bi bi-calendar-check text-primary me-2"></i>
-                Marcações
-            </h2>
+            <h2 class="fw-bold mb-1">Marcações</h2>
 
             <p class="text-muted mb-0">
-                Acompanhe e faça a gestão das marcações da oficina.
+                Consulte e faça a gestão das marcações da oficina.
             </p>
         </div>
 
@@ -78,390 +100,255 @@
     }
 
     <!-- FILTROS E PESQUISA -->
-    <div class="row align-items-center g-3 mb-4">
-
-        <div class="col-lg-7">
-            <div class="d-flex gap-2 flex-wrap">
-
-                <!-- EM CURSO -->
-                <button type="button"
-                        class="btn btn-primary filtro-marcacao"
-                        data-filtro="curso">
-
-                    <i class="bi bi-clock me-1"></i>
-                    Em Curso (@emCurso.Count)
-                </button>
-
-                <!-- CONCLUÍDAS -->
-                <button type="button"
-                        class="btn btn-outline-primary filtro-marcacao"
-                        data-filtro="concluida">
-
-                    <i class="bi bi-check-circle me-1"></i>
-                    Concluídas (@concluidas.Count)
-                </button>
-
-                <!-- CANCELADAS -->
-                <button type="button"
-                        class="btn btn-outline-primary filtro-marcacao"
-                        data-filtro="cancelada">
-
-                    <i class="bi bi-x-circle me-1"></i>
-                    Canceladas (@canceladas.Count)
-                </button>
-
-            </div>
-        </div>
-
-        <div class="col-lg-5">
-            <div class="input-group">
-
-                <span class="input-group-text bg-white">
-                    <i class="bi bi-search"></i>
-                </span>
-
-                <input type="search"
-                       id="pesquisaMarcacoes"
-                       class="form-control"
-                       placeholder="Pesquisar cliente, veículo ou serviço..." />
-
-            </div>
-        </div>
-
-    </div>
-
-    <!-- MARCAÇÕES EM CURSO -->
-    <div id="tabelaEmCurso"
-         class="card border-0 shadow-sm tabela-marcacoes">
+    <div class="card shadow-sm border-0 mb-4">
 
         <div class="card-body p-3">
 
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
+            <div class="row align-items-end g-3">
 
-                    <thead class="table-light">
-                        <tr>
-                            <th>Cliente</th>
-                            <th>Veículo</th>
-                            <th>Mecânico</th>
-                            <th>Tipo de Serviço</th>
-                            <th>Data e Hora</th>
-                            <th>Estado</th>
-                            <th class="text-end">Ações</th>
-                        </tr>
-                    </thead>
+                <!-- FILTROS -->
+                <div class="col-lg-7">
 
-                    <tbody>
+                    <label class="form-label fw-semibold d-block">
+                        Estado das Marcações
+                    </label>
 
-                        @foreach (var marcacao in emCurso)
-                        {
-                            var pesquisa = $"{marcacao.User?.FullName} " +
-                                $"{marcacao.Veiculo?.Marca} " +
-                                $"{marcacao.Veiculo?.Modelo} " +
-                                $"{marcacao.Veiculo?.Matricula} " +
-                                $"{marcacao.Mecanico?.Nome} " +
-                                $"{marcacao.TipoServico}";
+                    <div class="d-flex gap-2 flex-wrap">
 
-                            <tr class="linha-marcacao"
-                                data-pesquisa="@pesquisa.ToLowerInvariant()">
+                        <button type="button"
+                                class="btn btn-primary filtro-marcacao"
+                                data-filtro="curso">
 
-                                <td class="fw-semibold">
-                                    @marcacao.User?.FullName
-                                </td>
+                            <i class="bi bi-clock me-1"></i>
+                            Em Curso (@emCurso.Count)
+                        </button>
 
-                                <td>
-                                    <div class="fw-semibold">
-                                        @marcacao.Veiculo?.Marca
-                                        @marcacao.Veiculo?.Modelo
-                                    </div>
+                        <button type="button"
+                                class="btn btn-outline-primary filtro-marcacao"
+                                data-filtro="concluida">
 
-                                    <small class="text-muted">
-                                        @marcacao.Veiculo?.Matricula
-                                    </small>
-                                </td>
+                            <i class="bi bi-check-circle me-1"></i>
+                            Concluídas (@concluidas.Count)
+                        </button>
 
-                                <td>
-                                    @marcacao.Mecanico?.Nome
-                                </td>
+                        <button type="button"
+                                class="btn btn-outline-primary filtro-marcacao"
+                                data-filtro="cancelada">
 
-                                <td>
-                                    @marcacao.TipoServico
-                                </td>
+                            <i class="bi bi-x-circle me-1"></i>
+                            Canceladas (@canceladas.Count)
+                        </button>
 
-                                <td>
-                                    @marcacao.DataHora.ToString("dd/MM/yyyy - HH:mm")
-                                </td>
+                    </div>
 
-                                <td>
-                                    <span class="badge bg-primary">
-                                        <i class="bi bi-clock me-1"></i>
-                                        Agendada
-                                    </span>
-                                </td>
+                </div>
 
-                                <td class="text-end">
-                                    <div class="d-flex justify-content-end align-items-center gap-2">
+                <!-- PESQUISA -->
+                <div class="col-lg-5">
 
-                                        <!-- DETALHES -->
-                                        <a asp-controller="Marcacoes"
-                                           asp-action="Details"
-                                           asp-route-id="@marcacao.Id"
-                                           class="btn btn-sm btn-outline-secondary">
+                    <label for="pesquisaMarcacoes"
+                           class="form-label fw-semibold">
+                        Pesquisar Marcações
+                    </label>
 
-                                            <i class="bi bi-eye me-1"></i>
-                                            Ver
-                                        </a>
+                    <div class="input-group">
 
-                                        <!-- EDITAR -->
-                                        <a asp-controller="Marcacoes"
-                                           asp-action="Edit"
-                                           asp-route-id="@marcacao.Id"
-                                           class="btn btn-sm btn-outline-primary">
+                        <span class="input-group-text bg-white">
+                            <i class="bi bi-search text-muted"></i>
+                        </span>
 
-                                            <i class="bi bi-pencil-square me-1"></i>
-                                            Editar
-                                        </a>
+                        <input type="search"
+                               id="pesquisaMarcacoes"
+                               class="form-control"
+                               placeholder="Cliente, matrícula ou serviço..."
+                               autocomplete="off" />
 
-                                        <!-- CANCELAR -->
-                                        <form asp-controller="Marcacoes"
-                                              asp-action="Cancelar"
-                                              asp-route-id="@marcacao.Id"
-                                              method="post"
-                                              class="m-0"
-                                              onsubmit="return confirm('Tem a certeza de que deseja cancelar esta marcação?');">
+                        <button type="button"
+                                id="limparPesquisa"
+                                class="btn btn-outline-secondary"
+                                title="Limpar pesquisa">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
 
-                                            @Html.AntiForgeryToken()
+                    </div>
 
-                                            <button type="submit"
-                                                    class="btn btn-sm btn-outline-danger">
+                </div>
 
-                                                <i class="bi bi-x-circle me-1"></i>
-                                                Cancelar
-                                            </button>
-                                        </form>
-
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-
-                    </tbody>
-                </table>
-            </div>
-
-            <div id="semResultadosCurso"
-                 class="text-center text-muted py-5 d-none">
-                <i class="bi bi-inbox fs-2 d-block mb-2"></i>
-                Nenhuma marcação em curso encontrada.
-            </div>
-
-            <div class="border-top mt-3 pt-3 text-muted small">
-                <span id="contadorCurso"></span>
             </div>
 
         </div>
     </div>
 
-    <!-- MARCAÇÕES CONCLUÍDAS -->
-    <div id="tabelaConcluidas"
-         class="card border-0 shadow-sm tabela-marcacoes d-none">
+    <!-- TABELAS DAS MARCAÇÕES -->
+    @foreach (var grupo in grupos)
+    {
+        <div id="tabela-@grupo.Chave"
+             class="card border-0 shadow-sm tabela-marcacoes @(grupo.Chave == "curso" ? "" : "d-none")">
 
-        <div class="card-body p-3">
+            <div class="card-body p-3">
 
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
+                <div class="table-responsive">
 
-                    <thead class="table-light">
-                        <tr>
-                            <th>Cliente</th>
-                            <th>Veículo</th>
-                            <th>Mecânico</th>
-                            <th>Tipo de Serviço</th>
-                            <th>Data e Hora</th>
-                            <th>Estado</th>
-                            <th class="text-end">Ações</th>
-                        </tr>
-                    </thead>
+                    <table class="table table-hover align-middle mb-0">
 
-                    <tbody>
-
-                        @foreach (var marcacao in concluidas)
-                        {
-                            var pesquisa = $"{marcacao.User?.FullName} " +
-                                $"{marcacao.Veiculo?.Marca} " +
-                                $"{marcacao.Veiculo?.Modelo} " +
-                                $"{marcacao.Veiculo?.Matricula} " +
-                                $"{marcacao.Mecanico?.Nome} " +
-                                $"{marcacao.TipoServico}";
-
-                            <tr class="linha-marcacao"
-                                data-pesquisa="@pesquisa.ToLowerInvariant()">
-
-                                <td class="fw-semibold">
-                                    @marcacao.User?.FullName
-                                </td>
-
-                                <td>
-                                    <div class="fw-semibold">
-                                        @marcacao.Veiculo?.Marca
-                                        @marcacao.Veiculo?.Modelo
-                                    </div>
-
-                                    <small class="text-muted">
-                                        @marcacao.Veiculo?.Matricula
-                                    </small>
-                                </td>
-
-                                <td>
-                                    @marcacao.Mecanico?.Nome
-                                </td>
-
-                                <td>
-                                    @marcacao.TipoServico
-                                </td>
-
-                                <td>
-                                    @marcacao.DataHora.ToString("dd/MM/yyyy - HH:mm")
-                                </td>
-
-                                <td>
-                                    <span class="badge bg-success">
-                                        <i class="bi bi-check-circle me-1"></i>
-                                        Concluída
-                                    </span>
-                                </td>
-
-                                <td class="text-end">
-                                    <a asp-controller="Marcacoes"
-                                       asp-action="Details"
-                                       asp-route-id="@marcacao.Id"
-                                       class="btn btn-sm btn-outline-secondary">
-
-                                        <i class="bi bi-eye me-1"></i>
-                                        Ver
-                                    </a>
-                                </td>
+                        <thead class="table-light">
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Veículo</th>
+                                <th>Mecânico</th>
+                                <th>Tipo de Serviço</th>
+                                <th>Data e Hora</th>
+                                <th>Estado</th>
+                                <th class="text-end">Ações</th>
                             </tr>
-                        }
+                        </thead>
 
-                    </tbody>
-                </table>
+                        <tbody>
+
+                            @foreach (var marcacao in grupo.Registos)
+                            {
+                                var pesquisa = $"{marcacao.User?.FullName} " +
+                                    $"{marcacao.Veiculo?.Marca} " +
+                                    $"{marcacao.Veiculo?.Modelo} " +
+                                    $"{marcacao.Veiculo?.Matricula} " +
+                                    $"{marcacao.Mecanico?.Nome} " +
+                                    $"{marcacao.TipoServico}";
+
+                                <tr class="linha-marcacao"
+                                    data-pesquisa="@pesquisa.ToLowerInvariant()">
+
+                                    <!-- CLIENTE -->
+                                    <td class="fw-semibold">
+                                        @(marcacao.User?.FullName ?? "Não informado")
+                                    </td>
+
+                                    <!-- VEÍCULO -->
+                                    <td>
+                                        <div class="fw-semibold">
+                                            @marcacao.Veiculo?.Marca
+                                            @marcacao.Veiculo?.Modelo
+                                        </div>
+
+                                        <small class="text-muted">
+                                            @marcacao.Veiculo?.Matricula
+                                        </small>
+                                    </td>
+
+                                    <!-- MECÂNICO -->
+                                    <td>
+                                        @(marcacao.Mecanico?.Nome ?? "Não atribuído")
+                                    </td>
+
+                                    <!-- SERVIÇO -->
+                                    <td>
+                                        @marcacao.TipoServico
+                                    </td>
+
+                                    <!-- DATA -->
+                                    <td class="text-nowrap">
+                                        @marcacao.DataHora.ToString("dd/MM/yyyy - HH:mm")
+                                    </td>
+
+                                    <!-- ESTADO -->
+                                    <td>
+
+                                        @if (grupo.Chave == "curso")
+                                        {
+                                            <span class="badge bg-primary">
+                                                Agendada
+                                            </span>
+                                        }
+                                        else if (grupo.Chave == "concluida")
+                                        {
+                                            <span class="badge bg-success">
+                                                Concluída
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">
+                                                Cancelada
+                                            </span>
+                                        }
+
+                                    </td>
+
+                                    <!-- AÇÕES -->
+                                    <td class="text-end">
+
+                                        <div class="d-flex justify-content-end
+                                                    align-items-center gap-2">
+
+                                            @if (grupo.Chave == "curso")
+                                            {
+                                                <!-- CANCELAR -->
+                                                <form asp-controller="Marcacoes"
+                                                      asp-action="Cancelar"
+                                                      asp-route-id="@marcacao.Id"
+                                                      method="post"
+                                                      class="m-0"
+                                                      onsubmit="return confirm('Tem a certeza que deseja cancelar esta marcação?');">
+
+                                                    @Html.AntiForgeryToken()
+
+                                                    <button type="submit"
+                                                            class="btn btn-sm btn-danger">
+                                                        Cancelar
+                                                    </button>
+
+                                                </form>
+
+                                                <!-- EDITAR -->
+                                                <a asp-controller="Marcacoes"
+                                                   asp-action="Edit"
+                                                   asp-route-id="@marcacao.Id"
+                                                   class="btn btn-sm btn-warning">
+                                                    Editar
+                                                </a>
+                                            }
+
+                                            <!-- DETALHES -->
+                                            <a asp-controller="Marcacoes"
+                                               asp-action="Details"
+                                               asp-route-id="@marcacao.Id"
+                                               class="btn btn-sm btn-info text-white">
+                                                Detalhes
+                                            </a>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                <!-- SEM RESULTADOS -->
+                <div id="semResultados-@grupo.Chave"
+                     class="text-center text-muted py-5 d-none">
+
+                    <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                    Nenhuma marcação encontrada.
+
+                </div>
+
+                <!-- CONTADOR -->
+                <div class="border-top mt-3 pt-3 text-muted small">
+                    <span id="contador-@grupo.Chave"></span>
+                </div>
+
             </div>
-
-            <div id="semResultadosConcluidas"
-                 class="text-center text-muted py-5 d-none">
-                <i class="bi bi-inbox fs-2 d-block mb-2"></i>
-                Nenhuma marcação concluída encontrada.
-            </div>
-
-            <div class="border-top mt-3 pt-3 text-muted small">
-                <span id="contadorConcluidas"></span>
-            </div>
-
         </div>
-    </div>
-
-    <!-- MARCAÇÕES CANCELADAS -->
-    <div id="tabelaCanceladas"
-         class="card border-0 shadow-sm tabela-marcacoes d-none">
-
-        <div class="card-body p-3">
-
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-
-                    <thead class="table-light">
-                        <tr>
-                            <th>Cliente</th>
-                            <th>Veículo</th>
-                            <th>Mecânico</th>
-                            <th>Tipo de Serviço</th>
-                            <th>Data e Hora</th>
-                            <th>Estado</th>
-                            <th class="text-end">Ações</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-
-                        @foreach (var marcacao in canceladas)
-                        {
-                            var pesquisa = $"{marcacao.User?.FullName} " +
-                                $"{marcacao.Veiculo?.Marca} " +
-                                $"{marcacao.Veiculo?.Modelo} " +
-                                $"{marcacao.Veiculo?.Matricula} " +
-                                $"{marcacao.Mecanico?.Nome} " +
-                                $"{marcacao.TipoServico}";
-
-                            <tr class="linha-marcacao"
-                                data-pesquisa="@pesquisa.ToLowerInvariant()">
-
-                                <td class="fw-semibold">
-                                    @marcacao.User?.FullName
-                                </td>
-
-                                <td>
-                                    <div class="fw-semibold">
-                                        @marcacao.Veiculo?.Marca
-                                        @marcacao.Veiculo?.Modelo
-                                    </div>
-
-                                    <small class="text-muted">
-                                        @marcacao.Veiculo?.Matricula
-                                    </small>
-                                </td>
-
-                                <td>
-                                    @marcacao.Mecanico?.Nome
-                                </td>
-
-                                <td>
-                                    @marcacao.TipoServico
-                                </td>
-
-                                <td>
-                                    @marcacao.DataHora.ToString("dd/MM/yyyy - HH:mm")
-                                </td>
-
-                                <td>
-                                    <span class="badge bg-danger">
-                                        <i class="bi bi-x-circle me-1"></i>
-                                        Cancelada
-                                    </span>
-                                </td>
-
-                                <td class="text-end">
-                                    <a asp-controller="Marcacoes"
-                                       asp-action="Details"
-                                       asp-route-id="@marcacao.Id"
-                                       class="btn btn-sm btn-outline-secondary">
-
-                                        <i class="bi bi-eye me-1"></i>
-                                        Ver
-                                    </a>
-                                </td>
-                            </tr>
-                        }
-
-                    </tbody>
-                </table>
-            </div>
-
-            <div id="semResultadosCanceladas"
-                 class="text-center text-muted py-5 d-none">
-                <i class="bi bi-inbox fs-2 d-block mb-2"></i>
-                Nenhuma marcação cancelada encontrada.
-            </div>
-
-            <div class="border-top mt-3 pt-3 text-muted small">
-                <span id="contadorCanceladas"></span>
-            </div>
-
-        </div>
-    </div>
+    }
 
     <!-- VOLTAR -->
     <div class="mt-3">
+
         <a asp-controller="RececionistaArea"
            asp-action="Index"
            class="btn btn-secondary">
@@ -469,6 +356,7 @@
             <i class="bi bi-arrow-left me-1"></i>
             Voltar
         </a>
+
     </div>
 
 </div>
@@ -480,63 +368,54 @@
 
             const botoes = document.querySelectorAll(".filtro-marcacao");
             const pesquisa = document.getElementById("pesquisaMarcacoes");
-
-            const tabelas = {
-                curso: document.getElementById("tabelaEmCurso"),
-                concluida: document.getElementById("tabelaConcluidas"),
-                cancelada: document.getElementById("tabelaCanceladas")
-            };
-
-            const mensagensVazias = {
-                curso: document.getElementById("semResultadosCurso"),
-                concluida: document.getElementById("semResultadosConcluidas"),
-                cancelada: document.getElementById("semResultadosCanceladas")
-            };
-
-            const contadores = {
-                curso: document.getElementById("contadorCurso"),
-                concluida: document.getElementById("contadorConcluidas"),
-                cancelada: document.getElementById("contadorCanceladas")
-            };
+            const limparPesquisa = document.getElementById("limparPesquisa");
 
             let filtroAtual = "curso";
 
             function atualizarTabela() {
 
-                const termo = pesquisa.value.trim().toLowerCase();
-                const tabelaAtual = tabelas[filtroAtual];
-                const linhas = tabelaAtual.querySelectorAll(".linha-marcacao");
+                const termo = pesquisa.value.trim().toLocaleLowerCase("pt-PT");
+
+                const tabelaAtual =
+                    document.getElementById("tabela-" + filtroAtual);
+
+                const linhas =
+                    tabelaAtual.querySelectorAll(".linha-marcacao");
+
+                const semResultados =
+                    document.getElementById("semResultados-" + filtroAtual);
+
+                const contador =
+                    document.getElementById("contador-" + filtroAtual);
 
                 let visiveis = 0;
 
-                linhas.forEach(linha => {
+                linhas.forEach(function (linha) {
 
                     const texto = linha.dataset.pesquisa || "";
-                    const mostrar = texto.includes(termo);
+                    const corresponde = texto.includes(termo);
 
-                    linha.classList.toggle("d-none", !mostrar);
+                    linha.classList.toggle("d-none", !corresponde);
 
-                    if (mostrar) {
+                    if (corresponde) {
                         visiveis++;
                     }
                 });
 
-                mensagensVazias[filtroAtual].classList.toggle(
-                    "d-none",
-                    visiveis > 0
-                );
+                semResultados.classList.toggle("d-none", visiveis > 0);
 
-                contadores[filtroAtual].textContent =
+                contador.textContent =
                     `A mostrar ${visiveis} marcação(ões)`;
             }
 
-            botoes.forEach(botao => {
+            // ALTERNAR ESTADO
+            botoes.forEach(function (botao) {
 
                 botao.addEventListener("click", function () {
 
                     filtroAtual = this.dataset.filtro;
 
-                    botoes.forEach(b => {
+                    botoes.forEach(function (b) {
                         b.classList.remove("btn-primary");
                         b.classList.add("btn-outline-primary");
                     });
@@ -544,17 +423,27 @@
                     this.classList.remove("btn-outline-primary");
                     this.classList.add("btn-primary");
 
-                    Object.values(tabelas).forEach(tabela => {
-                        tabela.classList.add("d-none");
-                    });
+                    document.querySelectorAll(".tabela-marcacoes")
+                        .forEach(function (tabela) {
+                            tabela.classList.add("d-none");
+                        });
 
-                    tabelas[filtroAtual].classList.remove("d-none");
+                    document.getElementById("tabela-" + filtroAtual)
+                        .classList.remove("d-none");
 
                     atualizarTabela();
                 });
             });
 
+            // PESQUISA
             pesquisa.addEventListener("input", atualizarTabela);
+
+            // LIMPAR PESQUISA
+            limparPesquisa.addEventListener("click", function () {
+                pesquisa.value = "";
+                atualizarTabela();
+                pesquisa.focus();
+            });
 
             atualizarTabela();
         });

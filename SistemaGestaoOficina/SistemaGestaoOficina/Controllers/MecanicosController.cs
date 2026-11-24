@@ -30,19 +30,14 @@ namespace SistemaGestaoOficina.Controllers
 
         // GET: Mecanicos/Details/5
         [HttpGet]
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var mecanico = await _mecanicoRepository.GetByIdAsync(id.Value);
+            var mecanico = await _mecanicoRepository.GetAll()
+                .Include(m => m.User)
+                .FirstOrDefaultAsync(m => m.Id == id);
 
             if (mecanico == null)
-            {
                 return NotFound();
-            }
 
             return View(mecanico);
         }

@@ -1,46 +1,40 @@
 ﻿
 @model IEnumerable<SistemaGestaoOficina.Data.Entities.Reparacao>
 
+@using System.Linq
+
 @{
     ViewData["Title"] = "Reparações";
-    Layout = "_InternalLayout";
+    Layout = "~/Views/Shared/_InternalLayout.cshtml";
 
-    var reparacoes = Model?.ToList()
-        ?? new List<SistemaGestaoOficina.Data.Entities.Reparacao>();
-
-    var emCurso = reparacoes
-        .Where(r => !r.Concluida && !r.Cancelada)
-        .ToList();
-
-    var concluidas = reparacoes
+    var reparacoes = (Model
+        ?? Enumerable.Empty<SistemaGestaoOficina.Data.Entities.Reparacao>())
         .Where(r => r.Concluida && !r.Cancelada)
+        .OrderByDescending(r => r.DataInicio)
         .ToList();
 }
 
 <div class="container-fluid py-4">
 
     <!-- CABEÇALHO -->
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div class="d-flex justify-content-between
+                align-items-center flex-wrap gap-3 mb-4">
 
         <div>
-            <h2 class="fw-bold mb-1">
-                <i class="bi bi-wrench-adjustable text-primary me-2"></i>
-                Reparações
-            </h2>
+            <h2 class="fw-bold mb-1">Reparações concluídas</h2>
 
             <p class="text-muted mb-0">
-                Acompanhe as reparações em curso e consulte
-                o histórico dos serviços concluídos.
+                Consulte as reparações concluídas e os serviços
+                realizados na oficina.
             </p>
         </div>
 
-        <!-- VOLTAR À PÁGINA PRINCIPAL -->
         <a asp-controller="Reparacoes"
            asp-action="Create"
-           class="btn btn-outline-primary">
+           class="btn btn-secondary">
 
             <i class="bi bi-arrow-left me-1"></i>
-            Reparações e Faturação
+            Voltar
         </a>
 
     </div>
@@ -76,191 +70,65 @@
         </div>
     }
 
-    <!-- FILTROS E PESQUISA -->
-    <div class="row align-items-center g-3 mb-4">
-
-        <div class="col-lg-7">
-
-            <div class="d-flex gap-2 flex-wrap">
-
-                <!-- EM CURSO -->
-                <button type="button"
-                        class="btn btn-primary filtro-reparacao"
-                        data-filtro="curso">
-
-                    <i class="bi bi-clock me-1"></i>
-                    Em Curso (@emCurso.Count)
-                </button>
-
-                <!-- CONCLUÍDAS -->
-                <button type="button"
-                        class="btn btn-outline-primary filtro-reparacao"
-                        data-filtro="concluida">
-
-                    <i class="bi bi-check-circle me-1"></i>
-                    Concluídas (@concluidas.Count)
-                </button>
-
-            </div>
-
-        </div>
-
-        <!-- PESQUISA -->
-        <div class="col-lg-5">
-
-            <div class="input-group">
-
-                <span class="input-group-text bg-white">
-                    <i class="bi bi-search"></i>
-                </span>
-
-                <input type="search"
-                       id="pesquisaReparacoes"
-                       class="form-control"
-                       placeholder="Pesquisar cliente, veículo ou serviço..." />
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- REPARAÇÕES EM CURSO -->
-    <div id="tabelaEmCurso"
-         class="card border-0 shadow-sm tabela-reparacoes">
+    <!-- LISTAGEM DE REPARAÇÕES -->
+    <div class="card shadow-sm border-0">
 
         <div class="card-body p-3">
 
+            <!-- PESQUISA -->
+            <div class="mb-4">
+
+                <label for="pesquisaReparacoes"
+                       class="form-label fw-semibold">
+                    Pesquisar Reparações
+                </label>
+
+                <div class="input-group"
+                     style="max-width: 550px;">
+
+                    <span class="input-group-text bg-white">
+                        <i class="bi bi-search text-muted"></i>
+                    </span>
+
+                    <input type="search"
+                           id="pesquisaReparacoes"
+                           class="form-control"
+                           placeholder="Cliente, veículo, matrícula ou serviço..."
+                           autocomplete="off" />
+
+                    <button type="button"
+                            id="limparPesquisa"
+                            class="btn btn-outline-secondary"
+                            title="Limpar pesquisa"
+                            aria-label="Limpar pesquisa">
+
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+
+                </div>
+
+            </div>
+
+            <!-- TABELA -->
             <div class="table-responsive">
 
-                <table class="table table-hover align-middle mb-0">
-
-                    <thead class="table-light">
-                        <tr>
-                            <th>Cliente</th>
-                            <th>Mecânico</th>
-                            <th>Tipo de Serviço</th>
-                            <th>Data de Início</th>
-                            <th>Estado</th>
-                            <th class="text-end">Ações</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-
-                        @foreach (var reparacao in emCurso)
-                        {
-                            var cliente = reparacao.Marcacao?.User;
-                            var veiculo = reparacao.Marcacao?.Veiculo;
-
-                            var mecanicos = reparacao.MecanicoReparacaos?
-                                .Where(mr => mr.Mecanico != null)
-                                .Select(mr => mr.Mecanico!.Nome)
-                                .ToList() ?? new List<string>();
-
-                            var nomeCliente = cliente == null
-                                ? "Não informado"
-                                : $"{cliente.FirstName} {cliente.LastName}";
-
-                            var nomeMecanicos = mecanicos.Count > 0
-                                ? string.Join(", ", mecanicos)
-                                : "Não atribuído";
-
-                            var matricula = veiculo?.Matricula ?? "";
-
-                            var pesquisa = $"{nomeCliente} {nomeMecanicos} {matricula} {reparacao.TipoServico}"
-                                .ToLowerInvariant();
-
-                            <tr class="linha-reparacao"
-                                data-pesquisa="@pesquisa">
-
-                                <td class="fw-semibold">
-                                    @nomeCliente
-                                </td>
-
-                                <td>
-                                    @nomeMecanicos
-                                </td>
-
-                                <td>
-                                    @reparacao.TipoServico
-                                </td>
-
-                                <td>
-                                    @reparacao.DataInicio.ToString("dd/MM/yyyy")
-                                </td>
-
-                                <td>
-                                    <span class="badge bg-warning text-dark">
-                                        <i class="bi bi-clock me-1"></i>
-                                        Em Curso
-                                    </span>
-                                </td>
-
-                                <!-- APENAS VER -->
-                                <td class="text-end">
-
-                                    <a asp-controller="Reparacoes"
-                                       asp-action="Details"
-                                       asp-route-id="@reparacao.Id"
-                                       class="btn btn-sm btn-outline-secondary"
-                                       title="Ver detalhes da reparação">
-
-                                        <i class="bi bi-eye me-1"></i>
-                                        Ver
-                                    </a>
-
-                                </td>
-
-                            </tr>
-                        }
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-            <!-- SEM RESULTADOS -->
-            <div id="semResultadosCurso"
-                 class="text-center text-muted py-5 d-none">
-
-                <i class="bi bi-inbox fs-2 d-block mb-2"></i>
-                Nenhuma reparação em curso encontrada.
-            </div>
-
-            <!-- CONTADOR -->
-            <div class="border-top mt-3 pt-3 text-muted small">
-                <span id="contadorCurso"></span>
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- REPARAÇÕES CONCLUÍDAS -->
-    <div id="tabelaConcluidas"
-         class="card border-0 shadow-sm tabela-reparacoes d-none">
-
-        <div class="card-body p-3">
-
-            <div class="table-responsive">
-
-                <table class="table table-hover align-middle mb-0">
+                <table class="table table-hover align-middle mb-0"
+                       id="tabelaReparacoes">
 
                     <thead class="table-light">
                         <tr>
                             <th>Cliente</th>
                             <th>Veículo</th>
                             <th>Tipo de Serviço</th>
-                            <th>Valor Total</th>
+                            <th>Data de Conclusão</th>
+                            <th>Valor Final</th>
                             <th class="text-end">Ações</th>
                         </tr>
                     </thead>
 
                     <tbody>
 
-                        @foreach (var reparacao in concluidas)
+                        @foreach (var reparacao in reparacoes)
                         {
                             var cliente = reparacao.Marcacao?.User;
                             var veiculo = reparacao.Marcacao?.Veiculo;
@@ -281,10 +149,12 @@
                             <tr class="linha-reparacao"
                                 data-pesquisa="@pesquisa">
 
+                                <!-- CLIENTE -->
                                 <td class="fw-semibold">
                                     @nomeCliente
                                 </td>
 
+                                <!-- VEÍCULO -->
                                 <td>
 
                                     <div class="fw-semibold">
@@ -300,25 +170,31 @@
 
                                 </td>
 
+                                <!-- SERVIÇO -->
                                 <td>
                                     @reparacao.TipoServico
                                 </td>
 
+                                <!-- DATA -->
+                                <td>
+                                    @(reparacao.DataFim?.ToString("dd/MM/yyyy")
+                                        ?? "Não informada")
+                                </td>
+
+                                <!-- VALOR -->
                                 <td class="fw-bold text-success">
                                     @reparacao.CustoTotal.ToString("N2") €
                                 </td>
 
-                                <!-- APENAS VER -->
+                                <!-- AÇÕES -->
                                 <td class="text-end">
 
                                     <a asp-controller="Reparacoes"
                                        asp-action="Details"
                                        asp-route-id="@reparacao.Id"
-                                       class="btn btn-sm btn-outline-secondary"
-                                       title="Ver detalhes da reparação">
+                                       class="btn btn-sm btn-info text-white">
 
-                                        <i class="bi bi-eye me-1"></i>
-                                        Ver
+                                        Detalhes
                                     </a>
 
                                 </td>
@@ -332,21 +208,28 @@
 
             </div>
 
-            <!-- SEM RESULTADOS -->
-            <div id="semResultadosConcluidas"
-                 class="text-center text-muted py-5 d-none">
+            <!-- NENHUMA REPARAÇÃO -->
+            @if (!reparacoes.Any())
+            {
+                <div class="text-center text-muted py-4">
+                    Nenhuma reparação concluída registada.
+                </div>
+            }
 
-                <i class="bi bi-inbox fs-2 d-block mb-2"></i>
-                Nenhuma reparação concluída encontrada.
+            <!-- NENHUM RESULTADO NA PESQUISA -->
+            <div id="semResultados"
+                 class="text-center text-muted py-4 d-none">
+                Nenhuma reparação encontrada.
             </div>
 
             <!-- CONTADOR -->
             <div class="border-top mt-3 pt-3 text-muted small">
-                <span id="contadorConcluidas"></span>
+                <span id="contadorReparacoes">
+                    @reparacoes.Count reparações
+                </span>
             </div>
 
         </div>
-
     </div>
 
 </div>
@@ -356,93 +239,58 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
 
-            const botoes =
-                document.querySelectorAll(".filtro-reparacao");
-
             const pesquisa =
                 document.getElementById("pesquisaReparacoes");
 
-            // APENAS DOIS FILTROS
-            const tabelas = {
-                curso: document.getElementById("tabelaEmCurso"),
-                concluida: document.getElementById("tabelaConcluidas")
-            };
+            const limparPesquisa =
+                document.getElementById("limparPesquisa");
 
-            const mensagensVazias = {
-                curso: document.getElementById("semResultadosCurso"),
-                concluida: document.getElementById("semResultadosConcluidas")
-            };
+            const linhas =
+                document.querySelectorAll(".linha-reparacao");
 
-            const contadores = {
-                curso: document.getElementById("contadorCurso"),
-                concluida: document.getElementById("contadorConcluidas")
-            };
+            const semResultados =
+                document.getElementById("semResultados");
 
-            let filtroAtual = "curso";
+            const contador =
+                document.getElementById("contadorReparacoes");
 
-            function atualizarTabela() {
+            function atualizarPesquisa() {
 
                 const termo = pesquisa.value.trim().toLowerCase();
 
-                const tabelaAtual = tabelas[filtroAtual];
+                let encontrados = 0;
 
-                const linhas =
-                    tabelaAtual.querySelectorAll(".linha-reparacao");
-
-                let visiveis = 0;
-
-                linhas.forEach(linha => {
+                linhas.forEach(function (linha) {
 
                     const texto = linha.dataset.pesquisa || "";
 
-                    const mostrar = texto.includes(termo);
+                    const corresponde = texto.includes(termo);
 
-                    linha.classList.toggle("d-none", !mostrar);
+                    linha.classList.toggle("d-none", !corresponde);
 
-                    if (mostrar) {
-                        visiveis++;
+                    if (corresponde) {
+                        encontrados++;
                     }
                 });
 
-                mensagensVazias[filtroAtual].classList.toggle(
+                semResultados.classList.toggle(
                     "d-none",
-                    visiveis > 0
+                    encontrados > 0 || linhas.length === 0
                 );
 
-                contadores[filtroAtual].textContent =
-                    `A mostrar ${visiveis} reparação(ões)`;
+                contador.textContent =
+                    `A mostrar ${encontrados} reparação(ões)`;
             }
 
-            // ALTERNAR ENTRE EM CURSO E CONCLUÍDAS
-            botoes.forEach(botao => {
+            pesquisa.addEventListener("input", atualizarPesquisa);
 
-                botao.addEventListener("click", function () {
-
-                    filtroAtual = this.dataset.filtro;
-
-                    botoes.forEach(b => {
-                        b.classList.remove("btn-primary");
-                        b.classList.add("btn-outline-primary");
-                    });
-
-                    this.classList.remove("btn-outline-primary");
-                    this.classList.add("btn-primary");
-
-                    Object.values(tabelas).forEach(tabela => {
-                        tabela.classList.add("d-none");
-                    });
-
-                    tabelas[filtroAtual].classList.remove("d-none");
-
-                    atualizarTabela();
-                });
+            limparPesquisa.addEventListener("click", function () {
+                pesquisa.value = "";
+                atualizarPesquisa();
+                pesquisa.focus();
             });
 
-            // PESQUISA EM TEMPO REAL
-            pesquisa.addEventListener("input", atualizarTabela);
-
-            // INICIALIZAÇÃO
-            atualizarTabela();
+            atualizarPesquisa();
         });
     </script>
 }

@@ -29,6 +29,18 @@ namespace SistemaGestaoOficina.Controllers
             return View();
         }
 
+        // DETALHES
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
+        {
+            var tipo = await _repository.GetByIdAsync(id);
+
+            if (tipo == null)
+                return NotFound();
+
+            return View(tipo);
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(TipoReparacao model)

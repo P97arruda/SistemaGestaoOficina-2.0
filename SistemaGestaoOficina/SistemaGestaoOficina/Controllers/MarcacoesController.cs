@@ -13,10 +13,12 @@ namespace SistemaGestaoOficina.Controllers
     public class MarcacoesController : Controller
     {
         private readonly IMarcacaoRepository _marcacaoRepository;
+        private readonly IReparacaoRepository _reparacaoRepository;
 
-        public MarcacoesController(IMarcacaoRepository marcacaoRepository)
+        public MarcacoesController(IMarcacaoRepository marcacaoRepository, IReparacaoRepository reparacaoRepository)
         {
             _marcacaoRepository = marcacaoRepository;
+            _reparacaoRepository = reparacaoRepository;
         }
 
         // GET: Marcacoes
@@ -100,6 +102,7 @@ namespace SistemaGestaoOficina.Controllers
             return View(new MarcacaoViewModel());
         }
 
+
         // POST: Marcacoes/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -127,7 +130,23 @@ namespace SistemaGestaoOficina.Controllers
 
                 if (ModelState.IsValid)
                 {
+                    // 1. Guardar a marcação
                     await _marcacaoRepository.CreateAsync(marcacao);
+
+                    // 2. Criar automaticamente a reparação
+                    var reparacao = new Reparacao
+                    {
+                        MarcacaoId = marcacao.Id,
+                        TipoServico = marcacao.TipoServico,
+                        DataInicio = marcacao.DataHora,
+                        Concluida = false,
+                        Cancelada = false,
+                        CustoMaoDeObra = 0,
+                        CustoTotal = 0
+                    };
+
+                    // 3. Guardar a reparação
+                    await _reparacaoRepository.CreateAsync(reparacao);
 
                     TempData["SuccessMessage"] =
                         "Marcação criada com sucesso!";
@@ -137,10 +156,15 @@ namespace SistemaGestaoOficina.Controllers
             }
 
             var clientes = await _marcacaoRepository.GetClientesAsync();
+
             var veiculos = await _marcacaoRepository
                 .GetVeiculosPorClienteAsync(model.UserId);
-            var mecanicos = await _marcacaoRepository.GetMecanicosAsync();
-            var tipos = await _marcacaoRepository.GetTiposReparacaoAsync();
+
+            var mecanicos = await _marcacaoRepository
+                .GetMecanicosAsync();
+
+            var tipos = await _marcacaoRepository
+                .GetTiposReparacaoAsync();
 
             ViewBag.Clientes = new SelectList(
                 clientes, "Id", "FullName", model.UserId);
@@ -162,7 +186,7 @@ namespace SistemaGestaoOficina.Controllers
             return View(model);
         }
 
-        // GET: Marcacoes/Edit/5
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -196,9 +220,12 @@ namespace SistemaGestaoOficina.Controllers
             };
 
             var clientes = await _marcacaoRepository.GetClientesAsync();
+
             var veiculos = await _marcacaoRepository
                 .GetVeiculosPorClienteAsync(model.UserId);
+
             var mecanicos = await _marcacaoRepository.GetMecanicosAsync();
+
             var tipos = await _marcacaoRepository.GetTiposReparacaoAsync();
 
             ViewBag.Clientes = new SelectList(
@@ -220,6 +247,8 @@ namespace SistemaGestaoOficina.Controllers
 
             return View(model);
         }
+
+
 
         // POST: Marcacoes/Edit
         [HttpPost]

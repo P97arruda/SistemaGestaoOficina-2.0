@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace SistemaGestaoOficina.Models
 {
@@ -26,5 +27,12 @@ namespace SistemaGestaoOficina.Models
         [Display(Name = "NIF")]
         [MaxLength(9, ErrorMessage = "O campo {0} pode conter no máximo {1} caracteres.")]
         public string? NIF { get; set; }
+
+        // Nova fotografia selecionada pelo rececionista
+        [Display(Name = "Fotografia")]
+        public IFormFile? ImageFile { get; set; }
+
+        // URL da fotografia atual do cliente
+        public string? ImageUrl { get; set; }
     }
 }

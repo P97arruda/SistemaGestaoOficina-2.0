@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SistemaGestaoOficina.Data;
 using SistemaGestaoOficina.Data.Entities;
+using SistemaGestaoOficina.Data.Repository;
 using SistemaGestaoOficina.Helpers;
 using SistemaGestaoOficina.Models;
 
@@ -12,11 +14,13 @@ namespace SistemaGestaoOficina.Controllers
     {
         private readonly IUserHelper _userHelper;
         private readonly IVeiculoRepository _veiculoRepository;
+        private readonly IReparacaoRepository _reparacaoRepository;
 
-        public VeiculosController(IUserHelper userHelper, IVeiculoRepository veiculoRepository)
+        public VeiculosController(IUserHelper userHelper, IVeiculoRepository veiculoRepository, IReparacaoRepository reparacaoRepository)
         {
             _userHelper = userHelper;
             _veiculoRepository = veiculoRepository;
+            _reparacaoRepository = reparacaoRepository;
         }
 
 
@@ -45,10 +49,25 @@ namespace SistemaGestaoOficina.Controllers
                 .ToList();
 
             ViewBag.ClienteId = id;
+            ViewBag.NomeCliente = cliente.FullName;
 
             return View(veiculos);
         }
 
+
+        [HttpGet]
+        public IActionResult Details(int id)
+        {
+            var veiculo = _veiculoRepository.GetAllWithUsers()
+                .FirstOrDefault(v => v.Id == id);
+
+            if (veiculo == null)
+            {
+                return NotFound();
+            }
+
+            return View(veiculo);
+        }
 
 
         [HttpGet]
@@ -196,6 +215,36 @@ namespace SistemaGestaoOficina.Controllers
             await _veiculoRepository.DeleteAsync(veiculo);
 
             return RedirectToAction(nameof(Index), new { id = clienteId });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> HistoricoReparacoes(int id)
+        {
+            // Procurar o veículo
+            var veiculo = await _veiculoRepository.GetByIdAsync(id);
+
+            if (veiculo == null)
+            {
+                return NotFound();
+            }
+
+            // Procurar as reparações associadas ao veículo
+            var reparacoes = await _reparacaoRepository.GetAll()
+                .Include(r => r.Marcacao)
+                .Include(r => r.ReparacaoPecas)
+                    .ThenInclude(rp => rp.Peca)
+                .Where(r => r.Marcacao != null &&
+                            r.Marcacao.Veiculo != null &&
+                            r.Marcacao.Veiculo.Id == id &&
+                            r.Concluida &&
+                            !r.Cancelada)
+                .OrderByDescending(r => r.DataInicio)
+                .ToListAsync();
+
+            // Enviar o veículo para a View
+            ViewBag.Veiculo = veiculo;
+
+            return View(reparacoes);
         }
     }
  }
