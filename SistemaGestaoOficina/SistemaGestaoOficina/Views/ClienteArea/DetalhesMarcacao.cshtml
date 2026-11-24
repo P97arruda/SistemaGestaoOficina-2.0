@@ -1,0 +1,363 @@
+﻿
+@model SistemaGestaoOficina.Data.Entities.Marcacao
+
+@{
+    Layout = "~/Views/Shared/_InternalLayout.cshtml";
+    ViewData["Title"] = "Detalhes da Marcação";
+
+    var estado = Model.Estado ?? "";
+
+    var classeEstado = estado switch
+    {
+        "Agendada" => "bg-primary",
+        "Concluida" or "Concluída" => "bg-success",
+        "Cancelada" => "bg-danger",
+        _ => "bg-secondary"
+    };
+
+    var textoEstado = estado switch
+    {
+        "Concluida" => "Concluída",
+        _ => estado
+    };
+}
+
+<div class="container-fluid py-4">
+
+    <!-- CABEÇALHO -->
+    <div class="d-flex justify-content-between
+                align-items-center flex-wrap gap-3 mb-4">
+
+        <div>
+            <h2 class="fw-bold mb-1">
+                Detalhes da Marcação
+            </h2>
+
+            <p class="text-muted mb-0">
+                Consulte as informações da marcação #@Model.Id
+            </p>
+        </div>
+
+        <a asp-controller="ClienteArea"
+           asp-action="Index"
+           class="btn btn-secondary">
+
+            <i class="bi bi-arrow-left me-1"></i>
+            Voltar
+        </a>
+
+    </div>
+
+    <!-- CARTÃO -->
+    <div class="card shadow-sm border-0 mx-auto"
+         style="max-width: 900px;">
+
+        <!-- TOPO DO CARTÃO -->
+        <div class="card-header bg-white border-bottom
+                    d-flex justify-content-between
+                    align-items-center flex-wrap gap-2 py-3 px-4">
+
+            <div>
+                <h5 class="fw-bold mb-1">
+                    Marcação #@Model.Id
+                </h5>
+
+                <small class="text-muted">
+                    @Model.TipoServico
+                </small>
+            </div>
+
+            <span class="badge @classeEstado px-3 py-2">
+                @textoEstado
+            </span>
+
+        </div>
+
+        <div class="card-body p-4">
+
+            <!-- DADOS DO CLIENTE -->
+            <h6 class="fw-bold text-dark mb-3">
+
+                <i class="bi bi-person-circle me-2"></i>
+                Dados do Cliente
+
+            </h6>
+
+            @if (Model.User != null)
+            {
+                <div class="d-flex align-items-center
+                            gap-3 mb-3">
+
+                    @if (Model.User.ImageId != Guid.Empty)
+                    {
+                        <img src="@Model.User.ImageFullPath"
+                             alt="Fotografia do cliente"
+                             class="rounded-circle border"
+                             style="width: 64px;
+                                    height: 64px;
+                                    object-fit: cover;" />
+                    }
+                    else
+                    {
+                        <div class="rounded-circle bg-light border
+                                    d-flex align-items-center
+                                    justify-content-center text-secondary"
+                             style="width: 64px;
+                                    height: 64px;
+                                    min-width: 64px;">
+
+                            <i class="bi bi-person fs-2"></i>
+
+                        </div>
+                    }
+
+                    <div>
+                        <div class="fw-bold">
+                            @Model.User.FullName
+                        </div>
+
+                        <small class="text-muted">
+                            Cliente
+                        </small>
+                    </div>
+
+                </div>
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+
+                        <small class="text-muted d-block">
+                            Email
+                        </small>
+
+                        <span class="fw-semibold">
+                            @(Model.User.Email ?? "Não informado")
+                        </span>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <small class="text-muted d-block">
+                            Contacto
+                        </small>
+
+                        <span class="fw-semibold">
+                            @(Model.User.PhoneNumber ?? "Não informado")
+                        </span>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <small class="text-muted d-block">
+                            NIF
+                        </small>
+
+                        <span class="fw-semibold">
+                            @(Model.User.NIF ?? "Não informado")
+                        </span>
+
+                    </div>
+
+                </div>
+            }
+            else
+            {
+                <p class="text-muted mb-0">
+                    Cliente não identificado.
+                </p>
+            }
+
+            <hr class="my-4" />
+
+            <!-- DADOS DO VEÍCULO -->
+            <h6 class="fw-bold text-primary mb-3">
+
+                <i class="bi bi-car-front me-2"></i>
+                Dados do Veículo
+
+            </h6>
+
+            @if (Model.Veiculo != null)
+            {
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <small class="text-muted d-block">
+                            Marca
+                        </small>
+
+                        <span class="fw-semibold">
+                            @Model.Veiculo.Marca
+                        </span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <small class="text-muted d-block">
+                            Modelo
+                        </small>
+
+                        <span class="fw-semibold">
+                            @Model.Veiculo.Modelo
+                        </span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <small class="text-muted d-block">
+                            Matrícula
+                        </small>
+
+                        <span class="fw-semibold">
+                            @Model.Veiculo.Matricula
+                        </span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <small class="text-muted d-block">
+                            Ano
+                        </small>
+
+                        <span class="fw-semibold">
+                            @Model.Veiculo.Ano
+                        </span>
+                    </div>
+
+                </div>
+            }
+            else
+            {
+                <p class="text-muted mb-0">
+                    Veículo não identificado.
+                </p>
+            }
+
+            <hr class="my-4" />
+
+            <!-- DADOS DA MARCAÇÃO -->
+            <h6 class="fw-bold text-primary mb-3">
+
+                <i class="bi bi-calendar-check me-2"></i>
+                Dados da Marcação
+
+            </h6>
+
+            <div class="row g-3">
+
+                <div class="col-md-6">
+
+                    <small class="text-muted d-block">
+                        Tipo de Serviço
+                    </small>
+
+                    <span class="fw-semibold">
+                        @Model.TipoServico
+                    </span>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <small class="text-muted d-block">
+                        Estado
+                    </small>
+
+                    <span class="badge @classeEstado">
+                        @textoEstado
+                    </span>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <small class="text-muted d-block">
+                        Data
+                    </small>
+
+                    <span class="fw-semibold">
+                        @Model.DataHora.ToString("dd/MM/yyyy")
+                    </span>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <small class="text-muted d-block">
+                        Hora
+                    </small>
+
+                    <span class="fw-semibold">
+                        @Model.DataHora.ToString("HH:mm")
+                    </span>
+
+                </div>
+
+            </div>
+
+            <hr class="my-4" />
+
+            <!-- MECÂNICO RESPONSÁVEL -->
+            <h6 class="fw-bold text-primary mb-3">
+
+                <i class="bi bi-tools me-2"></i>
+                Mecânico Responsável
+
+            </h6>
+
+            @if (Model.Mecanico != null)
+            {
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+
+                        <small class="text-muted d-block">
+                            Nome
+                        </small>
+
+                        <span class="fw-semibold">
+                            @Model.Mecanico.Nome
+                        </span>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <small class="text-muted d-block">
+                            Especialidade
+                        </small>
+
+                        <span class="fw-semibold">
+                            @Model.Mecanico.Especialidade
+                        </span>
+
+                    </div>
+
+                </div>
+            }
+            else
+            {
+                <p class="text-muted mb-0">
+                    Mecânico não atribuído.
+                </p>
+            }
+
+        </div>
+
+        <!-- RODAPÉ -->
+        <div class="card-footer bg-white border-top
+                    text-end px-4 py-3">
+
+            <a asp-controller="ClienteArea"
+               asp-action="Index"
+               class="btn btn-secondary">
+
+                <i class="bi bi-arrow-left me-1"></i>
+                Voltar
+            </a>
+
+        </div>
+
+    </div>
+
+</div>

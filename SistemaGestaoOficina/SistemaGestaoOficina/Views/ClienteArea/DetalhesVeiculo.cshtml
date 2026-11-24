@@ -1,0 +1,186 @@
+﻿
+@model SistemaGestaoOficina.Data.Entities.Veiculo
+
+@{
+    Layout = "~/Views/Shared/_InternalLayout.cshtml";
+    ViewData["Title"] = "Detalhes do Veículo";
+}
+
+<div class="container-fluid py-4">
+
+    <!-- CABEÇALHO -->
+    <div class="mb-4">
+
+        <h2 class="fw-bold mb-1">
+            Detalhes do Veículo
+        </h2>
+
+        <p class="text-muted mb-0">
+            Consulte as informações do seu veículo.
+        </p>
+
+    </div>
+
+    <!-- CARTÃO PRINCIPAL -->
+    <div class="card shadow-sm border-0 rounded-3"
+         style="max-width: 900px;">
+
+        <div class="card-body p-4">
+
+            <!-- IDENTIFICAÇÃO DO VEÍCULO -->
+            <div class="mb-4">
+
+                <h4 class="fw-bold mb-2">
+                    @Model.Marca @Model.Modelo
+                </h4>
+
+                <span class="badge bg-primary">
+                    @Model.Matricula
+                </span>
+
+            </div>
+
+            <hr class="mb-4" />
+
+            <!-- INFORMAÇÕES DO VEÍCULO -->
+            <h5 class="fw-bold text-dark mb-3">
+                Informações do Veículo
+            </h5>
+
+            <dl class="row mb-4">
+
+                <dt class="col-sm-4">
+                    Marca
+                </dt>
+                <dd class="col-sm-8">
+                    @Model.Marca
+                </dd>
+
+                <dt class="col-sm-4">
+                    Modelo
+                </dt>
+                <dd class="col-sm-8">
+                    @Model.Modelo
+                </dd>
+
+                <dt class="col-sm-4">
+                    Matrícula
+                </dt>
+                <dd class="col-sm-8">
+
+                    <span class="badge bg-light text-dark border">
+                        @Model.Matricula
+                    </span>
+
+                </dd>
+
+                <dt class="col-sm-4">
+                    Ano
+                </dt>
+                <dd class="col-sm-8">
+                    @Model.Ano
+                </dd>
+
+                <dt class="col-sm-4">
+                    Quilometragem
+                </dt>
+                <dd class="col-sm-8">
+                    @Model.Quilometragem km
+                </dd>
+
+                <dt class="col-sm-4">
+                    Combustível
+                </dt>
+                <dd class="col-sm-8">
+                    @Model.Combustivel
+                </dd>
+
+            </dl>
+
+            <hr class="mb-4" />
+
+            <!-- PROPRIETÁRIO -->
+            <h5 class="fw-bold text-dark mb-3">
+                Proprietário
+            </h5>
+
+            <div class="d-flex align-items-center gap-3 mb-4">
+
+                @if (Model.User != null)
+                {
+                    @if (Model.User.ImageId != Guid.Empty)
+                    {
+                        <img src="@Model.User.ImageFullPath"
+                             alt="Fotografia do proprietário"
+                             class="rounded-circle border"
+                             style="width: 55px;
+                                    height: 55px;
+                                    object-fit: cover;" />
+                    }
+                    else
+                    {
+                        <div class="rounded-circle bg-primary text-white
+                                    d-flex align-items-center
+                                    justify-content-center fw-bold"
+                             style="width: 55px;
+                                    height: 55px;
+                                    min-width: 55px;">
+
+                            @(string.IsNullOrWhiteSpace(Model.User.FirstName)
+                                ? "C"
+                                : Model.User.FirstName.Substring(0, 1).ToUpper())
+
+                        </div>
+                    }
+
+                    <div>
+
+                        <div class="fw-semibold">
+                            @Model.User.FullName
+                        </div>
+
+                        <div class="text-muted small">
+                            @Model.User.Email
+                        </div>
+
+                    </div>
+                }
+                else
+                {
+                    <span class="text-muted">
+                        Proprietário não identificado.
+                    </span>
+                }
+
+            </div>
+
+            <hr />
+
+            <!-- BOTÕES -->
+            <div class="d-flex flex-wrap gap-2 mt-4">
+
+                <!-- VOLTAR -->
+                <a asp-controller="ClienteArea"
+                   asp-action="MeusVeiculos"
+                   class="btn btn-secondary">
+
+                    <i class="bi bi-arrow-left me-1"></i>
+                    Voltar
+                </a>
+
+                <!-- EDITAR -->
+                <a asp-controller="ClienteArea"
+                   asp-action="EditarVeiculo"
+                   asp-route-id="@Model.Id"
+                   class="btn btn-warning">
+
+                    <i class="bi bi-pencil-square me-1"></i>
+                    Editar Veículo
+                </a>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>

@@ -1,0 +1,280 @@
+﻿
+@model IEnumerable<SistemaGestaoOficina.Data.Entities.Reparacao>
+
+@using System.Linq
+@using SistemaGestaoOficina.Data.Entities
+
+@{
+    ViewData["Title"] = "Histórico de Reparações";
+    Layout = "~/Views/Shared/_InternalLayout.cshtml";
+
+    var reparacoes = (Model ?? Enumerable.Empty<Reparacao>())
+        .ToList();
+}
+
+<div class="container-fluid py-4">
+
+    <!-- CABEÇALHO -->
+    <div class="d-flex justify-content-between
+                align-items-center flex-wrap gap-3 mb-4">
+
+        <div>
+            <h2 class="fw-bold mb-1">
+                Histórico de Reparações
+            </h2>
+
+            <p class="text-muted mb-0">
+                Consulte as reparações concluídas
+                dos seus veículos.
+            </p>
+        </div>
+
+        <a asp-controller="ClienteArea"
+           asp-action="Index"
+           class="btn btn-secondary">
+
+            <i class="bi bi-arrow-left me-1"></i>
+            Voltar
+        </a>
+
+    </div>
+
+    <!-- LISTAGEM -->
+    <div class="card shadow-sm border-0">
+
+        <div class="card-body p-3">
+
+            <!-- PESQUISA -->
+            <div class="mb-4">
+
+                <label for="pesquisaReparacoes"
+                       class="form-label fw-semibold">
+                    Pesquisar Reparações
+                </label>
+
+                <div class="input-group"
+                     style="max-width: 550px;">
+
+                    <span class="input-group-text bg-white">
+                        <i class="bi bi-search text-muted"></i>
+                    </span>
+
+                    <input type="search"
+                           id="pesquisaReparacoes"
+                           class="form-control"
+                           placeholder="Veículo, matrícula ou serviço..."
+                           autocomplete="off" />
+
+                    <button type="button"
+                            id="limparPesquisa"
+                            class="btn btn-outline-secondary"
+                            title="Limpar pesquisa"
+                            aria-label="Limpar pesquisa">
+
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+
+                </div>
+
+            </div>
+
+            <!-- TABELA -->
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0"
+                       id="tabelaReparacoes">
+
+                    <thead class="table-light">
+                        <tr>
+                            <th>Veículo</th>
+                            <th>Tipo de Serviço</th>
+                            <th>Data de Conclusão</th>
+                            <th>Valor Final</th>
+                            <th class="text-end">Ações</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var reparacao in reparacoes)
+                        {
+                            var veiculo = reparacao.Marcacao?.Veiculo;
+
+                            var nomeVeiculo = veiculo == null
+                                ? "Não informado"
+                                : $"{veiculo.Marca} {veiculo.Modelo}";
+
+                            var matricula = veiculo?.Matricula ?? "";
+
+                            var pesquisa =
+                                $"{nomeVeiculo} {matricula} {reparacao.TipoServico}"
+                                .ToLowerInvariant();
+
+                            <tr class="linha-reparacao"
+                                data-pesquisa="@pesquisa">
+
+                                <!-- VEÍCULO -->
+                                <td>
+
+                                    <div class="fw-semibold">
+                                        @nomeVeiculo
+                                    </div>
+
+                                    @if (!string.IsNullOrWhiteSpace(matricula))
+                                    {
+                                        <small class="text-muted">
+                                            @matricula
+                                        </small>
+                                    }
+
+                                </td>
+
+                                <!-- TIPO DE SERVIÇO -->
+                                <td>
+                                    @reparacao.TipoServico
+                                </td>
+
+                                <!-- DATA DE CONCLUSÃO -->
+                                <td>
+                                    @(reparacao.DataFim?.ToString("dd/MM/yyyy")
+                                        ?? "Não informada")
+                                </td>
+
+                                <!-- VALOR FINAL -->
+                                <td class="fw-bold text-success">
+                                    @reparacao.CustoTotal.ToString("N2") €
+                                </td>
+
+                                <!-- AÇÕES -->
+                                <td class="text-end">
+
+                                    <a asp-controller="ClienteArea"
+                                       asp-action="DetalhesReparacao"
+                                       asp-route-id="@reparacao.Id"
+                                       class="btn btn-sm btn-info text-white">
+
+                                        <i class="bi bi-eye me-1"></i>
+                                        Detalhes
+                                    </a>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <!-- NENHUMA REPARAÇÃO -->
+            @if (!reparacoes.Any())
+            {
+                <div class="text-center text-muted py-5">
+
+                    <i class="bi bi-tools fs-1 d-block mb-3"></i>
+
+                    <h6 class="fw-bold">
+                        Nenhuma reparação concluída
+                    </h6>
+
+                    <p class="mb-0">
+                        Ainda não existem reparações concluídas
+                        associadas aos seus veículos.
+                    </p>
+
+                </div>
+            }
+
+            <!-- NENHUM RESULTADO NA PESQUISA -->
+            <div id="semResultados"
+                 class="text-center text-muted py-4 d-none">
+
+                Nenhuma reparação encontrada.
+
+            </div>
+
+            <!-- CONTADOR -->
+            <div class="border-top mt-3 pt-3 text-muted small">
+
+                <span id="contadorReparacoes">
+                    @reparacoes.Count reparação(ões)
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const pesquisa =
+                document.getElementById("pesquisaReparacoes");
+
+            const limparPesquisa =
+                document.getElementById("limparPesquisa");
+
+            const linhas =
+                document.querySelectorAll(".linha-reparacao");
+
+            const semResultados =
+                document.getElementById("semResultados");
+
+            const contador =
+                document.getElementById("contadorReparacoes");
+
+            function atualizarPesquisa() {
+
+                const termo = pesquisa.value
+                    .trim()
+                    .toLocaleLowerCase("pt-PT");
+
+                let encontrados = 0;
+
+                linhas.forEach(function (linha) {
+
+                    const texto = linha.dataset.pesquisa || "";
+
+                    const corresponde = texto.includes(termo);
+
+                    linha.classList.toggle(
+                        "d-none",
+                        !corresponde
+                    );
+
+                    if (corresponde) {
+                        encontrados++;
+                    }
+                });
+
+                semResultados.classList.toggle(
+                    "d-none",
+                    encontrados > 0 || linhas.length === 0
+                );
+
+                contador.textContent =
+                    `A mostrar ${encontrados} reparação(ões)`;
+            }
+
+            pesquisa.addEventListener("input", atualizarPesquisa);
+
+            limparPesquisa.addEventListener("click", function () {
+
+                pesquisa.value = "";
+
+                atualizarPesquisa();
+
+                pesquisa.focus();
+            });
+
+            atualizarPesquisa();
+        });
+    </script>
+}

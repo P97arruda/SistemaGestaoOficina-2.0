@@ -1,276 +1,555 @@
 ﻿
-@model IEnumerable<SistemaGestaoOficina.Data.Entities.Veiculo>
+@model IEnumerable<SistemaGestaoOficina.Data.Entities.Marcacao>
+
+@using System.Linq
+@using SistemaGestaoOficina.Data.Entities
 
 @{
-    ViewData["Title"] = "Área do Cliente";
+    Layout = "~/Views/Shared/_InternalLayout.cshtml";
+    ViewData["Title"] = "Painel do Cliente";
+
+    var marcacoes = Model?.ToList() ?? new List<Marcacao>();
+
+    var emCurso = marcacoes
+        .Where(m => m.Estado == "Agendada")
+        .ToList();
+
+    var concluidas = marcacoes
+        .Where(m => m.Estado == "Concluida" ||
+                    m.Estado == "Concluída")
+        .ToList();
+
+    var canceladas = marcacoes
+        .Where(m => m.Estado == "Cancelada")
+        .ToList();
+
+    var totalVeiculos = ViewBag.TotalVeiculos ?? 0;
+
+    var grupos = new[]
+    {
+        new
+        {
+            Chave = "curso",
+            Titulo = "Agendada",
+            Registos = emCurso
+        },
+        new
+        {
+            Chave = "concluida",
+            Titulo = "Concluída",
+            Registos = concluidas
+        },
+        new
+        {
+            Chave = "cancelada",
+            Titulo = "Cancelada",
+            Registos = canceladas
+        }
+    };
 }
 
-<div class="container mt-4 mb-5">
+<div class="container-fluid py-4">
 
     <!-- CABEÇALHO -->
-    <div class="mb-4">
-        <h2 class="fw-bold mb-1">Bem-vindo à sua oficina!</h2>
+    <div class="d-flex justify-content-between align-items-center
+                flex-wrap gap-3 mb-4">
 
-        <p class="text-muted mb-0">
-            Faça a gestão dos seus veículos, consulte os seus dados
-            e acompanhe os serviços da nossa oficina.
-        </p>
-    </div>
-
-    <!-- RESUMO -->
-    <div class="row g-3 mb-4">
-
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body p-4">
-                    <h6 class="text-muted">Meus Veículos</h6>
-
-                    <h2 class="fw-bold text-primary">
-                        @(Model?.Count() ?? 0)
-                    </h2>
-
-                    <p class="mb-0 text-muted">
-                        Veículos associados à sua conta
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body p-4">
-                    <h6 class="text-muted">Marcações</h6>
-                    <h2 class="fw-bold">—</h2>
-                    <p class="mb-0 text-muted">
-                        Disponível em breve
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body p-4">
-                    <h6 class="text-muted">Serviços Realizados</h6>
-                    <h2 class="fw-bold">—</h2>
-                    <p class="mb-0 text-muted">
-                        Disponível em breve
-                    </p>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- MENU DO CLIENTE -->
-    <div id="menuCliente">
-
-        <h5 class="fw-bold mb-3">O que deseja fazer?</h5>
-
-        <div class="row g-3">
-
-            <!-- 1. MEUS VEÍCULOS -->
-            <div class="col-md-6">
-                <div class="card shadow-sm border-0 h-100">
-                    <div class="card-body p-4 d-flex flex-column">
-
-                        <h5 class="fw-bold">
-                            <i class="bi bi-car-front text-primary me-2"></i>
-                            Meus Veículos
-                        </h5>
-
-                        <p class="text-muted">
-                            Consulte e edite os veículos associados
-                            à sua conta.
-                        </p>
-
-                        <div class="mt-auto">
-                            <button type="button"
-                                    class="btn btn-primary"
-                                    onclick="mostrarSecao('secaoVeiculos')">
-                                Ver Veículos
-                            </button>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-
-            <!-- 2. MARCAÇÕES -->
-            <div class="col-md-6">
-                <div class="card shadow-sm border-0 h-100">
-                    <div class="card-body p-4 d-flex flex-column">
-
-                        <h5 class="fw-bold">
-                            <i class="bi bi-calendar-check text-primary me-2"></i>
-                            Marcações
-                        </h5>
-
-                        <p class="text-muted">
-                            Consulte as suas marcações na oficina.
-                        </p>
-
-                        <div class="mt-auto">
-                            <button type="button"
-                                    class="btn btn-outline-secondary"
-                                    disabled>
-                                Disponível em breve
-                            </button>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-
-            <!-- 3. HISTÓRICO -->
-            <div class="col-md-6">
-                <div class="card shadow-sm border-0 h-100">
-                    <div class="card-body p-4 d-flex flex-column">
-
-                        <h5 class="fw-bold">
-                            <i class="bi bi-clock-history text-primary me-2"></i>
-                            Histórico de Serviços
-                        </h5>
-
-                        <p class="text-muted">
-                            Consulte o histórico dos serviços
-                            realizados nos seus veículos.
-                        </p>
-
-                        <div class="mt-auto">
-                            <button type="button"
-                                    class="btn btn-outline-secondary"
-                                    disabled>
-                                Disponível em breve
-                            </button>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-
-            <!-- 4. MEU PERFIL -->
-            <div class="col-md-6">
-                <div class="card shadow-sm border-0 h-100">
-                    <div class="card-body p-4 d-flex flex-column">
-
-                        <h5 class="fw-bold">
-                            <i class="bi bi-person-circle text-primary me-2"></i>
-                            Meu Perfil
-                        </h5>
-
-                        <p class="text-muted">
-                            Consulte e atualize os seus dados pessoais
-                            e informações de contacto.
-                        </p>
-
-                        <div class="mt-auto">
-                            <a asp-controller="ClienteArea"
-                               asp-action="EditarPerfil"
-                               class="btn btn-primary">
-                                Editar Perfil
-                            </a>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- SECÇÃO DOS VEÍCULOS -->
-    <div id="secaoVeiculos" class="mt-4" style="display: none;">
-
-        <div class="mb-4">
-            <h4 class="fw-bold mb-1">Os Meus Veículos</h4>
+        <div>
+            <h2 class="fw-bold mb-1">
+                Painel do Cliente
+            </h2>
 
             <p class="text-muted mb-0">
-                Consulte e atualize as informações dos seus veículos.
+                Consulte os seus veículos e acompanhe
+                as suas marcações na oficina.
             </p>
         </div>
 
-        <div class="card shadow-sm border-0">
+        <a asp-controller="ClienteArea"
+           asp-action="MeusVeiculos"
+           class="btn btn-primary">
+
+            <i class="bi bi-car-front me-1"></i>
+            Meus Veículos
+        </a>
+
+    </div>
+
+    <!-- MENSAGENS -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show"
+             role="alert">
+
+            @TempData["SuccessMessage"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Fechar">
+            </button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show"
+             role="alert">
+
+            @TempData["ErrorMessage"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Fechar">
+            </button>
+        </div>
+    }
+
+    <!-- INDICADORES -->
+    <div class="row g-3 mb-4">
+
+        <!-- TOTAL DE VEÍCULOS -->
+        <div class="col-md-6 col-lg-4">
+
+            <div class="card shadow-sm border-0 h-100">
+
+                <div class="card-body p-4">
+
+                    <div class="d-flex justify-content-between
+                                align-items-center">
+
+                        <div>
+                            <p class="text-muted mb-2">
+                                Meus Veículos
+                            </p>
+
+                            <h2 class="fw-bold text-dark mb-1">
+                                @totalVeiculos
+                            </h2>
+
+                            <small class="text-muted">
+                                Veículos registados
+                            </small>
+                        </div>
+
+                        <div class="rounded p-3"
+                             style="background-color: #e5f7ef;">
+
+                            <i class="bi bi-car-front-fill
+                                      fs-3 text-success"></i>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- MARCAÇÕES AGENDADAS -->
+        <div class="col-md-6 col-lg-4">
+
+            <div class="card shadow-sm border-0 h-100">
+
+                <div class="card-body p-4">
+
+                    <div class="d-flex justify-content-between
+                                align-items-center">
+
+                        <div>
+                            <p class="text-muted mb-2">
+                                Marcações Agendadas
+                            </p>
+
+                            <h2 class="fw-bold text-dark mb-1">
+                                @emCurso.Count
+                            </h2>
+
+                            <small class="text-muted">
+                                Marcações em curso
+                            </small>
+                        </div>
+
+                        <div class="rounded p-3"
+                             style="background-color: #e8f2ff;">
+
+                            <i class="bi bi-calendar-check
+                                      fs-3 text-primary"></i>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- TÍTULO DAS MARCAÇÕES -->
+    <div class="mb-3">
+
+        <h5 class="fw-bold mb-1">
+            Minhas Marcações
+        </h5>
+
+        <p class="text-muted mb-0">
+            Consulte as suas marcações e acompanhe
+            o estado dos serviços.
+        </p>
+
+    </div>
+
+    <!-- FILTROS E PESQUISA -->
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-body p-3">
+
+            <div class="row align-items-end g-3">
+
+                <!-- FILTROS -->
+                <div class="col-lg-7">
+
+                    <label class="form-label fw-semibold d-block">
+                        Estado das Marcações
+                    </label>
+
+                    <div class="d-flex gap-2 flex-wrap">
+
+                        <!-- EM CURSO -->
+                        <button type="button"
+                                class="btn btn-primary filtro-marcacao"
+                                data-filtro="curso">
+
+                            <i class="bi bi-clock me-1"></i>
+                            Em Curso (@emCurso.Count)
+                        </button>
+
+                        <!-- CONCLUÍDAS -->
+                        <button type="button"
+                                class="btn btn-outline-primary filtro-marcacao"
+                                data-filtro="concluida">
+
+                            <i class="bi bi-check-circle me-1"></i>
+                            Concluídas (@concluidas.Count)
+                        </button>
+
+                        <!-- CANCELADAS -->
+                        <button type="button"
+                                class="btn btn-outline-primary filtro-marcacao"
+                                data-filtro="cancelada">
+
+                            <i class="bi bi-x-circle me-1"></i>
+                            Canceladas (@canceladas.Count)
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <!-- PESQUISA -->
+                <div class="col-lg-5">
+
+                    <label for="pesquisaMarcacoes"
+                           class="form-label fw-semibold">
+                        Pesquisar Marcações
+                    </label>
+
+                    <div class="input-group">
+
+                        <span class="input-group-text bg-white">
+                            <i class="bi bi-search text-muted"></i>
+                        </span>
+
+                        <input type="search"
+                               id="pesquisaMarcacoes"
+                               class="form-control"
+                               placeholder="Veículo, matrícula ou serviço..."
+                               autocomplete="off" />
+
+                        <button type="button"
+                                id="limparPesquisa"
+                                class="btn btn-outline-secondary"
+                                title="Limpar pesquisa">
+
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- TABELAS DAS MARCAÇÕES -->
+    @foreach (var grupo in grupos)
+    {
+        <div id="tabela-@grupo.Chave"
+             class="card border-0 shadow-sm tabela-marcacoes @(grupo.Chave == "curso" ? "" : "d-none")">
 
             <div class="card-body p-3">
 
-                @if (Model == null || !Model.Any())
-                {
-                    <div class="alert alert-info mb-0">
-                        Ainda não tem veículos registados.
-                        Contacte a oficina para registar o seu veículo.
-                    </div>
-                }
-                else
-                {
-                    <div class="table-responsive">
+                <div class="table-responsive">
 
-                        <table class="table table-hover align-middle mb-0">
+                    <table class="table table-hover align-middle mb-0">
 
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Marca</th>
-                                    <th>Modelo</th>
-                                    <th>Matrícula</th>
-                                    <th>Ano</th>
-                                    <th>Quilometragem</th>
-                                    <th>Combustível</th>
-                                    <th class="text-end">Ações</th>
+                        <thead class="table-light">
+
+                            <tr>
+                                <th>Veículo</th>
+                                <th>Mecânico</th>
+                                <th>Tipo de Serviço</th>
+                                <th>Data e Hora</th>
+                                <th>Estado</th>
+                                <th class="text-end">Ações</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var marcacao in grupo.Registos)
+                            {
+                                var pesquisa =
+                                    $"{marcacao.Veiculo?.Marca} " +
+                                    $"{marcacao.Veiculo?.Modelo} " +
+                                    $"{marcacao.Veiculo?.Matricula} " +
+                                    $"{marcacao.Mecanico?.Nome} " +
+                                    $"{marcacao.TipoServico}";
+
+                                <tr class="linha-marcacao"
+                                    data-pesquisa="@pesquisa.ToLowerInvariant()">
+
+                                    <!-- VEÍCULO -->
+                                    <td>
+
+                                        @if (marcacao.Veiculo != null)
+                                        {
+                                            <div class="fw-semibold">
+                                                @marcacao.Veiculo.Marca
+                                                @marcacao.Veiculo.Modelo
+                                            </div>
+
+                                            <small class="text-muted">
+                                                @marcacao.Veiculo.Matricula
+                                            </small>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">
+                                                Não informado
+                                            </span>
+                                        }
+
+                                    </td>
+
+                                    <!-- MECÂNICO -->
+                                    <td>
+                                        @(marcacao.Mecanico?.Nome
+                                            ?? "Não atribuído")
+                                    </td>
+
+                                    <!-- TIPO DE SERVIÇO -->
+                                    <td>
+                                        @marcacao.TipoServico
+                                    </td>
+
+                                    <!-- DATA E HORA -->
+                                    <td class="text-nowrap">
+                                        @marcacao.DataHora.ToString("dd/MM/yyyy - HH:mm")
+                                    </td>
+
+                                    <!-- ESTADO -->
+                                    <td>
+
+                                        @if (grupo.Chave == "curso")
+                                        {
+                                            <span class="badge bg-primary">
+                                                Agendada
+                                            </span>
+                                        }
+                                        else if (grupo.Chave == "concluida")
+                                        {
+                                            <span class="badge bg-success">
+                                                Concluída
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">
+                                                Cancelada
+                                            </span>
+                                        }
+
+                                    </td>
+
+                                    <!-- AÇÕES -->
+                                    <td class="text-end">
+
+                                        <a asp-controller="ClienteArea"
+                                           asp-action="DetalhesMarcacao"
+                                           asp-route-id="@marcacao.Id"
+                                           class="btn btn-sm btn-info text-white">
+
+                                            <i class="bi bi-eye me-1"></i>
+                                            Detalhes
+                                        </a>
+
+                                    </td>
+
                                 </tr>
-                            </thead>
+                            }
 
-                            <tbody>
-                                @foreach (var veiculo in Model)
-                                {
-                                    <tr>
-                                        <td>@veiculo.Marca</td>
-                                        <td>@veiculo.Modelo</td>
-                                        <td>@veiculo.Matricula</td>
-                                        <td>@veiculo.Ano</td>
-                                        <td>@veiculo.Quilometragem</td>
-                                        <td>@veiculo.Combustivel</td>
+                        </tbody>
 
-                                        <td class="text-end">
-                                            <a asp-controller="ClienteArea"
-                                               asp-action="EditarVeiculo"
-                                               asp-route-id="@veiculo.Id"
-                                               class="btn btn-sm btn-warning">
-                                                Editar
-                                            </a>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
+                    </table>
 
-                        </table>
+                </div>
 
-                    </div>
-                }
+                <!-- SEM RESULTADOS -->
+                <div id="semResultados-@grupo.Chave"
+                     class="text-center text-muted py-5 d-none">
+
+                    <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+
+                    Nenhuma marcação encontrada.
+
+                </div>
+
+                <!-- CONTADOR -->
+                <div class="border-top mt-3 pt-3 text-muted small">
+
+                    <span id="contador-@grupo.Chave"></span>
+
+                </div>
 
             </div>
+
         </div>
-
-        <button type="button"
-                class="btn btn-secondary mt-3"
-                onclick="fecharSecao()">
-            Voltar
-        </button>
-
-    </div>
+    }
 
 </div>
 
 @section Scripts {
-    <script>
-        function mostrarSecao(id) {
-            document.getElementById("menuCliente").style.display = "none";
-            document.getElementById("secaoVeiculos").style.display = "none";
-            document.getElementById(id).style.display = "block";
-        }
 
-        function fecharSecao() {
-            document.getElementById("secaoVeiculos").style.display = "none";
-            document.getElementById("menuCliente").style.display = "block";
-        }
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const botoes =
+                document.querySelectorAll(".filtro-marcacao");
+
+            const pesquisa =
+                document.getElementById("pesquisaMarcacoes");
+
+            const limparPesquisa =
+                document.getElementById("limparPesquisa");
+
+            let filtroAtual = "curso";
+
+            function atualizarTabela() {
+
+                const termo = pesquisa.value
+                    .trim()
+                    .toLocaleLowerCase("pt-PT");
+
+                const tabelaAtual =
+                    document.getElementById("tabela-" + filtroAtual);
+
+                const linhas =
+                    tabelaAtual.querySelectorAll(".linha-marcacao");
+
+                const semResultados =
+                    document.getElementById(
+                        "semResultados-" + filtroAtual
+                    );
+
+                const contador =
+                    document.getElementById(
+                        "contador-" + filtroAtual
+                    );
+
+                let visiveis = 0;
+
+                linhas.forEach(function (linha) {
+
+                    const texto = linha.dataset.pesquisa || "";
+
+                    const corresponde = texto.includes(termo);
+
+                    linha.classList.toggle(
+                        "d-none",
+                        !corresponde
+                    );
+
+                    if (corresponde) {
+                        visiveis++;
+                    }
+                });
+
+                semResultados.classList.toggle(
+                    "d-none",
+                    visiveis > 0
+                );
+
+                contador.textContent =
+                    `A mostrar ${visiveis} marcação(ões)`;
+            }
+
+            // ALTERNAR ESTADO
+            botoes.forEach(function (botao) {
+
+                botao.addEventListener("click", function () {
+
+                    filtroAtual = this.dataset.filtro;
+
+                    // Atualizar os botões
+                    botoes.forEach(function (b) {
+
+                        b.classList.remove("btn-primary");
+                        b.classList.add("btn-outline-primary");
+                    });
+
+                    this.classList.remove("btn-outline-primary");
+                    this.classList.add("btn-primary");
+
+                    // Esconder as outras tabelas
+                    document.querySelectorAll(".tabela-marcacoes")
+                        .forEach(function (tabela) {
+
+                            tabela.classList.add("d-none");
+                        });
+
+                    // Mostrar a tabela selecionada
+                    document.getElementById("tabela-" + filtroAtual)
+                        .classList.remove("d-none");
+
+                    atualizarTabela();
+                });
+            });
+
+            // PESQUISAR
+            pesquisa.addEventListener("input", atualizarTabela);
+
+            // LIMPAR PESQUISA
+            limparPesquisa.addEventListener("click", function () {
+
+                pesquisa.value = "";
+
+                atualizarTabela();
+
+                pesquisa.focus();
+            });
+
+            // INICIALIZAR
+            atualizarTabela();
+
+        });
     </script>
 }

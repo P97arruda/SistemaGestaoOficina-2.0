@@ -1,0 +1,319 @@
+﻿
+@model IEnumerable<SistemaGestaoOficina.Data.Entities.Veiculo>
+
+@using System.Linq
+@using SistemaGestaoOficina.Data.Entities
+
+@{
+    Layout = "~/Views/Shared/_InternalLayout.cshtml";
+    ViewData["Title"] = "Meus Veículos";
+
+    var veiculos = Model?.ToList() ?? new List<Veiculo>();
+}
+
+<div class="container-fluid py-4">
+
+    <!-- CABEÇALHO -->
+    <div class="d-flex justify-content-between align-items-center
+                flex-wrap gap-3 mb-4">
+
+        <div>
+            <h2 class="fw-bold mb-1">
+                Meus Veículos
+            </h2>
+
+            <p class="text-muted mb-0">
+                Consulte e atualize os dados dos seus veículos.
+            </p>
+        </div>
+
+        <a asp-controller="ClienteArea"
+           asp-action="Index"
+           class="btn btn-secondary">
+
+            <i class="bi bi-arrow-left me-1"></i>
+            Voltar
+        </a>
+
+    </div>
+
+    <!-- MENSAGENS -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show"
+             role="alert">
+
+            @TempData["SuccessMessage"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Fechar">
+            </button>
+        </div>
+    }
+
+    <!-- TABELA DE VEÍCULOS -->
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header bg-white border-0 p-4 pb-2">
+
+            <div class="d-flex justify-content-between
+                        align-items-center flex-wrap gap-3">
+
+                <div>
+                    <h5 class="fw-bold mb-1">
+                        Veículos Registados
+                    </h5>
+
+                    <p class="text-muted small mb-0">
+                        Lista dos veículos associados à sua conta.
+                    </p>
+                </div>
+
+                <span class="badge bg-light text-dark border px-3 py-2">
+                    @veiculos.Count veículo(s)
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="card-body px-4 pt-3">
+
+            @if (veiculos.Any())
+            {
+                <!-- PESQUISA -->
+                <div class="mb-3">
+
+                    <div class="input-group"
+                         style="max-width: 450px;">
+
+                        <span class="input-group-text bg-white">
+                            <i class="bi bi-search text-muted"></i>
+                        </span>
+
+                        <input type="search"
+                               id="pesquisaVeiculos"
+                               class="form-control"
+                               placeholder="Pesquisar marca, modelo ou matrícula..."
+                               autocomplete="off" />
+
+                        <button type="button"
+                                id="limparPesquisa"
+                                class="btn btn-outline-secondary"
+                                title="Limpar pesquisa">
+
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <!-- TABELA -->
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle mb-0">
+
+                        <thead class="table-light">
+
+                            <tr>
+                                <th>Marca</th>
+                                <th>Modelo</th>
+                                <th>Matrícula</th>
+                                <th>Ano</th>
+                                <th>Quilometragem</th>
+                                <th>Combustível</th>
+                                <th class="text-end">Ações</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var veiculo in veiculos)
+                            {
+                                var pesquisa =
+                                    $"{veiculo.Marca} {veiculo.Modelo} " +
+                                    $"{veiculo.Matricula} {veiculo.Combustivel}";
+
+                                <tr class="linha-veiculo"
+                                    data-pesquisa="@pesquisa.ToLowerInvariant()">
+
+                                    <!-- MARCA -->
+                                    <td class="fw-semibold">
+                                        @veiculo.Marca
+                                    </td>
+
+                                    <!-- MODELO -->
+                                    <td>
+                                        @veiculo.Modelo
+                                    </td>
+
+                                    <!-- MATRÍCULA -->
+                                    <td>
+                                        <span class="badge bg-light text-dark border">
+                                            @veiculo.Matricula
+                                        </span>
+                                    </td>
+
+                                    <!-- ANO -->
+                                    <td>
+                                        @veiculo.Ano
+                                    </td>
+
+                                    <!-- QUILOMETRAGEM -->
+                                    <td class="text-nowrap">
+                                        @veiculo.Quilometragem km
+                                    </td>
+
+                                    <!-- COMBUSTÍVEL -->
+                                    <td>
+                                        @veiculo.Combustivel
+                                    </td>
+
+                                    <!-- AÇÕES -->
+                                    <td class="text-end">
+
+                                        <div class="d-flex justify-content-end
+                                                    align-items-center gap-2">
+
+                                            <!-- DETALHES -->
+                                            <a asp-controller="ClienteArea"
+                                               asp-action="DetalhesVeiculo"
+                                               asp-route-id="@veiculo.Id"
+                                               class="btn btn-sm btn-info text-white">
+
+                                                <i class="bi bi-eye me-1"></i>
+                                                Detalhes
+                                            </a>
+
+                                            <!-- EDITAR -->
+                                            <a asp-controller="ClienteArea"
+                                               asp-action="EditarVeiculo"
+                                               asp-route-id="@veiculo.Id"
+                                               class="btn btn-sm btn-warning">
+
+                                                <i class="bi bi-pencil-square me-1"></i>
+                                                Editar
+                                            </a>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                <!-- SEM RESULTADOS -->
+                <div id="semResultados"
+                     class="text-center text-muted py-4 d-none">
+
+                    Nenhum veículo encontrado.
+
+                </div>
+
+                <!-- CONTADOR -->
+                <div class="border-top mt-3 pt-3 text-muted small">
+
+                    <span id="contadorVeiculos"></span>
+
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+
+                    <i class="bi bi-car-front
+                              fs-1 text-secondary d-block mb-3"></i>
+
+                    <h6 class="fw-bold">
+                        Nenhum veículo registado
+                    </h6>
+
+                    <p class="text-muted mb-0">
+                        Ainda não tem veículos associados à sua conta.
+                        Contacte a oficina para registar um veículo.
+                    </p>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const pesquisa =
+                document.getElementById("pesquisaVeiculos");
+
+            const limparPesquisa =
+                document.getElementById("limparPesquisa");
+
+            const linhas =
+                document.querySelectorAll(".linha-veiculo");
+
+            const semResultados =
+                document.getElementById("semResultados");
+
+            const contador =
+                document.getElementById("contadorVeiculos");
+
+            if (!pesquisa) {
+                return;
+            }
+
+            function atualizarPesquisa() {
+
+                const termo = pesquisa.value.trim().toLowerCase();
+
+                let encontrados = 0;
+
+                linhas.forEach(function (linha) {
+
+                    const texto = linha.dataset.pesquisa || "";
+
+                    const mostrar = texto.includes(termo);
+
+                    linha.classList.toggle("d-none", !mostrar);
+
+                    if (mostrar) {
+                        encontrados++;
+                    }
+                });
+
+                semResultados.classList.toggle(
+                    "d-none",
+                    encontrados > 0
+                );
+
+                contador.textContent =
+                    `A mostrar ${encontrados} veículo(s)`;
+            }
+
+            pesquisa.addEventListener("input", atualizarPesquisa);
+
+            limparPesquisa.addEventListener("click", function () {
+
+                pesquisa.value = "";
+                atualizarPesquisa();
+                pesquisa.focus();
+            });
+
+            atualizarPesquisa();
+        });
+    </script>
+}

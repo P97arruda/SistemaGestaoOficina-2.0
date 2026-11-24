@@ -2,75 +2,183 @@
 @model SistemaGestaoOficina.Models.VeiculoViewModel
 
 @{
+    Layout = "~/Views/Shared/_InternalLayout.cshtml";
     ViewData["Title"] = "Editar Veículo";
 }
 
-<div class="container mt-5">
+<div class="container py-4">
 
-    <h2 class="fw-bold">Editar Veículo</h2>
+    <!-- CABEÇALHO -->
+    <div class="mb-4">
 
-    <p class="text-muted">
-        Atualize os dados do seu veículo.
-    </p>
+        <h2 class="fw-bold mb-1">
+            Editar Veículo
+        </h2>
 
-    <form asp-controller="ClienteArea" asp-action="EditarVeiculo" method="post">
+        <p class="text-muted mb-0">
+            Consulte e atualize os dados do seu veículo.
+        </p>
 
-        @Html.AntiForgeryToken()
+    </div>
 
-        <input type="hidden" asp-for="Id" />
-        <input type="hidden" asp-for="UserId" />
+    <!-- CARTÃO PRINCIPAL -->
+    <div class="card shadow-sm border-0">
 
-        <div asp-validation-summary="All" class="text-danger"></div>
+        <div class="card-body p-4">
 
-        <div class="mb-3">
-            <label asp-for="Marca" class="form-label"></label>
-            <input asp-for="Marca" class="form-control" />
-            <span asp-validation-for="Marca" class="text-danger"></span>
+            <div class="row">
+
+                <div class="col-md-7">
+
+                    <form asp-controller="ClienteArea"
+                          asp-action="EditarVeiculo"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <!-- CAMPOS OCULTOS -->
+                        <input asp-for="Id" type="hidden" />
+                        <input asp-for="UserId" type="hidden" />
+
+                        <!-- VALIDAÇÕES -->
+                        <div asp-validation-summary="ModelOnly"
+                             class="text-danger mb-3">
+                        </div>
+
+                        <!-- MARCA -->
+                        <div class="mb-3">
+
+                            <label asp-for="Marca"
+                                   class="form-label">
+                            </label>
+
+                            <input asp-for="Marca"
+                                   class="form-control" />
+
+                            <span asp-validation-for="Marca"
+                                  class="text-danger small">
+                            </span>
+
+                        </div>
+
+                        <!-- MODELO -->
+                        <div class="mb-3">
+
+                            <label asp-for="Modelo"
+                                   class="form-label">
+                            </label>
+
+                            <input asp-for="Modelo"
+                                   class="form-control" />
+
+                            <span asp-validation-for="Modelo"
+                                  class="text-danger small">
+                            </span>
+
+                        </div>
+
+                        <!-- MATRÍCULA -->
+                        <div class="mb-3">
+
+                            <label asp-for="Matricula"
+                                   class="form-label">
+                            </label>
+
+                            <input asp-for="Matricula"
+                                   class="form-control" />
+
+                            <span asp-validation-for="Matricula"
+                                  class="text-danger small">
+                            </span>
+
+                        </div>
+
+                        <!-- ANO -->
+                        <div class="mb-3">
+
+                            <label asp-for="Ano"
+                                   class="form-label">
+                            </label>
+
+                            <input asp-for="Ano"
+                                   type="number"
+                                   class="form-control" />
+
+                            <span asp-validation-for="Ano"
+                                  class="text-danger small">
+                            </span>
+
+                        </div>
+
+                        <!-- QUILOMETRAGEM -->
+                        <div class="mb-3">
+
+                            <label asp-for="Quilometragem"
+                                   class="form-label">
+                            </label>
+
+                            <div class="input-group">
+
+                                <input asp-for="Quilometragem"
+                                       type="number"
+                                       min="0"
+                                       class="form-control" />
+
+                                <span class="input-group-text">
+                                    km
+                                </span>
+
+                            </div>
+
+                            <span asp-validation-for="Quilometragem"
+                                  class="text-danger small">
+                            </span>
+
+                        </div>
+
+                        <!-- COMBUSTÍVEL -->
+                        <div class="mb-4">
+
+                            <label asp-for="Combustivel"
+                                   class="form-label">
+                            </label>
+
+                            <input asp-for="Combustivel"
+                                   class="form-control" />
+
+                            <span asp-validation-for="Combustivel"
+                                  class="text-danger small">
+                            </span>
+
+                        </div>
+
+                        <!-- BOTÕES -->
+                        <div class="d-flex flex-wrap gap-2">
+
+                            <button type="submit"
+                                    class="btn btn-primary">
+
+                                Guardar Alterações
+                            </button>
+
+                            <a asp-controller="ClienteArea"
+                               asp-action="MeusVeiculos"
+                               class="btn btn-secondary">
+
+                                Voltar
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
         </div>
 
-        <div class="mb-3">
-            <label asp-for="Modelo" class="form-label"></label>
-            <input asp-for="Modelo" class="form-control" />
-            <span asp-validation-for="Modelo" class="text-danger"></span>
-        </div>
-
-        <div class="mb-3">
-            <label asp-for="Matricula" class="form-label"></label>
-            <input asp-for="Matricula" class="form-control" />
-            <span asp-validation-for="Matricula" class="text-danger"></span>
-        </div>
-
-        <div class="mb-3">
-            <label asp-for="Ano" class="form-label"></label>
-            <input asp-for="Ano" type="number" class="form-control" />
-            <span asp-validation-for="Ano" class="text-danger"></span>
-        </div>
-
-        <div class="mb-3">
-            <label asp-for="Quilometragem" class="form-label"></label>
-            <input asp-for="Quilometragem"
-                   type="number"
-                   class="form-control" />
-            <span asp-validation-for="Quilometragem" class="text-danger"></span>
-        </div>
-
-        <div class="mb-3">
-            <label asp-for="Combustivel" class="form-label"></label>
-            <input asp-for="Combustivel" class="form-control" />
-            <span asp-validation-for="Combustivel" class="text-danger"></span>
-        </div>
-
-        <button type="submit" class="btn btn-primary">
-            Guardar Alterações
-        </button>
-
-        <a asp-controller="ClienteArea"
-           asp-action="Index"
-           class="btn btn-outline-secondary">
-            Voltar
-        </a>
-
-    </form>
+    </div>
 
 </div>
 

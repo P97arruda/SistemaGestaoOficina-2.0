@@ -2,137 +2,302 @@
 @model SistemaGestaoOficina.Models.EditarPerfilViewModel
 
 @{
-    ViewData["Title"] = "Editar Perfil";
+    Layout = "~/Views/Shared/_InternalLayout.cshtml";
+    ViewData["Title"] = "Meu Perfil";
 }
 
-<div class="container mt-4 mb-5">
+<div class="container py-4">
 
-    <!-- Cabeçalho -->
+    <!-- CABEÇALHO -->
     <div class="mb-4">
-        <h2 class="fw-bold">Meu Perfil</h2>
+        <h2 class="fw-bold mb-1">Meu Perfil</h2>
 
-        <p class="text-muted">
+        <p class="text-muted mb-0">
             Consulte e atualize os seus dados pessoais.
         </p>
     </div>
 
-    <!-- Formulário -->
-    <div class="card shadow-sm">
+    <!-- MENSAGENS -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show"
+             role="alert">
+
+            @TempData["SuccessMessage"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Fechar">
+            </button>
+        </div>
+    }
+
+    <!-- CARTÃO -->
+    <div class="card shadow-sm border-0">
+
         <div class="card-body p-4">
 
-            <h5 class="fw-bold mb-3">
-                Informações Pessoais
-            </h5>
+            <div class="row">
 
-            <hr class="mb-4" />
+                <div class="col-md-7">
 
-            <form asp-controller="ClienteArea"
-                  asp-action="EditarPerfil"
-                  method="post">
+                    <form asp-controller="ClienteArea"
+                          asp-action="EditarPerfil"
+                          method="post"
+                          enctype="multipart/form-data">
 
-                @Html.AntiForgeryToken()
+                        @Html.AntiForgeryToken()
 
-                <div asp-validation-summary="ModelOnly"
-                     class="text-danger mb-3"></div>
+                        <div asp-validation-summary="ModelOnly"
+                             class="text-danger mb-3">
+                        </div>
 
-                <div class="row g-3">
+                        <!-- FOTOGRAFIA -->
+                        <div class="mb-4">
 
-                    <!-- Nome -->
-                    <div class="col-md-6">
-                        <label asp-for="FirstName"
-                               class="form-label"></label>
+                            <label asp-for="ImageFile"
+                                   class="form-label fw-semibold">
+                                Foto de Perfil
+                            </label>
 
-                        <input asp-for="FirstName"
-                               class="form-control" />
+                            <div class="d-flex align-items-center gap-3 mb-2">
 
-                        <span asp-validation-for="FirstName"
-                              class="text-danger"></span>
-                    </div>
+                                <div class="rounded-circle border bg-light
+                                            d-flex align-items-center
+                                            justify-content-center overflow-hidden"
+                                     style="width: 100px;
+                                            height: 100px;
+                                            flex-shrink: 0;">
 
-                    <!-- Apelido -->
-                    <div class="col-md-6">
-                        <label asp-for="LastName"
-                               class="form-label"></label>
+                                    <img id="photoPreview"
+                                         src="@Model.ImageFullPath"
+                                         alt="Fotografia do cliente"
+                                         class="@(string.IsNullOrWhiteSpace(Model.ImageFullPath) ? "d-none" : "")"
+                                         style="width: 100%;
+                                                height: 100%;
+                                                object-fit: cover;" />
 
-                        <input asp-for="LastName"
-                               class="form-control" />
+                                    <span id="photoPlaceholder"
+                                          class="text-secondary @(string.IsNullOrWhiteSpace(Model.ImageFullPath) ? "" : "d-none")">
 
-                        <span asp-validation-for="LastName"
-                              class="text-danger"></span>
-                    </div>
+                                        <i class="bi bi-person fs-1"></i>
 
-                    <!-- NIF -->
-                    <div class="col-md-6">
-                        <label asp-for="NIF"
-                               class="form-label"></label>
+                                    </span>
 
-                        <input asp-for="NIF"
-                               class="form-control"
-                               maxlength="9" />
+                                </div>
 
-                        <span asp-validation-for="NIF"
-                              class="text-danger"></span>
-                    </div>
+                                <div class="flex-grow-1">
 
-                    <!-- Telefone -->
-                    <div class="col-md-6">
-                        <label asp-for="PhoneNumber"
-                               class="form-label"></label>
+                                    <input asp-for="ImageFile"
+                                           type="file"
+                                           class="form-control"
+                                           accept=".jpg,.jpeg,.png,.webp" />
 
-                        <input asp-for="PhoneNumber"
-                               class="form-control" />
+                                    <small class="text-muted d-block mt-1">
+                                        JPG, PNG ou WebP. Máximo 2 MB.
+                                    </small>
 
-                        <span asp-validation-for="PhoneNumber"
-                              class="text-danger"></span>
-                    </div>
+                                </div>
+
+                            </div>
+
+                            <span asp-validation-for="ImageFile"
+                                  class="text-danger small">
+                            </span>
+
+                            <div id="photoError"
+                                 class="text-danger small"
+                                 role="alert">
+                            </div>
+
+                        </div>
+
+                        <!-- NOME -->
+                        <div class="mb-3">
+
+                            <label asp-for="FirstName"
+                                   class="form-label">
+                            </label>
+
+                            <input asp-for="FirstName"
+                                   class="form-control" />
+
+                            <span asp-validation-for="FirstName"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                        <!-- APELIDO -->
+                        <div class="mb-3">
+
+                            <label asp-for="LastName"
+                                   class="form-label">
+                            </label>
+
+                            <input asp-for="LastName"
+                                   class="form-control" />
+
+                            <span asp-validation-for="LastName"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                        <!-- EMAIL -->
+                        <div class="mb-3">
+
+                            <label asp-for="Email"
+                                   class="form-label">
+                            </label>
+
+                            <input asp-for="Email"
+                                   type="email"
+                                   class="form-control bg-light"
+                                   readonly />
+
+                            <span asp-validation-for="Email"
+                                  class="text-danger">
+                            </span>
+
+                            <small class="text-muted">
+                                O email não pode ser alterado nesta página.
+                            </small>
+
+                        </div>
+
+                        <!-- CONTACTO -->
+                        <div class="mb-3">
+
+                            <label asp-for="PhoneNumber"
+                                   class="form-label">
+                            </label>
+
+                            <input asp-for="PhoneNumber"
+                                   class="form-control" />
+
+                            <span asp-validation-for="PhoneNumber"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                        <!-- NIF -->
+                        <div class="mb-3">
+
+                            <label asp-for="NIF"
+                                   class="form-label">
+                            </label>
+
+                            <input asp-for="NIF"
+                                   class="form-control"
+                                   maxlength="9" />
+
+                            <span asp-validation-for="NIF"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                        <!-- BOTÕES -->
+                        <div class="d-flex flex-wrap gap-2 mt-4">
+
+                            <button type="submit"
+                                    class="btn btn-primary">
+
+                                Guardar Alterações
+                            </button>
+
+                            <a asp-controller="ClienteArea"
+                               asp-action="AlterarPassword"
+                               class="btn btn-outline-primary">
+
+                                Alterar Password
+                            </a>
+
+                            <a asp-controller="ClienteArea"
+                               asp-action="Index"
+                               class="btn btn-secondary">
+
+                                Voltar
+                            </a>
+
+                        </div>
+
+                    </form>
 
                 </div>
 
-                <!-- Informações da Conta -->
-                <h5 class="fw-bold mt-4 mb-3">
-                    Informações da Conta
-                </h5>
-
-                <hr class="mb-4" />
-
-                <div class="mb-3">
-                    <label asp-for="Email"
-                           class="form-label"></label>
-
-                    <input asp-for="Email"
-                           type="email"
-                           class="form-control bg-light"
-                           readonly />
-
-                    <small class="text-muted">
-                        O email está associado à sua conta
-                        e não pode ser alterado nesta página.
-                    </small>
-                </div>
-
-                <!-- Botões -->
-                <div class="d-flex flex-wrap gap-2 mt-4">
-
-                    <button type="submit"
-                            class="btn btn-primary">
-                        Guardar Alterações
-                    </button>
-
-                    <a asp-controller="ClienteArea"
-                       asp-action="Index"
-                       class="btn btn-outline-secondary">
-                        Voltar
-                    </a>
-
-                </div>
-
-            </form>
+            </div>
 
         </div>
+
     </div>
 
 </div>
 
 @section Scripts {
+
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const inputFoto = document.getElementById("ImageFile");
+            const previewFoto = document.getElementById("photoPreview");
+            const placeholder = document.getElementById("photoPlaceholder");
+            const photoError = document.getElementById("photoError");
+
+            let imageUrl = null;
+
+            if (!inputFoto) {
+                return;
+            }
+
+            previewFoto.addEventListener("error", function () {
+                this.classList.add("d-none");
+                placeholder.classList.remove("d-none");
+            });
+
+            inputFoto.addEventListener("change", function () {
+
+                photoError.textContent = "";
+
+                if (imageUrl) {
+                    URL.revokeObjectURL(imageUrl);
+                    imageUrl = null;
+                }
+
+                const file = this.files[0];
+
+                if (!file) {
+                    return;
+                }
+
+                const allowedTypes = [
+                    "image/jpeg",
+                    "image/png",
+                    "image/webp"
+                ];
+
+                if (!allowedTypes.includes(file.type) ||
+                    file.size === 0 ||
+                    file.size > 2 * 1024 * 1024) {
+
+                    photoError.textContent =
+                        "Escolha uma fotografia JPG, PNG ou WebP com até 2 MB.";
+
+                    this.value = "";
+                    return;
+                }
+
+                imageUrl = URL.createObjectURL(file);
+
+                previewFoto.src = imageUrl;
+                previewFoto.classList.remove("d-none");
+                placeholder.classList.add("d-none");
+            });
+        });
+    </script>
 }

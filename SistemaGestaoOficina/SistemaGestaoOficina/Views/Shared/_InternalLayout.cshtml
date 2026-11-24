@@ -12,6 +12,8 @@
 
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+
+    var isCliente = User.IsInRole("Cliente");
 }
 
 <!DOCTYPE html>
@@ -272,7 +274,6 @@
 <body>
 
     <!-- MENU LATERAL -->
-
     <aside class="sidebar">
 
         <a asp-controller="Home"
@@ -283,10 +284,9 @@
 
         <nav class="sidebar-menu">
 
+            <!-- ADMINISTRADOR -->
             @if (User.IsInRole("Admin"))
             {
-                <!-- ADMINISTRAÇÃO -->
-
                 <div class="sidebar-title">
                     Administração
                 </div>
@@ -305,12 +305,11 @@
                     Administração
                 </a>
 
-                <!-- GESTÃO DE UTILIZADORES -->
-
                 <div class="sidebar-title">
                     Gestão de Utilizadores
                 </div>
 
+                <!-- CRIAR FUNCIONÁRIO -->
                 <a asp-controller="Admin"
                    asp-action="CreateUser"
                    class="sidebar-link @(currentController == "Admin" && currentAction == "CreateUser" ? "active" : "")">
@@ -323,6 +322,7 @@
                     Criar Funcionário
                 </a>
 
+                <!-- RECECIONISTAS -->
                 <a asp-controller="Admin"
                    asp-action="Rececionistas"
                    class="sidebar-link @(currentController == "Admin" && (currentAction == "Rececionistas" || currentAction == "EditUser") ? "active" : "")">
@@ -336,7 +336,6 @@
                 </a>
 
                 <!-- MECÂNICOS -->
-
                 <a asp-controller="Mecanicos"
                    asp-action="Index"
                    class="sidebar-link @(currentController == "Mecanicos" ? "active" : "")">
@@ -348,14 +347,11 @@
                     Mecânicos
                 </a>
 
-                <!-- CONFIGURAÇÃO DA OFICINA -->
-
                 <div class="sidebar-title">
                     Configuração da Oficina
                 </div>
 
                 <!-- TIPOS DE REPARAÇÕES -->
-
                 <a asp-controller="TiposReparacoes"
                    asp-action="Index"
                    class="sidebar-link @(currentController == "TiposReparacoes" ? "active" : "")">
@@ -368,7 +364,6 @@
                 </a>
 
                 <!-- PEÇAS -->
-
                 <a asp-controller="Pecas"
                    asp-action="Index"
                    class="sidebar-link @(currentController == "Pecas" ? "active" : "")">
@@ -381,16 +376,14 @@
                 </a>
             }
 
+            <!-- FUNCIONÁRIO -->
             @if (User.IsInRole("Rececionista") || User.IsInRole("Mecanico"))
             {
-                <!-- GESTÃO DA OFICINA -->
-
                 <div class="sidebar-title">
                     Gestão da Oficina
                 </div>
 
                 <!-- PAINEL DA OFICINA -->
-
                 <a asp-controller="RececionistaArea"
                    asp-action="Index"
                    class="sidebar-link @(currentController == "RececionistaArea" && currentAction == "Index" ? "active" : "")">
@@ -406,7 +399,6 @@
                 </a>
 
                 <!-- CLIENTES -->
-
                 <a asp-controller="RececionistaArea"
                    asp-action="Clientes"
                    class="sidebar-link @(currentController == "RececionistaArea" && currentAction != "Index" ? "active" : "")">
@@ -419,21 +411,7 @@
                     Clientes
                 </a>
 
-                <!-- VEÍCULOS -->
-
-                <a asp-controller="Veiculos"
-                   asp-action="TodosVeiculos"
-                   class="sidebar-link @(currentController == "Veiculos" ? "active" : "")">
-
-                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="m5 7 2-4h10l2 4 2 3v9H3v-9l2-3ZM5 7h14M3 14h18M6 18v3m12-3v3M6 11h2m8 0h2" />
-                    </svg>
-
-                    Veículos
-                </a>
-
                 <!-- MARCAÇÕES -->
-
                 <a asp-controller="Marcacoes"
                    asp-action="Index"
                    class="sidebar-link @(currentController == "Marcacoes" ? "active" : "")">
@@ -447,7 +425,6 @@
                 </a>
 
                 <!-- REPARAÇÕES -->
-
                 <a asp-controller="Reparacoes"
                    asp-action="Create"
                    class="sidebar-link @(currentController == "Reparacoes" ? "active" : "")">
@@ -460,26 +437,93 @@
                 </a>
             }
 
-            <!-- CONTA -->
+            <!-- ÁREA DO CLIENTE -->
+            @if (isCliente)
+            {
+                <div class="sidebar-title">
+                    Área do Cliente
+                </div>
 
+                <!-- PAINEL INICIAL -->
+                <a asp-controller="ClienteArea"
+                   asp-action="Index"
+                   class="sidebar-link @(currentController == "ClienteArea" && currentAction == "Index" ? "active" : "")">
+
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <rect x="3" y="3" width="7" height="7" rx="1.5" />
+                        <rect x="14" y="3" width="7" height="7" rx="1.5" />
+                        <rect x="3" y="14" width="7" height="7" rx="1.5" />
+                        <rect x="14" y="14" width="7" height="7" rx="1.5" />
+                    </svg>
+
+                    Painel Inicial
+                </a>
+
+                <!-- MEUS VEÍCULOS -->
+                <a asp-controller="ClienteArea"
+                   asp-action="MeusVeiculos"
+                   class="sidebar-link @(currentController == "ClienteArea" && (currentAction == "MeusVeiculos" || currentAction == "EditarVeiculo") ? "active" : "")">
+
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="m5 7 2-4h10l2 4 2 3v9H3v-9l2-3ZM5 7h14M3 14h18M6 18v3m12-3v3M6 11h2m8 0h2" />
+                    </svg>
+
+                    Meus Veículos
+                </a>
+
+              <!-- HISTÓRICO DE REPARAÇÕES -->
+              <a asp-controller="ClienteArea"
+                 asp-action="HistoricoReparacoes"
+                 class="sidebar-link @(currentController == "ClienteArea" &&
+                 currentAction == "HistoricoReparacoes" ? "active" : "")">
+
+                <svg class="sidebar-icon"
+                viewBox="0 0 24 24"
+                aria-hidden="true">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 7v5l3 2" />
+                </svg>
+
+                Histórico de Reparações
+             </a>
+            }
+
+            <!-- CONTA -->
             <div class="sidebar-title">
                 Conta
             </div>
 
             <!-- MEU PERFIL -->
+            @if (isCliente)
+            {
+                <a asp-controller="ClienteArea"
+                   asp-action="EditarPerfil"
+                   class="sidebar-link @(currentController == "ClienteArea" && currentAction == "EditarPerfil" ? "active" : "")">
 
-            <a asp-controller="Account"
-               asp-action="EditarPerfil"
-               class="sidebar-link @(currentController == "Account" && currentAction == "EditarPerfil" ? "active" : "")">
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="12" cy="8" r="4" />
+                        <path d="M4 21v-1a8 8 0 0 1 16 0v1" />
+                    </svg>
 
-                <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
-                    <circle cx="12" cy="8" r="4" />
-                    <path d="M4 21v-1a8 8 0 0 1 16 0v1" />
-                </svg>
+                    Meu Perfil
+                </a>
+            }
+            else
+            {
+                <a asp-controller="Account"
+                   asp-action="EditarPerfil"
+                   class="sidebar-link @(currentController == "Account" && currentAction == "EditarPerfil" ? "active" : "")">
 
-                Meu Perfil
-            </a>
+                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="12" cy="8" r="4" />
+                        <path d="M4 21v-1a8 8 0 0 1 16 0v1" />
+                    </svg>
 
+                    Meu Perfil
+                </a>
+            }
+
+            <!-- PÁGINA INICIAL -->
             <a asp-controller="Home"
                asp-action="Index"
                class="sidebar-link">
@@ -494,7 +538,6 @@
         </nav>
 
         <!-- UTILIZADOR NO RODAPÉ -->
-
         <div class="sidebar-user">
 
             @if (user != null && user.ImageId != Guid.Empty)
@@ -529,6 +572,10 @@
                     {
                         <span>Mecânico</span>
                     }
+                    else if (isCliente)
+                    {
+                        <span>Cliente</span>
+                    }
 
                 </div>
             </div>
@@ -538,7 +585,6 @@
     </aside>
 
     <!-- ÁREA PRINCIPAL -->
-
     <div class="main-area">
 
         <header class="topbar">
@@ -574,6 +620,10 @@
                         else if (User.IsInRole("Mecanico"))
                         {
                             <span>Mecânico</span>
+                        }
+                        else if (isCliente)
+                        {
+                            <span>Cliente</span>
                         }
 
                     </div>
