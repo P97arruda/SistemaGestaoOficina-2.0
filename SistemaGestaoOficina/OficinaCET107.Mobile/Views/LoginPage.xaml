@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="OficinaCET107.Mobile.Views.LoginPage"
+    BackgroundColor="#F4F6F9"
+    Title="Login">
+
+    <ScrollView>
+
+        <VerticalStackLayout
+            Padding="28"
+            Spacing="20"
+            VerticalOptions="Center">
+
+            <!-- TÍTULO -->
+            <Label
+                Text="OficinaCET107"
+                FontSize="30"
+                FontAttributes="Bold"
+                TextColor="#1E293B"
+                HorizontalOptions="Center" />
+
+            <Label
+                Text="Área do Cliente"
+                FontSize="17"
+                TextColor="#64748B"
+                HorizontalOptions="Center" />
+
+            <!-- FORMULÁRIO -->
+            <Border
+                BackgroundColor="White"
+                Padding="24"
+                Stroke="#E2E8F0"
+                StrokeShape="RoundRectangle 16">
+
+                <VerticalStackLayout Spacing="16">
+
+                    <Label
+                        Text="Bem-vindo!"
+                        FontSize="23"
+                        FontAttributes="Bold"
+                        TextColor="#1E293B" />
+
+                    <Label
+                        Text="Inicie sessão para consultar os seus veículos."
+                        TextColor="#64748B"
+                        FontSize="14" />
+
+                    <!-- EMAIL -->
+                    <Label
+                        Text="Email"
+                        FontAttributes="Bold"
+                        TextColor="#334155" />
+
+                    <Entry
+                        x:Name="EmailEntry"
+                        Placeholder="exemplo@email.com"
+                        Keyboard="Email"
+                        TextColor="#1E293B" />
+
+                    <!-- PASSWORD -->
+                    <Label
+                        Text="Password"
+                        FontAttributes="Bold"
+                        TextColor="#334155" />
+
+                    <Entry
+                        x:Name="PasswordEntry"
+                        Placeholder="Introduza a password"
+                        IsPassword="True"
+                        TextColor="#1E293B" />
+
+                    <!-- LOGIN -->
+                    <Button
+                        x:Name="LoginButton"
+                        Text="Entrar"
+                        BackgroundColor="#2563EB"
+                        TextColor="White"
+                        FontAttributes="Bold"
+                        HeightRequest="50"
+                        CornerRadius="10" />
+
+                </VerticalStackLayout>
+
+            </Border>
+
+        </VerticalStackLayout>
+
+    </ScrollView>
+
+</ContentPage>

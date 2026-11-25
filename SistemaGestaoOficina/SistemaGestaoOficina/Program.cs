@@ -31,6 +31,14 @@ builder.Services.AddIdentity<User, IdentityRole>(cfg =>
  .AddDefaultTokenProviders()
 .AddEntityFrameworkStores<DataContext>();
 
+// Autenticação por token para o aplicativo Mobile
+builder.Services.AddAuthentication()
+    .AddBearerToken("MobileBearer", options =>
+    {
+        options.BearerTokenExpiration = TimeSpan.FromHours(2);
+        options.RefreshTokenExpiration = TimeSpan.FromDays(7);
+    });
+
 builder.Services.AddTransient<SeedDb>();
 
 
