@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿
+using Microsoft.Extensions.Logging;
+using OficinaCET107.Mobile.Services;
 
 namespace OficinaCET107.Mobile
 {
@@ -7,6 +9,7 @@ namespace OficinaCET107.Mobile
         public static MauiApp CreateMauiApp()
         {
             var builder = MauiApp.CreateBuilder();
+
             builder
                 .UseMauiApp<App>()
                 .ConfigureFonts(fonts =>
@@ -15,8 +18,28 @@ namespace OficinaCET107.Mobile
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
 
+            // Configuração da API local
+            var handler = new HttpClientHandler();
+
 #if DEBUG
-    		builder.Logging.AddDebug();
+            handler.ServerCertificateCustomValidationCallback =
+                (request, cert, chain, errors) =>
+                    errors == System.Net.Security.SslPolicyErrors.None ||
+                    (request.RequestUri?.Host == "10.0.2.2" &&
+                     request.RequestUri.Port == 7204 &&
+                     cert?.Subject.Contains("CN=localhost") == true);
+#endif
+
+            builder.Services.AddSingleton(new HttpClient(handler)
+            {
+                BaseAddress = new Uri("https://10.0.2.2:7204/")
+            });
+
+            // Services
+            builder.Services.AddTransient<AuthService>();
+
+#if DEBUG
+            builder.Logging.AddDebug();
 #endif
 
             return builder.Build();

@@ -80,7 +80,8 @@
                         TextColor="White"
                         FontAttributes="Bold"
                         HeightRequest="50"
-                        CornerRadius="10" />
+                        CornerRadius="10" 
+                        Clicked="OnLoginClicked" />
 
                 </VerticalStackLayout>
 
