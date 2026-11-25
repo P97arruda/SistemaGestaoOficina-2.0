@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.Extensions.Logging;
 using OficinaCET107.Mobile.Services;
+using OficinaCET107.Mobile.Views;
 
 namespace OficinaCET107.Mobile
 {
@@ -37,6 +38,9 @@ namespace OficinaCET107.Mobile
 
             // Services
             builder.Services.AddTransient<AuthService>();
+            builder.Services.AddTransient<VeiculoService>();
+            builder.Services.AddTransient<VeiculosPage>();
+            builder.Services.AddTransient<DetalhesVeiculoPage>();
 
 #if DEBUG
             builder.Logging.AddDebug();

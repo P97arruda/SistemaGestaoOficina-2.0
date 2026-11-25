@@ -47,7 +47,11 @@ namespace SistemaGestaoOficina.Controllers.API.Mobile
                     Id = v.Id,
                     Marca = v.Marca,
                     Modelo = v.Modelo,
-                    Matricula = v.Matricula
+                    Matricula = v.Matricula,
+                    Ano = v.Ano,
+                    Quilometragem = v.Quilometragem,
+                    Combustivel = v.Combustivel,
+                    
                 })
                 .ToListAsync();
 
@@ -74,7 +78,10 @@ namespace SistemaGestaoOficina.Controllers.API.Mobile
                     Id = v.Id,
                     Marca = v.Marca,
                     Modelo = v.Modelo,
-                    Matricula = v.Matricula
+                    Matricula = v.Matricula,
+                    Ano = v.Ano,
+                    Quilometragem = v.Quilometragem,
+                    Combustivel = v.Combustivel,
                 })
                 .FirstOrDefaultAsync();
 

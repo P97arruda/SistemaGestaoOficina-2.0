@@ -8,7 +8,6 @@
     BackgroundColor="#F8F9FA">
 
     <ScrollView>
-
         <VerticalStackLayout Spacing="0">
 
             <!-- CABEÇALHO -->
@@ -39,8 +38,8 @@
                     </Border>
 
                     <VerticalStackLayout Grid.Column="1"
-                                         VerticalOptions="Center"
-                                         Spacing="2">
+                                         Spacing="2"
+                                         VerticalOptions="Center">
 
                         <Label Text="OficinaCET107"
                                FontSize="21"
@@ -52,7 +51,6 @@
                                TextColor="#6C757D"/>
 
                     </VerticalStackLayout>
-
                 </Grid>
             </Border>
 
@@ -82,10 +80,9 @@
                                LineBreakMode="WordWrap"/>
 
                     </VerticalStackLayout>
-
                 </Border>
 
-                <!-- TÍTULO DA SECÇÃO -->
+                <!-- TÍTULO -->
                 <VerticalStackLayout Spacing="5">
 
                     <Label Text="Acesso rápido"
@@ -102,26 +99,34 @@
                 <!-- CARDS -->
                 <VerticalStackLayout Spacing="14">
 
+
                     <!-- MEUS VEÍCULOS -->
-                    <Border BackgroundColor="White"
+                    <Border x:Name="VeiculosCard"
+                            BackgroundColor="White"
                             Stroke="#E9ECEF"
                             StrokeThickness="1"
                             Padding="16">
 
-                        <Border.StrokeShape>
+                            <Border.StrokeShape>
                             <RoundRectangle CornerRadius="14"/>
-                        </Border.StrokeShape>
+                            </Border.StrokeShape>
+
+                        <!-- Permite clicar em todo o cartão -->
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnVeiculosTapped"/>
+                        </Border.GestureRecognizers>
 
                         <Border.Shadow>
                             <Shadow Brush="Black"
-                                    Opacity="0.06"
-                                    Radius="8"
-                                    Offset="0,3"/>
+                            Opacity="0.06"
+                            Radius="8"
+                            Offset="0,3"/>
                         </Border.Shadow>
 
                         <Grid ColumnDefinitions="50,*,20"
                               ColumnSpacing="12">
 
+                            <!-- Ícone -->
                             <Border Grid.Column="0"
                                     BackgroundColor="#E7F1FF"
                                     StrokeThickness="0"
@@ -139,24 +144,23 @@
                                        VerticalOptions="Center"/>
                             </Border>
 
+                            <!-- Informações -->
                             <VerticalStackLayout Grid.Column="1"
-                                                 Spacing="4"
-                                                 VerticalOptions="Center">
+                             Spacing="5"
+                             VerticalOptions="Center">
 
-                                <Button x:Name="VeiculosButton"
-                                        Text="Meus Veículos"
-                                        FontSize="16"
-                                        FontAttributes="Bold"
-                                        TextColor="#212529"
-                                        BackgroundColor="Transparent"
-                                        HorizontalOptions="Start"
-                                        Padding="0"/>
+                                <Label Text="Meus Veículos"
+                                       FontSize="16"
+                                       FontAttributes="Bold"
+                                       TextColor="#212529"/>
 
                                 <Label Text="Consultar veículos registados"
                                        FontSize="12"
                                        TextColor="#6C757D"/>
+
                             </VerticalStackLayout>
 
+                            <!-- Seta -->
                             <Label Grid.Column="2"
                                    Text="›"
                                    FontSize="27"
@@ -165,6 +169,7 @@
 
                         </Grid>
                     </Border>
+
 
                     <!-- MINHAS MARCAÇÕES -->
                     <Border BackgroundColor="White"
@@ -219,6 +224,7 @@
                                 <Label Text="Consultar agendamentos"
                                        FontSize="12"
                                        TextColor="#6C757D"/>
+
                             </VerticalStackLayout>
 
                             <Label Grid.Column="2"
@@ -230,7 +236,7 @@
                         </Grid>
                     </Border>
 
-                    <!-- REPARAÇÕES -->
+                    <!-- HISTÓRICO DE REPARAÇÕES -->
                     <Border BackgroundColor="White"
                             Stroke="#E9ECEF"
                             StrokeThickness="1"
@@ -283,6 +289,7 @@
                                 <Label Text="Consultar serviços realizados"
                                        FontSize="12"
                                        TextColor="#6C757D"/>
+
                             </VerticalStackLayout>
 
                             <Label Grid.Column="2"
@@ -294,7 +301,7 @@
                         </Grid>
                     </Border>
 
-                    <!-- PERFIL -->
+                    <!-- MEU PERFIL -->
                     <Border BackgroundColor="White"
                             Stroke="#E9ECEF"
                             StrokeThickness="1"
@@ -347,6 +354,7 @@
                                 <Label Text="Consultar dados pessoais"
                                        FontSize="12"
                                        TextColor="#6C757D"/>
+
                             </VerticalStackLayout>
 
                             <Label Grid.Column="2"
@@ -360,7 +368,7 @@
 
                 </VerticalStackLayout>
 
-                <!-- LOGOUT -->
+                <!-- TERMINAR SESSÃO -->
                 <Button x:Name="LogoutButton"
                         Text="Terminar Sessão"
                         FontSize="15"
@@ -383,7 +391,6 @@
             </VerticalStackLayout>
 
         </VerticalStackLayout>
-
     </ScrollView>
 
 </ContentPage>

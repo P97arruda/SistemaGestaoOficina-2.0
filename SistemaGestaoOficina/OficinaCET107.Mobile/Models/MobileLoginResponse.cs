@@ -4,7 +4,7 @@ using System.Text;
 
 namespace OficinaCET107.Mobile.Models
 {
-    internal class MobileLoginResponse
+    public class MobileLoginResponse
     {
         public string TokenType { get; set; } = string.Empty;
 

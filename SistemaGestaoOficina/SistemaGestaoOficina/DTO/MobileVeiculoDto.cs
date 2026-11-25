@@ -9,5 +9,11 @@
         public string Modelo { get; set; } = string.Empty;
 
         public string Matricula { get; set; } = string.Empty;
+
+        public int Ano { get; set; }
+
+        public int Quilometragem { get; set; }
+
+        public string Combustivel { get; set; } = string.Empty;
     }
 }
