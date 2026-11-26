@@ -27,6 +27,18 @@ namespace OficinaCET107.Mobile
             Routing.RegisterRoute(
                 nameof(DetalhesMarcacaoPage),
                 typeof(DetalhesMarcacaoPage));
+
+            Routing.RegisterRoute(
+                nameof(ReparacoesPage),
+                typeof(ReparacoesPage));
+
+            Routing.RegisterRoute(
+                nameof(DetalhesReparacaoPage),
+                typeof(DetalhesReparacaoPage));
+
+            Routing.RegisterRoute(
+                nameof(PerfilPage),
+                typeof(PerfilPage));
         }
     }
 }

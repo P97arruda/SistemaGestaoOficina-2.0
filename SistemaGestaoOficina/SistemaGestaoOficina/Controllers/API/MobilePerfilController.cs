@@ -24,8 +24,9 @@ namespace SistemaGestaoOficina.Controllers.API.Mobile
 
         // GET: api/mobile/cliente/perfil
         [HttpGet("perfil")]
-        public async Task<IActionResult> GetMeuPerfil()
+        public async Task<IActionResult> GetPerfil()
         {
+            // Recuperar o cliente autenticado
             var cliente = await _userManager.GetUserAsync(User);
 
             if (cliente == null)
@@ -33,12 +34,19 @@ namespace SistemaGestaoOficina.Controllers.API.Mobile
                 return Unauthorized();
             }
 
+            // Preparar os dados do perfil
             var perfil = new MobilePerfilDto
             {
                 FirstName = cliente.FirstName,
                 LastName = cliente.LastName,
+                NIF = cliente.NIF ?? string.Empty,
                 Email = cliente.Email ?? string.Empty,
-                PhoneNumber = cliente.PhoneNumber ?? string.Empty
+                PhoneNumber = cliente.PhoneNumber ?? string.Empty,
+
+                // Fotografia do perfil
+                FotoUrl = cliente.ImageId != Guid.Empty
+                    ? cliente.ImageFullPath
+                    : null
             };
 
             return Ok(perfil);

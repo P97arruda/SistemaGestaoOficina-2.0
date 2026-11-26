@@ -3,8 +3,15 @@
     public class MobilePerfilDto
     {
         public string FirstName { get; set; } = string.Empty;
+
         public string LastName { get; set; } = string.Empty;
+
+        public string NIF { get; set; } = string.Empty;
+
         public string Email { get; set; } = string.Empty;
+
         public string PhoneNumber { get; set; } = string.Empty;
+
+        public string? FotoUrl { get; set; }
     }
 }

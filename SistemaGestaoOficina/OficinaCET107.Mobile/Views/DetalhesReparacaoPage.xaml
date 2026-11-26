@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="OficinaCET107.Mobile.Views.DetalhesReparacaoPage"
+    Title="Detalhes da Reparação"
+    BackgroundColor="#F8F9FA">
+
+    <ScrollView>
+
+        <VerticalStackLayout Padding="20"
+                             Spacing="20">
+
+            <!-- CABEÇALHO -->
+            <Border BackgroundColor="#0D6EFD"
+                    StrokeThickness="0"
+                    Padding="22">
+
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="16"/>
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="8">
+
+                    <Label Text="🔧  Detalhes da Reparação"
+                           FontSize="22"
+                           FontAttributes="Bold"
+                           TextColor="White"/>
+
+                    <Label Text="Consulte os serviços, peças e custos da reparação."
+                           FontSize="14"
+                           TextColor="#E7F1FF"/>
+
+                </VerticalStackLayout>
+
+            </Border>
+
+            <!-- INDICADOR DE CARREGAMENTO -->
+            <ActivityIndicator
+                x:Name="LoadingIndicator"
+                Color="#0D6EFD"
+                IsRunning="False"
+                IsVisible="False"
+                HorizontalOptions="Center"/>
+
+            <!-- CONTEÚDO -->
+            <VerticalStackLayout
+                x:Name="DetalhesContent"
+                Spacing="16"
+                IsVisible="False">
+
+                <Label Text="Resumo da reparação"
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       TextColor="#212529"/>
+
+                <!-- CARTÃO PRINCIPAL -->
+                <Border BackgroundColor="White"
+                        Stroke="#E9ECEF"
+                        StrokeThickness="1"
+                        Padding="20">
+
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="14"/>
+                    </Border.StrokeShape>
+
+                    <Border.Shadow>
+                        <Shadow Brush="Black"
+                                Opacity="0.06"
+                                Radius="8"
+                                Offset="0,3"/>
+                    </Border.Shadow>
+
+                    <VerticalStackLayout Spacing="18">
+
+                        <!-- IDENTIFICAÇÃO DA REPARAÇÃO -->
+                        <Grid ColumnDefinitions="*,Auto"
+                              ColumnSpacing="10">
+
+                            <VerticalStackLayout
+                                Grid.Column="0"
+                                Spacing="5">
+
+                                <Label x:Name="TipoServicoLabel"
+                                       FontSize="20"
+                                       FontAttributes="Bold"
+                                       TextColor="#212529"
+                                       LineBreakMode="WordWrap"/>
+
+                                <Label x:Name="NumeroReparacaoLabel"
+                                       FontSize="13"
+                                       TextColor="#6C757D"/>
+
+                            </VerticalStackLayout>
+
+                            <!-- ESTADO -->
+                            <Border Grid.Column="1"
+                                    BackgroundColor="#E8F5E9"
+                                    StrokeThickness="0"
+                                    Padding="10,6"
+                                    VerticalOptions="Start">
+
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="8"/>
+                                </Border.StrokeShape>
+
+                                <Label Text="Concluída"
+                                       FontSize="12"
+                                       FontAttributes="Bold"
+                                       TextColor="#198754"/>
+
+                            </Border>
+
+                        </Grid>
+
+                        <BoxView HeightRequest="1"
+                                 Color="#E9ECEF"/>
+
+                        <!-- DADOS DO VEÍCULO -->
+                        <Label Text="Dados do veículo"
+                               FontSize="17"
+                               FontAttributes="Bold"
+                               TextColor="#212529"/>
+
+                        <VerticalStackLayout Spacing="5">
+
+                            <Label Text="Veículo"
+                                   FontSize="13"
+                                   TextColor="#6C757D"/>
+
+                            <Label x:Name="VeiculoLabel"
+                                   FontSize="17"
+                                   FontAttributes="Bold"
+                                   TextColor="#212529"/>
+
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Spacing="5">
+
+                            <Label Text="Matrícula"
+                                   FontSize="13"
+                                   TextColor="#6C757D"/>
+
+                            <Label x:Name="MatriculaLabel"
+                                   FontSize="17"
+                                   FontAttributes="Bold"
+                                   TextColor="#212529"/>
+
+                        </VerticalStackLayout>
+
+                        <BoxView HeightRequest="1"
+                                 Color="#E9ECEF"/>
+
+                        <!-- DATAS -->
+                        <Label Text="Período da reparação"
+                               FontSize="17"
+                               FontAttributes="Bold"
+                               TextColor="#212529"/>
+
+                        <VerticalStackLayout Spacing="5">
+
+                            <Label Text="Data e hora de início"
+                                   FontSize="13"
+                                   TextColor="#6C757D"/>
+
+                            <Label x:Name="DataInicioLabel"
+                                   FontSize="16"
+                                   TextColor="#212529"/>
+
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Spacing="5">
+
+                            <Label Text="Data e hora de conclusão"
+                                   FontSize="13"
+                                   TextColor="#6C757D"/>
+
+                            <Label x:Name="DataFimLabel"
+                                   FontSize="16"
+                                   TextColor="#212529"/>
+
+                        </VerticalStackLayout>
+
+                        <BoxView HeightRequest="1"
+                                 Color="#E9ECEF"/>
+
+                        <!-- MECÂNICOS RESPONSÁVEIS -->
+                        <Label Text="Mecânicos responsáveis"
+                               FontSize="17"
+                               FontAttributes="Bold"
+                               TextColor="#212529"/>
+
+                        <Label x:Name="MecanicosLabel"
+                               FontSize="16"
+                               TextColor="#495057"
+                               LineBreakMode="WordWrap"/>
+
+                        <BoxView HeightRequest="1"
+                                 Color="#E9ECEF"/>
+
+                        <!-- PEÇAS UTILIZADAS -->
+                        <Label Text="Peças utilizadas"
+                               FontSize="17"
+                               FontAttributes="Bold"
+                               TextColor="#212529"/>
+
+                        <!-- MENSAGEM SEM PEÇAS -->
+                        <Label x:Name="SemPecasLabel"
+                               Text="Nenhuma peça registada nesta reparação."
+                               FontSize="14"
+                               TextColor="#6C757D"
+                               IsVisible="False"/>
+
+                        <!-- LISTA DAS PEÇAS -->
+                        <VerticalStackLayout
+                            x:Name="PecasLayout"
+                            Spacing="10">
+
+                            <BindableLayout.ItemTemplate>
+
+                                <DataTemplate>
+
+                                    <Border BackgroundColor="#F8F9FA"
+                                            Stroke="#E9ECEF"
+                                            StrokeThickness="1"
+                                            Padding="12">
+
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="10"/>
+                                        </Border.StrokeShape>
+
+                                        <VerticalStackLayout Spacing="10">
+
+                                            <!-- NOME DA PEÇA -->
+                                            <Label Text="{Binding Nome}"
+                                                   FontSize="15"
+                                                   FontAttributes="Bold"
+                                                   TextColor="#212529"
+                                                   LineBreakMode="WordWrap"/>
+
+                                            <!-- QUANTIDADE -->
+                                            <Label Text="{Binding Quantidade, StringFormat='Quantidade: {0}'}"
+                                                   FontSize="13"
+                                                   TextColor="#6C757D"/>
+
+                                            <!-- PREÇO UNITÁRIO -->
+                                            <Grid ColumnDefinitions="*,Auto"
+                                                  ColumnSpacing="10">
+
+                                                <Label Text="Preço unitário"
+                                                       FontSize="13"
+                                                       TextColor="#6C757D"/>
+
+                                                <Label Grid.Column="1"
+                                                       Text="{Binding PrecoUnitario, StringFormat='{0:N2} €'}"
+                                                       FontSize="13"
+                                                       TextColor="#212529"/>
+
+                                            </Grid>
+
+                                            <!-- SUBTOTAL -->
+                                            <Grid ColumnDefinitions="*,Auto"
+                                                  ColumnSpacing="10">
+
+                                                <Label Text="Subtotal"
+                                                       FontSize="14"
+                                                       FontAttributes="Bold"
+                                                       TextColor="#212529"/>
+
+                                                <Label Grid.Column="1"
+                                                       Text="{Binding Subtotal, StringFormat='{0:N2} €'}"
+                                                       FontSize="14"
+                                                       FontAttributes="Bold"
+                                                       TextColor="#0D6EFD"/>
+
+                                            </Grid>
+
+                                        </VerticalStackLayout>
+
+                                    </Border>
+
+                                </DataTemplate>
+
+                            </BindableLayout.ItemTemplate>
+
+                        </VerticalStackLayout>
+
+                        <BoxView HeightRequest="1"
+                                 Color="#E9ECEF"/>
+
+                        <!-- RESUMO DOS CUSTOS -->
+                        <Label Text="Resumo dos custos"
+                               FontSize="17"
+                               FontAttributes="Bold"
+                               TextColor="#212529"/>
+
+                        <!-- TOTAL DAS PEÇAS -->
+                        <Grid ColumnDefinitions="*,Auto"
+                              ColumnSpacing="10">
+
+                            <Label Grid.Column="0"
+                                   Text="Total das peças"
+                                   FontSize="14"
+                                   TextColor="#6C757D"/>
+
+                            <Label Grid.Column="1"
+                                   x:Name="TotalPecasLabel"
+                                   FontSize="15"
+                                   FontAttributes="Bold"
+                                   TextColor="#212529"/>
+
+                        </Grid>
+
+                        <!-- MÃO DE OBRA -->
+                        <Grid ColumnDefinitions="*,Auto"
+                              ColumnSpacing="10">
+
+                            <Label Grid.Column="0"
+                                   Text="Mão de obra"
+                                   FontSize="14"
+                                   TextColor="#6C757D"/>
+
+                            <Label Grid.Column="1"
+                                   x:Name="CustoMaoDeObraLabel"
+                                   FontSize="15"
+                                   FontAttributes="Bold"
+                                   TextColor="#212529"/>
+
+                        </Grid>
+
+                        <!-- VALOR TOTAL -->
+                        <Border BackgroundColor="#E7F1FF"
+                                StrokeThickness="0"
+                                Padding="16">
+
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="12"/>
+                            </Border.StrokeShape>
+
+                            <VerticalStackLayout Spacing="8">
+
+                                <Label Text="Valor total da reparação"
+                                       FontSize="15"
+                                       FontAttributes="Bold"
+                                       TextColor="#212529"/>
+
+                                <Label x:Name="CustoTotalLabel"
+                                       FontSize="26"
+                                       FontAttributes="Bold"
+                                       TextColor="#0D6EFD"/>
+
+                            </VerticalStackLayout>
+
+                        </Border>
+
+                    </VerticalStackLayout>
+
+                </Border>
+
+                <!-- INFORMAÇÃO FINAL -->
+                <Label
+                    Text="Resumo informativo da reparação. Não substitui uma fatura fiscal."
+                    FontSize="12"
+                    TextColor="#6C757D"
+                    HorizontalTextAlignment="Center"/>
+
+            </VerticalStackLayout>
+
+        </VerticalStackLayout>
+
+    </ScrollView>
+
+</ContentPage>

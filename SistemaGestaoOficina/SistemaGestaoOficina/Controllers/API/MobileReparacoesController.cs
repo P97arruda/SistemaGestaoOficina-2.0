@@ -93,18 +93,44 @@ namespace SistemaGestaoOficina.Controllers.API.Mobile
                     r.Marcacao.Veiculo.UserId == cliente.Id)
                 .Select(r => new MobileReparacaoDto
                 {
+                    // DADOS DA REPARAÇÃO
                     Id = r.Id,
                     TipoServico = r.TipoServico,
                     DataInicio = r.DataInicio,
                     DataFim = r.DataFim,
 
+                    // DADOS DO VEÍCULO
                     Veiculo = r.Marcacao!.Veiculo!.Marca + " " +
                               r.Marcacao.Veiculo.Modelo,
 
                     Matricula = r.Marcacao.Veiculo.Matricula,
 
+                    // VALORES
                     CustoMaoDeObra = r.CustoMaoDeObra,
-                    CustoTotal = r.CustoTotal
+                    CustoTotal = r.CustoTotal,
+
+                    // MECÂNICOS RESPONSÁVEIS
+                    Mecanicos = r.MecanicoReparacaos
+                        .Where(mr => mr.Mecanico != null)
+                        .Select(mr => mr.Mecanico!.Nome)
+                        .ToList(),
+
+                    // PEÇAS UTILIZADAS
+                    Pecas = r.ReparacaoPecas
+                        .Select(item => new MobileReparacaoPecaDto
+                        {
+                            Nome = item.Peca != null
+                                ? item.Peca.Nome
+                                : "Peça não identificada",
+
+                            Quantidade = item.Quantidade,
+
+                            PrecoUnitario = item.PrecoUnitario,
+
+                            Subtotal = item.Quantidade *
+                                       item.PrecoUnitario
+                        })
+                        .ToList()
                 })
                 .FirstOrDefaultAsync();
 

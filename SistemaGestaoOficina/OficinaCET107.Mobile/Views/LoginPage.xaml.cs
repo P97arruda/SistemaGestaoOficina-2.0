@@ -11,6 +11,16 @@ namespace OficinaCET107.Mobile.Views
             InitializeComponent();
         }
 
+        // LIMPAR CAMPOS AO ABRIR O LOGIN
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+
+            EmailEntry.Text = string.Empty;
+            PasswordEntry.Text = string.Empty;
+        }
+
+        // EFETUAR LOGIN
         private async void OnLoginClicked(object sender, EventArgs e)
         {
             var email = EmailEntry.Text?.Trim();
@@ -40,7 +50,8 @@ namespace OficinaCET107.Mobile.Views
 
                 if (sucesso)
                 {
-                    await Shell.Current.GoToAsync(nameof(DashboardPage));
+                    await Shell.Current.GoToAsync(
+                        nameof(DashboardPage));
                 }
                 else
                 {
@@ -57,7 +68,6 @@ namespace OficinaCET107.Mobile.Views
                     ex.Message + "\n" + ex.InnerException?.Message,
                     "OK");
             }
-
             finally
             {
                 LoginButton.IsEnabled = true;

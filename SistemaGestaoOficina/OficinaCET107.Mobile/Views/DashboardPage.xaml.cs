@@ -1,14 +1,23 @@
 
+using OficinaCET107.Mobile.Services;
+
 namespace OficinaCET107.Mobile.Views
 {
     public partial class DashboardPage : ContentPage
     {
         private bool _abrindoVeiculos;
         private bool _abrindoMarcacoes;
+        private bool _abrindoReparacoes;
+        private bool _abrindoPerfil;
 
-        public DashboardPage()
+        private readonly AuthService _authService;
+
+        private bool _terminandoSessao;
+
+        public DashboardPage(AuthService authService)
         {
             InitializeComponent();
+            _authService = authService;
         }
 
         // MEUS VEÍCULOS
@@ -54,6 +63,75 @@ namespace OficinaCET107.Mobile.Views
                 _abrindoMarcacoes = false;
             }
         }
+
+        // HISTÓRICO DE REPARAÇÕES
+        private async void OnReparacoesTapped(object sender, TappedEventArgs e)
+        {
+            if (_abrindoReparacoes)
+                return;
+
+            _abrindoReparacoes = true;
+
+            try
+            {
+                await ReparacoesCard.ScaleTo(0.97, 80);
+                await ReparacoesCard.ScaleTo(1, 80);
+
+                await Shell.Current.GoToAsync(
+                    nameof(ReparacoesPage));
+            }
+            finally
+            {
+                _abrindoReparacoes = false;
+            }
+        }
+
+        // MEU PERFIL
+        private async void OnPerfilTapped(object sender, TappedEventArgs e)
+        {
+            if (_abrindoPerfil)
+                return;
+
+            _abrindoPerfil = true;
+
+            try
+            {
+                await PerfilCard.ScaleTo(0.97, 80);
+                await PerfilCard.ScaleTo(1, 80);
+
+                await Shell.Current.GoToAsync(
+                    nameof(PerfilPage));
+            }
+            finally
+            {
+                _abrindoPerfil = false;
+            }
+        }
+
+        // TERMINAR SESSÃO
+        private async void OnLogoutClicked(object sender, EventArgs e)
+        {
+            if (_terminandoSessao)
+                return;
+
+            _terminandoSessao = true;
+            LogoutButton.IsEnabled = false;
+
+            try
+            {
+                // Remover o token
+                _authService.Logout();
+
+                // Voltar ao Login
+                await Shell.Current.GoToAsync("//LoginPage");
+            }
+            finally
+            {
+                _terminandoSessao = false;
+                LogoutButton.IsEnabled = true;
+            }
+        }
+
+
     }
 }
-

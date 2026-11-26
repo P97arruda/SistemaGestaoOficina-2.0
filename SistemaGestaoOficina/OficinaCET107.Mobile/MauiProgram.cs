@@ -44,6 +44,13 @@ namespace OficinaCET107.Mobile
             builder.Services.AddTransient<MarcacaoService>();
             builder.Services.AddTransient<MarcacoesPage>();
 
+            builder.Services.AddTransient<ReparacaoService>();
+            builder.Services.AddTransient<ReparacoesPage>();
+
+            builder.Services.AddTransient<DetalhesReparacaoPage>();
+            builder.Services.AddTransient<PerfilService>();
+            builder.Services.AddTransient<PerfilPage>();
+
 #if DEBUG
             builder.Logging.AddDebug();
 #endif
