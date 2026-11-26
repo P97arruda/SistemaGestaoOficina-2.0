@@ -41,6 +41,8 @@ namespace OficinaCET107.Mobile
             builder.Services.AddTransient<VeiculoService>();
             builder.Services.AddTransient<VeiculosPage>();
             builder.Services.AddTransient<DetalhesVeiculoPage>();
+            builder.Services.AddTransient<MarcacaoService>();
+            builder.Services.AddTransient<MarcacoesPage>();
 
 #if DEBUG
             builder.Logging.AddDebug();

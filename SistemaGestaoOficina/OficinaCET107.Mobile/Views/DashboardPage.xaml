@@ -170,9 +170,9 @@
                         </Grid>
                     </Border>
 
-
                     <!-- MINHAS MARCAÇÕES -->
-                    <Border BackgroundColor="White"
+                    <Border x:Name="MarcacoesCard"
+                            BackgroundColor="White"
                             Stroke="#E9ECEF"
                             StrokeThickness="1"
                             Padding="16">
@@ -183,14 +183,20 @@
 
                         <Border.Shadow>
                             <Shadow Brush="Black"
-                                    Opacity="0.06"
-                                    Radius="8"
-                                    Offset="0,3"/>
+                            Opacity="0.06"
+                            Radius="8"
+                            Offset="0,3"/>
                         </Border.Shadow>
+
+                        <!-- CARTÃO INTEIRO CLICÁVEL -->
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnMarcacoesTapped"/>
+                        </Border.GestureRecognizers>
 
                         <Grid ColumnDefinitions="50,*,20"
                               ColumnSpacing="12">
 
+                            <!-- ÍCONE -->
                             <Border Grid.Column="0"
                                     BackgroundColor="#E7F1FF"
                                     StrokeThickness="0"
@@ -203,38 +209,39 @@
                                 </Border.StrokeShape>
 
                                 <Label Text="📅"
-                                       FontSize="23"
-                                       HorizontalOptions="Center"
-                                       VerticalOptions="Center"/>
+                                FontSize="23"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center"/>
                             </Border>
 
+                            <!-- INFORMAÇÕES -->
                             <VerticalStackLayout Grid.Column="1"
-                                                 Spacing="4"
-                                                 VerticalOptions="Center">
+                             Spacing="4"
+                             VerticalOptions="Center">
 
-                                <Button x:Name="MarcacoesButton"
-                                        Text="Minhas Marcações"
-                                        FontSize="16"
-                                        FontAttributes="Bold"
-                                        TextColor="#212529"
-                                        BackgroundColor="Transparent"
-                                        HorizontalOptions="Start"
-                                        Padding="0"/>
+                                <Label Text="Minhas Marcações"
+                                FontSize="16"
+                                FontAttributes="Bold"
+                                TextColor="#212529"/>
 
                                 <Label Text="Consultar agendamentos"
-                                       FontSize="12"
-                                       TextColor="#6C757D"/>
+                                FontSize="12"
+                                TextColor="#6C757D"/>
 
                             </VerticalStackLayout>
 
+                            <!-- SETA -->
                             <Label Grid.Column="2"
-                                   Text="›"
-                                   FontSize="27"
-                                   TextColor="#0D6EFD"
-                                   VerticalOptions="Center"/>
+                                Text="›"
+                            FontSize="27"
+                            TextColor="#0D6EFD"
+                            VerticalOptions="Center"/>
 
                         </Grid>
                     </Border>
+
+
+
 
                     <!-- HISTÓRICO DE REPARAÇÕES -->
                     <Border BackgroundColor="White"

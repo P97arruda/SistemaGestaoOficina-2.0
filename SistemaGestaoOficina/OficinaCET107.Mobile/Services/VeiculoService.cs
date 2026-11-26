@@ -25,28 +25,22 @@ namespace OficinaCET107.Mobile.Services
 
             if (string.IsNullOrWhiteSpace(token))
             {
-                throw new UnauthorizedAccessException(
-                    "Cliente não autenticado.");
+                throw new UnauthorizedAccessException("Cliente não autenticado.");
             }
 
             // Preparar a requisição
-            using var request = new HttpRequestMessage(
-                HttpMethod.Get,
-                "api/mobile/cliente/veiculos");
+            using var request = new HttpRequestMessage(HttpMethod.Get,"api/mobile/cliente/veiculos");
 
             // Enviar o token Bearer
-            request.Headers.Authorization =
-                new AuthenticationHeaderValue("Bearer", token);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             // Chamar a API
-            using var response =
-                await _httpClient.SendAsync(request);
+            using var response = await _httpClient.SendAsync(request);
 
             response.EnsureSuccessStatusCode();
 
             // Converter o JSON em lista de veículos
-            var veiculos = await response.Content
-                .ReadFromJsonAsync<List<Veiculo>>();
+            var veiculos = await response.Content.ReadFromJsonAsync<List<Veiculo>>();
 
             return veiculos ?? new List<Veiculo>();
         }
@@ -60,17 +54,13 @@ namespace OficinaCET107.Mobile.Services
 
             if (string.IsNullOrWhiteSpace(token))
             {
-                throw new UnauthorizedAccessException(
-                    "Cliente não autenticado.");
+                throw new UnauthorizedAccessException("Cliente não autenticado.");
             }
 
             // Preparar a requisição
-            using var request = new HttpRequestMessage(
-                HttpMethod.Get,
-                $"api/mobile/cliente/veiculos/{id}");
+            using var request = new HttpRequestMessage(HttpMethod.Get, $"api/mobile/cliente/veiculos/{id}");
 
-            request.Headers.Authorization =
-                new AuthenticationHeaderValue("Bearer", token);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             // Consultar a API
             using var response = await _httpClient.SendAsync(request);
