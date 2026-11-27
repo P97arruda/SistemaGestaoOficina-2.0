@@ -102,14 +102,13 @@ namespace SistemaGestaoOficina.Controllers
             return View(new MarcacaoViewModel());
         }
 
-
-        // POST: Marcacoes/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(MarcacaoViewModel model)
         {
             if (ModelState.IsValid)
             {
+                // 1. CRIAR A MARCAÇÃO
                 var marcacao = new Marcacao
                 {
                     UserId = model.UserId,
@@ -120,6 +119,7 @@ namespace SistemaGestaoOficina.Controllers
                     Estado = "Agendada"
                 };
 
+                // 2. VALIDAR A MARCAÇÃO
                 var erros = await _marcacaoRepository
                     .ValidarMarcacaoAsync(marcacao);
 
@@ -128,25 +128,10 @@ namespace SistemaGestaoOficina.Controllers
                     ModelState.AddModelError("", erro);
                 }
 
+                // 3. GUARDAR APENAS A MARCAÇÃO
                 if (ModelState.IsValid)
                 {
-                    // 1. Guardar a marcação
                     await _marcacaoRepository.CreateAsync(marcacao);
-
-                    // 2. Criar automaticamente a reparação
-                    var reparacao = new Reparacao
-                    {
-                        MarcacaoId = marcacao.Id,
-                        TipoServico = marcacao.TipoServico,
-                        DataInicio = marcacao.DataHora,
-                        Concluida = false,
-                        Cancelada = false,
-                        CustoMaoDeObra = 0,
-                        CustoTotal = 0
-                    };
-
-                    // 3. Guardar a reparação
-                    await _reparacaoRepository.CreateAsync(reparacao);
 
                     TempData["SuccessMessage"] =
                         "Marcação criada com sucesso!";
@@ -155,6 +140,7 @@ namespace SistemaGestaoOficina.Controllers
                 }
             }
 
+            // 4. RECARREGAR OS DADOS DO FORMULÁRIO
             var clientes = await _marcacaoRepository.GetClientesAsync();
 
             var veiculos = await _marcacaoRepository
@@ -185,6 +171,8 @@ namespace SistemaGestaoOficina.Controllers
 
             return View(model);
         }
+
+
 
         [HttpGet]
         public async Task<IActionResult> Edit(int? id)

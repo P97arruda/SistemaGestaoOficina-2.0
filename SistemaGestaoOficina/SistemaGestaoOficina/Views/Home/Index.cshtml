@@ -1,264 +1,983 @@
-﻿@{
+﻿
+@using SistemaGestaoOficina.Data.Entities
+@using System.Linq
+
+@{
     ViewData["Title"] = "Início";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var mecanicos = ViewBag.MecanicosAtivos as IEnumerable<Mecanico>
+                    ?? Enumerable.Empty<Mecanico>();
 }
 
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
 <style>
-    .home-hero {
-        background: linear-gradient(135deg, #f3f7fb 0%, #e7f1fc 100%);
+    /* CONFIGURAÇÕES GERAIS */
+
+    .auto-home {
+        --auto-blue: #0d6efd;
+        --auto-dark: #111820;
+        --auto-text: #172033;
+        --auto-muted: #667085;
+        --auto-border: #e5eaf0;
+
+        color: var(--auto-text);
+        padding: 25px 0 45px;
+    }
+
+    .auto-home a {
+        text-decoration: none;
+    }
+
+    .auto-home section[id] {
+        scroll-margin-top: 30px;
+    }
+
+    /* APRESENTAÇÃO PRINCIPAL */
+
+    .auto-hero {
+        position: relative;
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        align-items: center;
+        gap: 25px;
+        min-height: 430px;
+        padding: 50px;
         border-radius: 20px;
-        padding: 65px 55px;
-        margin-top: 30px;
+        overflow: hidden;
+
+        background:
+            radial-gradient(
+                circle at 90% 20%,
+                rgba(13, 110, 253, 0.32),
+                transparent 40%
+            ),
+            linear-gradient(
+                135deg,
+                #111820 0%,
+                #142337 55%,
+                #103b72 100%
+            );
+
+        color: white;
     }
 
-    .home-label {
-        color: #1769d2;
+    .auto-hero::before {
+        content: "";
+        position: absolute;
+        width: 330px;
+        height: 330px;
+        right: -120px;
+        top: -150px;
+        border: 1px solid rgba(255,255,255,.12);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .auto-hero-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .auto-hero-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(13,110,253,.20);
+        border: 1px solid rgba(120,180,255,.25);
+        border-radius: 30px;
+        padding: 8px 13px;
+        margin-bottom: 20px;
+        color: #b7d6ff;
+        font-size: 11px;
         font-weight: 700;
-        letter-spacing: 2px;
         text-transform: uppercase;
-        font-size: 0.85rem;
+        letter-spacing: 1px;
     }
 
-    .home-title {
-        color: #18212b;
-        font-size: 3.2rem;
+    .auto-hero-label i {
+        color: #7ab8ff;
+    }
+
+    .auto-hero h1 {
+        font-size: clamp(32px, 4vw, 49px);
         font-weight: 800;
-        line-height: 1.15;
+        line-height: 1.14;
+        letter-spacing: -1px;
+        margin-bottom: 20px;
     }
 
-    .home-description {
-        color: #5a6875;
-        font-size: 1.1rem;
-        max-width: 550px;
-        line-height: 1.7;
+    .auto-hero h1 span {
+        color: #68b0ff;
     }
 
-    .home-logo-container {
+    .auto-hero-description {
+        font-size: 14px;
+        color: #c6d3e2;
+        line-height: 1.85;
+        max-width: 470px;
+        margin-bottom: 26px;
+    }
+
+    .auto-hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .auto-hero-actions .btn {
+        border-radius: 9px;
+        padding: 12px 19px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .auto-hero-secondary {
+        background: rgba(255,255,255,.07);
+        border: 1px solid rgba(255,255,255,.30);
+        color: white;
+    }
+
+    .auto-hero-secondary:hover {
+        background: rgba(255,255,255,.16);
+        color: white;
+    }
+
+    .auto-hero-benefits {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px;
+        margin-top: 30px;
+        font-size: 12px;
+        color: #d3deeb;
+    }
+
+    .auto-hero-benefits i {
+        color: #75b7ff;
+        margin-right: 5px;
+    }
+
+    /* IMAGEM BMW AZUL */
+
+    .auto-hero-visual {
+        position: relative;
+        z-index: 2;
         display: flex;
         align-items: center;
         justify-content: center;
+        min-width: 0;
+        min-height: 300px;
     }
 
-    .home-logo {
+    .auto-bmw-image {
+        display: block;
         width: 100%;
-        max-width: 370px;
+        max-width: 440px;
+        max-height: 390px;
         height: auto;
-        border-radius: 50%;
+        object-fit: contain;
+        margin: 0 auto;
+
+        filter: drop-shadow(
+            0 12px 25px rgba(0,100,255,.18)
+        );
     }
 
-    .service-card {
-        height: 100%;
-        padding: 30px;
-        border: 1px solid #e3e8ed;
-        border-radius: 15px;
-        background: white;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    /* TÍTULOS DAS SECÇÕES */
+
+    .auto-section {
+        padding-top: 70px;
     }
 
-        .service-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-        }
+    .auto-section-heading {
+        text-align: center;
+        margin-bottom: 32px;
+    }
 
-    .service-number {
-        color: #1769d2;
+    .auto-section-label {
+        display: block;
+        color: var(--auto-blue);
+        font-size: 11px;
         font-weight: 800;
-        font-size: 1.5rem;
+        letter-spacing: 1.4px;
+        text-transform: uppercase;
+        margin-bottom: 10px;
     }
 
-    .info-section {
-        background: #18212b;
-        color: white;
-        border-radius: 20px;
-        padding: 45px;
-        margin-bottom: 50px;
+    .auto-section-heading h2 {
+        font-size: clamp(24px, 3vw, 32px);
+        font-weight: 800;
+        letter-spacing: -.5px;
+        margin-bottom: 12px;
     }
 
-        .info-section p {
-            color: #c9d1d9;
-        }
-
-    .info-icon {
-        font-size: 2rem;
-        margin-bottom: 15px;
+    .auto-section-heading p {
+        font-size: 13px;
+        color: var(--auto-muted);
+        line-height: 1.8;
+        max-width: 540px;
+        margin: 0 auto;
     }
 
-    @@media (max-width: 768px) {
-        .home-hero {
-            padding: 40px 25px;
-            text-align: center;
+    /* SERVIÇOS */
+
+    .auto-service-card {
+        height: 100%;
+        background: #fff;
+        border: 1px solid var(--auto-border);
+        border-radius: 14px;
+        padding: 24px;
+        box-shadow: 0 4px 15px rgba(16,24,40,.04);
+
+        transition:
+            transform .2s ease,
+            box-shadow .2s ease;
+    }
+
+    .auto-service-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 26px rgba(16,24,40,.09);
+    }
+
+    .auto-service-icon {
+        width: 54px;
+        height: 54px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #eff6ff;
+        color: var(--auto-blue);
+        border-radius: 12px;
+        font-size: 25px;
+        margin-bottom: 20px;
+    }
+
+    .auto-service-card h3 {
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .auto-service-card p {
+        color: var(--auto-muted);
+        font-size: 12px;
+        line-height: 1.8;
+        margin-bottom: 0;
+    }
+
+    /* MECÂNICOS EM DESTAQUE */
+
+    .auto-mechanic-card {
+        height: 100%;
+        background: #fff;
+        border: 1px solid var(--auto-border);
+        border-radius: 14px;
+        padding: 25px 15px;
+        box-shadow: 0 4px 15px rgba(16,24,40,.04);
+        text-align: center;
+
+        transition:
+            transform .2s ease,
+            box-shadow .2s ease;
+    }
+
+    .auto-mechanic-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 26px rgba(16,24,40,.08);
+    }
+
+    .auto-mechanic-photo-area {
+        width: 90px;
+        height: 90px;
+        margin: 0 auto 18px;
+    }
+
+    .auto-mechanic-photo {
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #dbeafe;
+    }
+
+    .auto-mechanic-photo-default {
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        background: #eff6ff;
+        color: #0d6efd;
+        border: 3px solid #dbeafe;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 30px;
+        font-weight: 800;
+    }
+
+    .auto-mechanic-card h3 {
+        font-size: 15px;
+        font-weight: 700;
+        margin-bottom: 9px;
+        color: #172033;
+    }
+
+    .auto-mechanic-specialty {
+        font-size: 12px;
+        color: var(--auto-muted);
+        line-height: 1.6;
+    }
+
+    .auto-mechanic-specialty strong {
+        color: #344054;
+    }
+
+    .auto-empty {
+        padding: 35px;
+        background: #f8fafc;
+        border: 1px solid var(--auto-border);
+        border-radius: 13px;
+        text-align: center;
+        color: var(--auto-muted);
+    }
+
+    /* HORÁRIOS */
+
+    .auto-hours-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: center;
+        gap: 35px;
+    }
+
+    .auto-hours-info h2 {
+        font-size: clamp(25px, 3vw, 34px);
+        font-weight: 800;
+        letter-spacing: -.5px;
+        line-height: 1.25;
+        margin-bottom: 17px;
+    }
+
+    .auto-hours-info p {
+        font-size: 13px;
+        color: var(--auto-muted);
+        line-height: 1.85;
+        max-width: 420px;
+    }
+
+    .auto-hours-note {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        border-radius: 9px;
+        padding: 12px 14px;
+        margin-top: 12px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .auto-hours-card {
+        background: white;
+        border: 1px solid var(--auto-border);
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(16,24,40,.05);
+    }
+
+    .auto-hours-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: #eff6ff;
+        border-bottom: 1px solid #dbeafe;
+        padding: 20px 24px;
+        color: #1d4ed8;
+        font-weight: 700;
+        font-size: 15px;
+    }
+
+    .auto-hours-header i {
+        font-size: 22px;
+    }
+
+    .auto-hours-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        padding: 20px 24px;
+        border-bottom: 1px solid #edf0f4;
+        font-size: 13px;
+    }
+
+    .auto-hours-row:last-child {
+        border-bottom: 0;
+    }
+
+    .auto-hours-day {
+        font-weight: 600;
+        color: #344054;
+    }
+
+    .auto-hours-time {
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .auto-hours-closed {
+        color: #dc3545;
+    }
+
+    /* MORADA */
+
+    .auto-address-card {
+        background: #fff;
+        border: 1px solid var(--auto-border);
+        border-radius: 14px;
+        padding: 25px;
+        box-shadow: 0 5px 20px rgba(16,24,40,.05);
+    }
+
+    .auto-address-content {
+        display: flex;
+        align-items: flex-start;
+        gap: 17px;
+    }
+
+    .auto-address-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        width: 55px;
+        height: 55px;
+        border-radius: 12px;
+
+        background: #eff6ff;
+        color: var(--auto-blue);
+        font-size: 25px;
+    }
+
+    .auto-address-card h2 {
+        font-size: 18px;
+        font-weight: 800;
+        margin-bottom: 12px;
+    }
+
+    .auto-address-card p {
+        font-size: 13px;
+        line-height: 1.6;
+        margin-bottom: 5px;
+    }
+
+    /* RESPONSIVIDADE */
+
+    @@media (max-width: 991px) {
+
+        .auto-hero {
+            grid-template-columns: 1fr;
+            padding: 42px 32px;
         }
 
-        .home-title {
-            font-size: 2.3rem;
+        .auto-hero-visual {
+            min-height: 220px;
         }
 
-        .home-description {
-            margin-left: auto;
-            margin-right: auto;
+        .auto-bmw-image {
+            max-width: 340px;
+            max-height: 300px;
         }
 
-        .home-logo {
-            max-width: 260px;
-            margin-top: 30px;
+        .auto-hours-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media (max-width: 767px) {
+
+        .auto-home {
+            padding-top: 12px;
+        }
+
+        .auto-hero {
+            padding: 35px 22px;
+            border-radius: 15px;
+        }
+
+        .auto-hero h1 {
+            letter-spacing: -.5px;
+        }
+
+        .auto-hero-description {
+            font-size: 13px;
+        }
+
+        .auto-hero-visual {
+            min-height: 230px;
+        }
+
+        .auto-bmw-image {
+            max-width: 290px;
+            max-height: 260px;
+        }
+
+        .auto-section {
+            padding-top: 50px;
+        }
+    }
+
+    @@media (max-width: 480px) {
+
+        .auto-hero-actions .btn {
+            width: 100%;
+        }
+
+        .auto-hero-benefits {
+            gap: 12px;
+        }
+
+        .auto-hours-row {
+            padding: 17px 15px;
+        }
+
+        .auto-service-card,
+        .auto-mechanic-card {
+            padding: 20px;
+        }
+
+        .auto-address-content {
+            gap: 12px;
         }
     }
 </style>
 
-<section class="home-hero">
-    <div class="row align-items-center">
+<div class="auto-home">
 
-        <div class="col-lg-7">
-            <span class="home-label">Bem-vindo à OficinaCET107</span>
+    <!-- 1. APRESENTAÇÃO PRINCIPAL -->
 
-            <h1 class="home-title mt-3">
-                Cuidamos do seu veículo com atenção e confiança.
+    <section class="auto-hero">
+
+        <div class="auto-hero-content">
+
+            <div class="auto-hero-label">
+                <i class="bi bi-tools"></i>
+                Bem-vindo à AutoCET
+            </div>
+
+            <h1>
+                O seu automóvel
+                em <span>boas mãos.</span>
             </h1>
 
-            <p class="home-description mt-4">
-                Manutenção, diagnóstico e reparação automóvel.
-                Acompanhe o seu veículo e conte com uma equipa preparada
-                para cuidar de cada detalhe.
+            <p class="auto-hero-description">
+                Na AutoCET, valorizamos o cuidado
+                com o seu automóvel.
+
+                Conheça os nossos serviços,
+                a equipa de mecânicos e os horários
+                de funcionamento da oficina.
             </p>
 
-            <div class="mt-4">
-                <a href="#servicos" class="btn btn-primary btn-lg me-2">
-                    Conhecer serviços
+            <div class="auto-hero-actions">
+
+                <a href="#servicos"
+                   class="btn btn-primary">
+
+                    Conhecer Serviços
+                    <i class="bi bi-arrow-right ms-2"></i>
+
                 </a>
 
-                <a href="#oficina" class="btn btn-outline-dark btn-lg">
-                    Sobre a oficina
+                <a href="#mecanicos"
+                   class="btn auto-hero-secondary">
+
+                    <i class="bi bi-people me-2"></i>
+                    A Nossa Equipa
+
                 </a>
+
             </div>
-        </div>
 
-        <div class="col-lg-5">
-            <div class="home-logo-container">
-                <img src="~/images/ImagenCET.png"
-                     alt="OficinaCET107"
-                     class="home-logo" />
-            </div>
-        </div>
+            <div class="auto-hero-benefits">
 
-    </div>
-</section>
-
-
-<section id="servicos" class="py-5">
-
-    <div class="text-center mb-5">
-        <span class="home-label">O que fazemos</span>
-
-        <h2 class="mt-2 fw-bold">
-            Serviços da oficina
-        </h2>
-
-        <p class="text-muted">
-            Tudo o que o seu veículo precisa num só lugar.
-        </p>
-    </div>
-
-    <div class="row">
-
-        <div class="col-md-4 mb-4">
-            <div class="service-card">
-
-                <span class="service-number">01</span>
-
-                <h4 class="mt-3">
+                <span>
+                    <i class="bi bi-check-circle"></i>
                     Manutenção
-                </h4>
+                </span>
 
-                <p class="text-muted mb-0">
-                    Revisões e manutenção preventiva para manter
-                    o seu veículo em boas condições.
-                </p>
+                <span>
+                    <i class="bi bi-check-circle"></i>
+                    Reparação
+                </span>
 
-            </div>
-        </div>
-
-
-        <div class="col-md-4 mb-4">
-            <div class="service-card">
-
-                <span class="service-number">02</span>
-
-                <h4 class="mt-3">
+                <span>
+                    <i class="bi bi-check-circle"></i>
                     Diagnóstico
-                </h4>
-
-                <p class="text-muted mb-0">
-                    Avaliação do veículo para identificar problemas
-                    e determinar o serviço necessário.
-                </p>
+                </span>
 
             </div>
+
         </div>
 
+        <!-- IMAGEM BMW AZUL -->
 
-        <div class="col-md-4 mb-4">
-            <div class="service-card">
+        <div class="auto-hero-visual">
 
-                <span class="service-number">03</span>
+            <img src="~/images/autocet-bmw.png"
+                 asp-append-version="true"
+                 alt="BMW azul - AutoCET"
+                 class="auto-bmw-image" />
 
-                <h4 class="mt-3">
-                    Reparações
-                </h4>
+        </div>
 
-                <p class="text-muted mb-0">
-                    Reparação e acompanhamento das intervenções
-                    realizadas no seu veículo.
-                </p>
+    </section>
+
+    <!-- 2. SERVIÇOS -->
+
+    <section id="servicos" class="auto-section">
+
+        <div class="auto-section-heading">
+
+            <span class="auto-section-label">
+                O que fazemos
+            </span>
+
+            <h2>
+                Serviços para o seu automóvel
+            </h2>
+
+            <p>
+                Diferentes soluções de manutenção e reparação
+                para cuidar do seu veículo.
+            </p>
+
+        </div>
+
+        <div class="row g-4">
+
+            <!-- MOTOR -->
+            <div class="col-12 col-md-6 col-lg-3">
+
+                <div class="auto-service-card">
+
+                    <div class="auto-service-icon">
+                        <i class="bi bi-gear-wide-connected"></i>
+                    </div>
+
+                    <h3>Motor e Mecânica</h3>
+
+                    <p>
+                        Serviços de manutenção e reparação
+                        dos componentes mecânicos do automóvel.
+                    </p>
+
+                </div>
 
             </div>
+
+            <!-- DIAGNÓSTICO -->
+            <div class="col-12 col-md-6 col-lg-3">
+
+                <div class="auto-service-card">
+
+                    <div class="auto-service-icon">
+                        <i class="bi bi-search"></i>
+                    </div>
+
+                    <h3>Diagnóstico</h3>
+
+                    <p>
+                        Identificação de problemas e avaliação
+                        do funcionamento dos sistemas do veículo.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <!-- REVISÃO -->
+            <div class="col-12 col-md-6 col-lg-3">
+
+                <div class="auto-service-card">
+
+                    <div class="auto-service-icon">
+                        <i class="bi bi-clipboard2-check"></i>
+                    </div>
+
+                    <h3>Revisão e Manutenção</h3>
+
+                    <p>
+                        Verificações e manutenção preventiva
+                        para ajudar a conservar o automóvel.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <!-- ELETRICIDADE -->
+            <div class="col-12 col-md-6 col-lg-3">
+
+                <div class="auto-service-card">
+
+                    <div class="auto-service-icon">
+                        <i class="bi bi-lightning-charge"></i>
+                    </div>
+
+                    <h3>Sistema Elétrico</h3>
+
+                    <p>
+                        Diagnóstico e intervenção nos
+                        componentes elétricos do veículo.
+                    </p>
+
+                </div>
+
+            </div>
+
         </div>
 
-    </div>
+    </section>
 
-</section>
+    <!-- 3. MECÂNICOS EM DESTAQUE -->
 
+    <section id="mecanicos" class="auto-section">
 
-<section id="oficina" class="info-section">
+        <div class="auto-section-heading">
 
-    <div class="row text-center">
+            <span class="auto-section-label">
+                A nossa equipa
+            </span>
 
-        <div class="col-md-4 mb-4 mb-md-0">
+            <h2>
+                Conheça os nossos mecânicos
+            </h2>
 
-            <div class="info-icon">🔧</div>
-
-            <h5>Mecânicos especializados</h5>
-
-            <p class="mb-0">
-                Profissionais preparados para cuidar do seu veículo.
+            <p>
+                Conheça os profissionais e as especialidades
+                da nossa oficina.
             </p>
 
         </div>
 
+        @if (mecanicos.Any())
+        {
+            <!-- MÁXIMO 5 MECÂNICOS -->
 
-        <div class="col-md-4 mb-4 mb-md-0">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-5 g-4">
 
-            <div class="info-icon">📅</div>
+                @foreach (var mecanico in mecanicos.Take(5))
+                {
+                    var nome = string.IsNullOrWhiteSpace(mecanico.Nome)
+                        ? "Mecânico"
+                        : mecanico.Nome.Trim();
 
-            <h5>Marcações organizadas</h5>
+                    var inicial = nome.Substring(0, 1)
+                        .ToUpperInvariant();
 
-            <p class="mb-0">
-                Gestão simples das suas marcações e serviços.
-            </p>
+                    var especialidade =
+                        string.IsNullOrWhiteSpace(mecanico.Especialidade)
+                            ? "Não informada"
+                            : mecanico.Especialidade;
+
+                    var possuiFotografia =
+                        mecanico.User != null &&
+                        mecanico.User.ImageId != Guid.Empty;
+
+                    var foto = possuiFotografia
+                        ? mecanico.User!.ImageFullPath
+                        : "";
+
+                    <div class="col">
+
+                        <div class="auto-mechanic-card">
+
+                            <!-- FOTOGRAFIA DO MECÂNICO -->
+                            <div class="auto-mechanic-photo-area">
+
+                                @if (possuiFotografia)
+                                {
+                                    <img src="@foto"
+                                         alt="Fotografia de @nome"
+                                         class="auto-mechanic-photo"
+                                         loading="lazy"
+                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+
+                                    <!-- FALLBACK SE A FOTO FALHAR -->
+                                    <div class="auto-mechanic-photo-default"
+                                         style="display: none;">
+                                        @inicial
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="auto-mechanic-photo-default">
+                                        @inicial
+                                    </div>
+                                }
+
+                            </div>
+
+                            <!-- NOME -->
+                            <h3>
+                                @nome
+                            </h3>
+
+                            <!-- ESPECIALIDADE -->
+                            <div class="auto-mechanic-specialty">
+
+                                Especialidade:
+                                <strong>@especialidade</strong>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+        }
+        else
+        {
+            <div class="auto-empty">
+
+                <i class="bi bi-people fs-2 d-block mb-3"></i>
+
+                De momento, não existem mecânicos
+                para apresentar.
+
+            </div>
+        }
+
+    </section>
+
+    <!-- 4. HORÁRIOS DE FUNCIONAMENTO -->
+
+    <section id="horarios" class="auto-section">
+
+        <div class="auto-hours-layout">
+
+            <div class="auto-hours-info">
+
+                <span class="auto-section-label">
+                    Planeie a sua visita
+                </span>
+
+                <h2>
+                    Horários de funcionamento
+                    da oficina
+                </h2>
+
+                <p>
+                    Consulte os nossos horários antes
+                    de visitar a AutoCET.
+
+                    Estamos disponíveis durante a semana
+                    e também aos sábados de manhã.
+                </p>
+
+                <div class="auto-hours-note">
+
+                    <i class="bi bi-info-circle"></i>
+
+                    Horários sujeitos a alterações em feriados.
+
+                </div>
+
+            </div>
+
+            <div class="auto-hours-card">
+
+                <div class="auto-hours-header">
+
+                    <i class="bi bi-clock-history"></i>
+
+                    Horário de Atendimento
+
+                </div>
+
+                <div class="auto-hours-row">
+
+                    <span class="auto-hours-day">
+                        Segunda a Sexta-feira
+                    </span>
+
+                    <span class="auto-hours-time">
+                        09:00 – 18:00
+                    </span>
+
+                </div>
+
+                <div class="auto-hours-row">
+
+                    <span class="auto-hours-day">
+                        Sábado
+                    </span>
+
+                    <span class="auto-hours-time">
+                        09:00 – 13:00
+                    </span>
+
+                </div>
+
+                <div class="auto-hours-row">
+
+                    <span class="auto-hours-day">
+                        Domingo
+                    </span>
+
+                    <span class="auto-hours-time auto-hours-closed">
+                        Encerrado
+                    </span>
+
+                </div>
+
+            </div>
 
         </div>
 
+    </section>
 
-        <div class="col-md-4">
+    <!-- 5. MORADA DA OFICINA -->
 
-            <div class="info-icon">🚘</div>
+    <section id="morada" class="auto-section">
 
-            <h5>Histórico do veículo</h5>
+        <div class="auto-address-card">
 
-            <p class="mb-0">
-                Consulte as intervenções realizadas no seu automóvel.
-            </p>
+            <div class="auto-address-content">
+
+                <div class="auto-address-icon">
+                    <i class="bi bi-geo-alt-fill"></i>
+                </div>
+
+                <div>
+
+                    <h2>
+                        Morada da Oficina
+                    </h2>
+
+                    <p class="text-muted">
+                        Pólo de Educação e Formação
+                        D. João de Castro
+                    </p>
+
+                    <p class="fw-semibold">
+                        Rua Jau, 1300-312 Lisboa
+                    </p>
+
+                </div>
+
+            </div>
 
         </div>
 
-    </div>
+    </section>
 
-</section>
+</div>

@@ -15,13 +15,21 @@
 <html lang="pt">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
 
-    <title>@ViewData["Title"] - OficinaCET107</title>
+    <title>@ViewData["Title"] - AutoCET</title>
 
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/SistemaGestaoOficina.styles.css" asp-append-version="true" />
+    <link rel="stylesheet"
+          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <link rel="stylesheet"
+          href="~/css/site.css"
+          asp-append-version="true" />
+
+    <link rel="stylesheet"
+          href="~/SistemaGestaoOficina.styles.css"
+          asp-append-version="true" />
 
     <style>
         html {
@@ -176,6 +184,7 @@
         /* RESPONSIVIDADE */
 
         @@media (max-width: 1199px) {
+
             .oficina-navbar {
                 padding: 8px 0;
             }
@@ -222,6 +231,7 @@
         }
 
         @@media (max-width: 576px) {
+
             .oficina-brand {
                 font-size: 1rem;
             }
@@ -240,16 +250,21 @@
 
 <body>
 
+    <!-- CABEÇALHO -->
+
     <header>
         <nav class="navbar navbar-expand-xl navbar-dark oficina-navbar">
+
             <div class="container">
 
-                <!-- LOGO -->
+                <!-- LOGÓTIPO AUTOCET -->
 
                 <a class="navbar-brand oficina-brand"
                    asp-controller="Home"
                    asp-action="Index">
-                    Oficina<span class="brand-blue">CET107</span>
+
+                    Auto<span class="brand-blue">CET</span>
+
                 </a>
 
                 <!-- MENU MOBILE -->
@@ -261,10 +276,13 @@
                         aria-controls="navbarOficina"
                         aria-expanded="false"
                         aria-label="Abrir menu">
+
                     <span class="navbar-toggler-icon"></span>
+
                 </button>
 
-                <div class="collapse navbar-collapse" id="navbarOficina">
+                <div class="collapse navbar-collapse"
+                     id="navbarOficina">
 
                     <ul class="navbar-nav ms-auto align-items-xl-center">
 
@@ -274,7 +292,9 @@
                             <a class="nav-link"
                                asp-controller="Home"
                                asp-action="Index">
+
                                 Home
+
                             </a>
                         </li>
 
@@ -285,28 +305,36 @@
                                asp-controller="Home"
                                asp-action="Index"
                                asp-fragment="servicos">
+
                                 Serviços
+
                             </a>
                         </li>
 
                         <!-- MECÂNICOS -->
 
                         <li class="nav-item">
-                            <span class="nav-link disabled"
-                                  aria-disabled="true"
-                                  title="Informação em preparação">
+                            <a class="nav-link"
+                               asp-controller="Home"
+                               asp-action="Index"
+                               asp-fragment="mecanicos">
+
                                 Mecânicos
-                            </span>
+
+                            </a>
                         </li>
 
                         <!-- HORÁRIOS -->
 
                         <li class="nav-item">
-                            <span class="nav-link disabled"
-                                  aria-disabled="true"
-                                  title="Informação em preparação">
+                            <a class="nav-link"
+                               asp-controller="Home"
+                               asp-action="Index"
+                               asp-fragment="horarios">
+
                                 Horários
-                            </span>
+
+                            </a>
                         </li>
 
                         @if (User.Identity?.IsAuthenticated == true)
@@ -316,7 +344,8 @@
                             <li class="nav-item">
                                 <div class="navbar-user">
 
-                                    @if (user != null && user.ImageId != Guid.Empty)
+                                    @if (user != null &&
+                                         user.ImageId != Guid.Empty)
                                     {
                                         <img src="@user.ImageFullPath"
                                              alt="Fotografia do utilizador"
@@ -361,7 +390,7 @@
                                 </div>
                             </li>
 
-                            <!-- ÁREA DO ADMINISTRADOR -->
+                            <!-- ADMINISTRADOR -->
 
                             @if (User.IsInRole("Admin"))
                             {
@@ -369,25 +398,30 @@
                                     <a class="navbar-dashboard-link"
                                        asp-controller="Admin"
                                        asp-action="Index">
+
                                         Administração
+
                                     </a>
                                 </li>
                             }
 
-                            <!-- ÁREA DO RECECIONISTA E MECÂNICO -->
+                            <!-- RECECIONISTA E MECÂNICO -->
 
-                            @if (User.IsInRole("Rececionista") || User.IsInRole("Mecanico"))
+                            @if (User.IsInRole("Rececionista") ||
+                                 User.IsInRole("Mecanico"))
                             {
                                 <li class="nav-item">
                                     <a class="navbar-dashboard-link"
                                        asp-controller="RececionistaArea"
                                        asp-action="Index">
+
                                         Painel da Oficina
+
                                     </a>
                                 </li>
                             }
 
-                            <!-- ÁREA DO CLIENTE -->
+                            <!-- CLIENTE -->
 
                             @if (User.IsInRole("Cliente"))
                             {
@@ -395,7 +429,9 @@
                                     <a class="navbar-dashboard-link"
                                        asp-controller="ClienteArea"
                                        asp-action="Index">
+
                                         Área do Cliente
+
                                     </a>
                                 </li>
                             }
@@ -406,7 +442,9 @@
                                 <a class="login-button"
                                    asp-controller="Account"
                                    asp-action="Logout">
+
                                     Sair
+
                                 </a>
                             </li>
                         }
@@ -418,43 +456,60 @@
                                 <a class="login-button"
                                    asp-controller="Account"
                                    asp-action="Login">
+
                                     Entrar
+
                                 </a>
                             </li>
                         }
 
                     </ul>
+
                 </div>
 
             </div>
+
         </nav>
     </header>
 
     <!-- CONTEÚDO PRINCIPAL -->
 
     <div class="page-content">
+
         <div class="container">
+
             <main role="main" class="pb-3">
                 @RenderBody()
             </main>
+
         </div>
+
     </div>
 
-    <!-- FOOTER -->
+    <!-- RODAPÉ -->
 
     <footer class="oficina-footer">
+
         <div class="container text-center">
-            <strong>OficinaCET107</strong>
+
+            <strong>AutoCET</strong>
+
             <span class="mx-2">|</span>
+
             &copy; 2026 - Todos os direitos reservados
+
         </div>
+
     </footer>
 
     <!-- SCRIPTS -->
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script src="~/js/site.js"
+            asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
 

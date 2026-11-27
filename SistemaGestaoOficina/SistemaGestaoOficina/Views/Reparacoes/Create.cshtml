@@ -1,5 +1,4 @@
-﻿
-@model SistemaGestaoOficina.Models.ReparacaoViewModel
+﻿@model SistemaGestaoOficina.Models.ReparacaoViewModel
 
 @{
     ViewData["Title"] = "Nova Reparação";
@@ -15,15 +14,15 @@
         margin-bottom: 20px;
     }
 
-    .repair-heading h2 {
-        font-size: 23px;
-        font-weight: 700;
-    }
+        .repair-heading h2 {
+            font-size: 23px;
+            font-weight: 700;
+        }
 
-    .repair-heading p {
-        font-size: 13px;
-        color: #667085;
-    }
+        .repair-heading p {
+            font-size: 13px;
+            color: #667085;
+        }
 
     .repair-navigation {
         display: flex;
@@ -32,21 +31,26 @@
         flex-wrap: wrap;
     }
 
-    .repair-navigation .btn {
-        font-size: 12px;
-        font-weight: 600;
-        border-radius: 8px;
-        padding: 9px 15px;
-    }
+        .repair-navigation .btn {
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 9px 15px;
+        }
 
     .repair-card {
+        position: relative;
         background: #fff;
         border: 1px solid #e5eaf0;
         border-radius: 12px;
-        overflow: hidden;
+        overflow: visible;
         margin-bottom: 16px;
         box-shadow: 0 3px 12px rgba(16, 24, 40, .04);
     }
+
+        .repair-card:focus-within {
+            z-index: 20;
+        }
 
     .repair-card-header {
         display: flex;
@@ -54,18 +58,19 @@
         gap: 10px;
         padding: 15px 17px;
         border-bottom: 1px solid #edf0f4;
+        border-radius: 12px 12px 0 0;
     }
 
-    .repair-card-header i {
-        color: #2563eb;
-        font-size: 18px;
-    }
+        .repair-card-header i {
+            color: #2563eb;
+            font-size: 18px;
+        }
 
-    .repair-card-header h5 {
-        margin: 0;
-        font-size: 14px;
-        font-weight: 700;
-    }
+        .repair-card-header h5 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 700;
+        }
 
     .repair-card-body {
         padding: 17px;
@@ -132,18 +137,18 @@
         margin: 0;
     }
 
-    .repair-table th {
-        background: #f8fafc;
-        font-size: 11px;
-        color: #667085;
-        white-space: nowrap;
-    }
+        .repair-table th {
+            background: #f8fafc;
+            font-size: 11px;
+            color: #667085;
+            white-space: nowrap;
+        }
 
-    .repair-table td,
-    .repair-table th {
-        padding: 10px 8px;
-        vertical-align: middle;
-    }
+        .repair-table td,
+        .repair-table th {
+            padding: 10px 8px;
+            vertical-align: middle;
+        }
 
     .repair-summary-row {
         display: flex;
@@ -154,13 +159,13 @@
         font-size: 13px;
     }
 
-    .repair-summary-row span {
-        color: #667085;
-    }
+        .repair-summary-row span {
+            color: #667085;
+        }
 
-    .repair-summary-row strong {
-        font-weight: 700;
-    }
+        .repair-summary-row strong {
+            font-weight: 700;
+        }
 
     .repair-summary-divider {
         border: 0;
@@ -175,9 +180,9 @@
         background: #f8fafc;
     }
 
-    .repair-labor-row strong {
-        color: #2563eb;
-    }
+        .repair-labor-row strong {
+            color: #2563eb;
+        }
 
     .repair-total-box {
         background: #eff6ff;
@@ -206,22 +211,54 @@
         margin-top: 8px;
     }
 
-    .repair-status {
-        display: inline-flex;
-        gap: 7px;
-        align-items: center;
-        background: #fff7e6;
-        color: #b7791f;
-        padding: 8px 12px;
-        border-radius: 8px;
-        font-size: 12px;
-        font-weight: 600;
-    }
-
     .repair-booking-help {
         font-size: 11px;
         color: #667085;
         margin-top: 7px;
+    }
+
+    /* PESQUISA AUTOMÁTICA */
+    .campo-pesquisa {
+        position: relative;
+    }
+
+    .pesquisa-resultados {
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        right: 0;
+        z-index: 1050;
+        max-height: 220px;
+        overflow-y: auto;
+        background: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 10px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+    }
+
+    .pesquisa-resultado {
+        display: block;
+        width: 100%;
+        padding: 10px 12px;
+        border: 0;
+        border-bottom: 1px solid #f1f3f5;
+        background: #fff;
+        text-align: left;
+        font-size: 12px;
+        cursor: pointer;
+    }
+
+        .pesquisa-resultado:hover,
+        .pesquisa-resultado:focus {
+            background: #eff6ff;
+            color: #0d6efd;
+        }
+
+    .repair-date-locked {
+        background-color: #f1f5f9 !important;
+        color: #475467 !important;
+        opacity: 1 !important;
+        cursor: not-allowed;
     }
 
     @@media (min-width: 1200px) {
@@ -263,7 +300,6 @@
             </p>
         </div>
 
-        <!-- BOTÃO DE NAVEGAÇÃO -->
         <div class="repair-navigation">
 
             <a asp-controller="Reparacoes"
@@ -276,7 +312,6 @@
             </a>
 
         </div>
-
     </div>
 
     <!-- FORMULÁRIO -->
@@ -304,17 +339,37 @@
 
                     <div class="repair-card-body">
 
-                        <!-- MARCAÇÃO -->
+                        <!-- MARCAÇÃO COM PESQUISA -->
                         <div class="mb-3">
 
-                            <label asp-for="MarcacaoId"
+                            <label for="pesquisaMarcacao"
                                    class="form-label">
                                 Marcação *
                             </label>
 
+                            <div class="campo-pesquisa"
+                                 id="areaPesquisaMarcacao">
+
+                                <input type="text"
+                                       id="pesquisaMarcacao"
+                                       class="form-control"
+                                       placeholder="Pesquisar cliente, matrícula ou serviço..."
+                                       autocomplete="off"
+                                       aria-autocomplete="list"
+                                       aria-controls="resultadosMarcacao" />
+
+                                <div id="resultadosMarcacao"
+                                     class="pesquisa-resultados d-none"
+                                     role="listbox"></div>
+
+                            </div>
+
+                            <!-- VALOR ENVIADO AO CONTROLLER -->
                             <select asp-for="MarcacaoId"
-                                    class="form-select"
-                                    required>
+                                    id="MarcacaoId"
+                                    class="d-none"
+                                    tabindex="-1"
+                                    aria-hidden="true">
 
                                 <option value="">
                                     Selecione uma marcação...
@@ -335,7 +390,8 @@
 
                                         <option value="@marcacao.Id"
                                                 data-servico="@marcacao.TipoServico"
-                                                data-data="@marcacao.DataHora.ToString("yyyy-MM-ddTHH:mm")">
+                                                data-data="@marcacao.DataHora.ToString("yyyy-MM-ddTHH:mm")"
+                                                data-data-exibicao="@horario">
                                             @($"{cliente} | {matricula} | {horario} | {marcacao.TipoServico}")
                                         </option>
                                     }
@@ -350,7 +406,6 @@
 
                             <span asp-validation-for="MarcacaoId"
                                   class="text-danger small"></span>
-
                         </div>
 
                         <!-- TIPO DE SERVIÇO -->
@@ -362,35 +417,42 @@
                             </label>
 
                             <input asp-for="TipoServico"
-                                   class="form-control"
+                                   class="form-control repair-date-locked"
                                    placeholder="Preenchido pela marcação"
-                                   readonly />
+                                   readonly
+                                   tabindex="-1" />
 
                             <span asp-validation-for="TipoServico"
                                   class="text-danger small"></span>
-
                         </div>
 
                         <!-- DATAS -->
                         <div class="row g-2 mb-3">
 
+                            <!-- DATA DE INÍCIO BLOQUEADA -->
                             <div class="col-12 col-md-6">
 
-                                <label asp-for="DataInicio"
+                                <label for="dataInicioExibicao"
                                        class="form-label">
                                     Data de Início
                                 </label>
 
+                                <input type="text"
+                                       id="dataInicioExibicao"
+                                       class="form-control repair-date-locked"
+                                       placeholder="Preenchida pela marcação"
+                                       disabled />
+
+                                <!-- DATA REAL ENVIADA AO CONTROLLER -->
                                 <input asp-for="DataInicio"
-                                       type="datetime-local"
-                                       asp-format="{0:yyyy-MM-ddTHH:mm}"
-                                       class="form-control" />
+                                       type="hidden"
+                                       id="DataInicio" />
 
                                 <span asp-validation-for="DataInicio"
                                       class="text-danger small"></span>
-
                             </div>
 
+                            <!-- DATA DE FIM -->
                             <div class="col-12 col-md-6">
 
                                 <label asp-for="DataFim"
@@ -405,26 +467,11 @@
 
                                 <span asp-validation-for="DataFim"
                                       class="text-danger small"></span>
-
                             </div>
 
                         </div>
 
-                        <!-- ESTADO -->
-                        <label class="form-label">
-                            Estado
-                        </label>
-
-                        <div>
-                            <span class="repair-status">
-                                <i class="bi bi-clock-history"></i>
-                                Em Curso
-                            </span>
-                        </div>
-
-                        <input asp-for="Concluida"
-                               type="hidden"
-                               value="false" />
+                        <!-- ESTADO REMOVIDO -->
 
                     </div>
                 </div>
@@ -448,13 +495,33 @@
 
                             <div class="col-8">
 
-                                <label for="mecanicoSelect"
+                                <label for="pesquisaMecanico"
                                        class="form-label">
                                     Mecânico
                                 </label>
 
+                                <div class="campo-pesquisa"
+                                     id="areaPesquisaMecanico">
+
+                                    <input type="text"
+                                           id="pesquisaMecanico"
+                                           class="form-control"
+                                           placeholder="Pesquisar mecânico..."
+                                           autocomplete="off"
+                                           aria-autocomplete="list"
+                                           aria-controls="resultadosMecanico" />
+
+                                    <div id="resultadosMecanico"
+                                         class="pesquisa-resultados d-none"
+                                         role="listbox"></div>
+
+                                </div>
+
+                                <!-- SELECT ORIGINAL OCULTO -->
                                 <select id="mecanicoSelect"
-                                        class="form-select">
+                                        class="d-none"
+                                        tabindex="-1"
+                                        aria-hidden="true">
 
                                     <option value="">
                                         Selecione...
@@ -479,12 +546,13 @@
                                 <button type="button"
                                         class="btn btn-outline-primary w-100"
                                         onclick="adicionarMecanico()">
+
                                     <i class="bi bi-plus-lg"></i>
                                     Adicionar
+
                                 </button>
 
                             </div>
-
                         </div>
 
                         <div class="text-muted small mt-2">
@@ -513,13 +581,33 @@
 
                             <div class="col-6">
 
-                                <label for="pecaSelect"
+                                <label for="pesquisaPeca"
                                        class="form-label">
                                     Peça
                                 </label>
 
+                                <div class="campo-pesquisa"
+                                     id="areaPesquisaPeca">
+
+                                    <input type="text"
+                                           id="pesquisaPeca"
+                                           class="form-control"
+                                           placeholder="Pesquisar peça..."
+                                           autocomplete="off"
+                                           aria-autocomplete="list"
+                                           aria-controls="resultadosPeca" />
+
+                                    <div id="resultadosPeca"
+                                         class="pesquisa-resultados d-none"
+                                         role="listbox"></div>
+
+                                </div>
+
+                                <!-- SELECT ORIGINAL OCULTO -->
                                 <select id="pecaSelect"
-                                        class="form-select">
+                                        class="d-none"
+                                        tabindex="-1"
+                                        aria-hidden="true">
 
                                     <option value="">
                                         Selecione...
@@ -561,8 +649,10 @@
                                 <button type="button"
                                         class="btn btn-outline-primary w-100"
                                         onclick="adicionarPeca()">
+
                                     <i class="bi bi-plus-lg"></i>
                                     Adicionar
+
                                 </button>
 
                             </div>
@@ -596,7 +686,7 @@
 
             </div>
 
-            <!-- RESUMO -->
+            <!-- RESUMO DA REPARAÇÃO -->
             <div class="col-12 col-xl-3">
 
                 <div class="repair-card repair-summary-card">
@@ -665,20 +755,24 @@
 
                         </div>
 
-                        <!-- VALOR ENVIADO PARA O CONTROLLER -->
+                        <!-- VALOR ENVIADO AO CONTROLLER -->
                         <input asp-for="CustoTotal"
                                type="hidden" />
 
                         <span asp-validation-for="CustoTotal"
                               class="text-danger small"></span>
 
-                        <!-- BOTÃO CONCLUIR REPARAÇÃO -->
+                        <!-- CONCLUIR REPARAÇÃO -->
                         <div class="d-flex justify-content-center mt-4 pt-2">
+
                             <button type="submit"
                                     class="btn btn-primary px-4 py-2">
+
                                 <i class="bi bi-check-lg me-2"></i>
                                 Concluir Reparação
+
                             </button>
+
                         </div>
 
                     </div>
@@ -695,6 +789,7 @@
     <partial name="_ValidationScriptsPartial" />
 
     <script>
+
         const CUSTO_POR_MECANICO = 45.00;
 
         const mecanicos = [];
@@ -707,6 +802,7 @@
                 currency: "EUR"
             }).format(valor);
 
+        // CAMPOS PRINCIPAIS
         const marcacaoSelect =
             document.getElementById("MarcacaoId");
 
@@ -716,19 +812,256 @@
         const dataInicioInput =
             document.getElementById("DataInicio");
 
+        const dataInicioExibicao =
+            document.getElementById("dataInicioExibicao");
+
         const dataFimInput =
             document.getElementById("DataFim");
 
-        // MARCAÇÃO
+        // NORMALIZAR TEXTO
+        function normalizar(texto) {
+
+            return texto.normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .toLowerCase();
+        }
+
+        // PESQUISA REUTILIZÁVEL
+        function configurarPesquisa(
+            inputId,
+            selectId,
+            resultadosId,
+            areaId,
+            mensagemVazia
+        ) {
+            const input =
+                document.getElementById(inputId);
+
+            const select =
+                document.getElementById(selectId);
+
+            const resultados =
+                document.getElementById(resultadosId);
+
+            const area =
+                document.getElementById(areaId);
+
+            // FECHAR LISTA
+            function fecharResultados() {
+
+                resultados.classList.add("d-none");
+                resultados.replaceChildren();
+
+                input.setAttribute("aria-expanded", "false");
+            }
+
+            // MOSTRAR TEXTO SELECIONADO
+            function sincronizarTexto() {
+
+                const opcao =
+                    select.options[select.selectedIndex];
+
+                if (select.value && opcao) {
+                    input.value = opcao.textContent.trim();
+                } else {
+                    input.value = "";
+                }
+            }
+
+            // FILTRAR RESULTADOS
+            function mostrarResultados() {
+
+                resultados.replaceChildren();
+
+                const busca =
+                    normalizar(input.value.trim());
+
+                // AGUARDAR PELO MENOS UMA LETRA
+                if (busca.length === 0) {
+
+                    fecharResultados();
+                    return;
+                }
+
+                const encontrados =
+                    Array.from(select.options)
+                        .filter(opcao =>
+                            opcao.value &&
+                            normalizar(
+                                opcao.textContent.trim()
+                            ).includes(busca))
+                        .slice(0, 8);
+
+                if (encontrados.length === 0) {
+
+                    const aviso =
+                        document.createElement("div");
+
+                    aviso.className =
+                        "text-muted small p-3";
+
+                    aviso.textContent =
+                        mensagemVazia;
+
+                    resultados.appendChild(aviso);
+                }
+
+                encontrados.forEach(opcao => {
+
+                    const botao =
+                        document.createElement("button");
+
+                    botao.type = "button";
+                    botao.className = "pesquisa-resultado";
+                    botao.textContent =
+                        opcao.textContent.trim();
+
+                    botao.setAttribute("role", "option");
+
+                    botao.addEventListener("click", function () {
+
+                        select.value = opcao.value;
+
+                        sincronizarTexto();
+
+                        fecharResultados();
+
+                        select.dispatchEvent(
+                            new Event("change", {
+                                bubbles: true
+                            })
+                        );
+                    });
+
+                    resultados.appendChild(botao);
+                });
+
+                resultados.classList.remove("d-none");
+
+                input.setAttribute("aria-expanded", "true");
+            }
+
+            // PESQUISAR AO ESCREVER
+            input.addEventListener("input", function () {
+
+                if (select.value) {
+
+                    select.value = "";
+
+                    select.dispatchEvent(
+                        new Event("change", {
+                            bubbles: true
+                        })
+                    );
+                }
+
+                mostrarResultados();
+            });
+
+            // NÃO MOSTRAR NOMES COM O CAMPO VAZIO
+            input.addEventListener("focus", function () {
+
+                if (input.value.trim().length === 0) {
+
+                    fecharResultados();
+                    return;
+                }
+
+                if (!select.value) {
+                    mostrarResultados();
+                }
+            });
+
+            // ENTER E ESCAPE
+            input.addEventListener("keydown", function (event) {
+
+                if (event.key === "Escape") {
+                    fecharResultados();
+                }
+
+                if (event.key === "Enter") {
+
+                    event.preventDefault();
+
+                    const primeiro =
+                        resultados.querySelector("button");
+
+                    if (primeiro &&
+                        !resultados.classList.contains("d-none")) {
+
+                        primeiro.click();
+                    }
+                }
+            });
+
+            // FECHAR AO CLICAR FORA
+            document.addEventListener("click", function (event) {
+
+                if (!area.contains(event.target)) {
+                    fecharResultados();
+                }
+            });
+
+            // LIMPAR SELEÇÃO
+            function limpar() {
+
+                select.value = "";
+                input.value = "";
+
+                fecharResultados();
+            }
+
+            return {
+                sincronizarTexto,
+                fecharResultados,
+                limpar
+            };
+        }
+
+        // PESQUISA DE MARCAÇÕES
+        const pesquisaMarcacoes = configurarPesquisa(
+            "pesquisaMarcacao",
+            "MarcacaoId",
+            "resultadosMarcacao",
+            "areaPesquisaMarcacao",
+            "Nenhuma marcação encontrada."
+        );
+
+        // PESQUISA DE MECÂNICOS
+        const pesquisaMecanicos = configurarPesquisa(
+            "pesquisaMecanico",
+            "mecanicoSelect",
+            "resultadosMecanico",
+            "areaPesquisaMecanico",
+            "Nenhum mecânico encontrado."
+        );
+
+        // PESQUISA DE PEÇAS
+        const pesquisaPecas = configurarPesquisa(
+            "pesquisaPeca",
+            "pecaSelect",
+            "resultadosPeca",
+            "areaPesquisaPeca",
+            "Nenhuma peça encontrada."
+        );
+
+        // AO SELECIONAR A MARCAÇÃO
         marcacaoSelect.addEventListener("change", function () {
 
-            const opcao = this.options[this.selectedIndex];
+            const opcao =
+                this.options[this.selectedIndex];
 
+            // TIPO DE SERVIÇO
             tipoServicoInput.value =
-                opcao.dataset.servico || "";
+                opcao?.dataset.servico || "";
 
+            // DATA ENVIADA AO CONTROLLER
             dataInicioInput.value =
-                opcao.dataset.data || "";
+                opcao?.dataset.data || "";
+
+            // DATA EXIBIDA, SEM PERMITIR EDIÇÃO
+            dataInicioExibicao.value =
+                opcao?.dataset.dataExibicao || "";
         });
 
         // ADICIONAR MECÂNICO
@@ -740,11 +1073,13 @@
             const id = Number(select.value);
 
             if (!id) {
+
                 alert("Selecione um mecânico.");
                 return;
             }
 
             if (mecanicos.some(m => m.id === id)) {
+
                 alert("Este mecânico já foi adicionado.");
                 return;
             }
@@ -755,7 +1090,7 @@
                     .text.trim()
             });
 
-            select.value = "";
+            pesquisaMecanicos.limpar();
 
             atualizarMecanicos();
         }
@@ -787,7 +1122,9 @@
 
             if (mecanicos.length === 0) {
 
-                const vazio = document.createElement("div");
+                const vazio =
+                    document.createElement("div");
+
                 vazio.className = "repair-empty";
                 vazio.textContent =
                     "Nenhum mecânico adicionado.";
@@ -797,16 +1134,23 @@
 
             mecanicos.forEach((mecanico, index) => {
 
-                const item = document.createElement("div");
+                const item =
+                    document.createElement("div");
+
                 item.className = "repair-mechanic-item";
 
-                const nome = document.createElement("span");
+                const nome =
+                    document.createElement("span");
+
                 nome.textContent = mecanico.nome;
 
-                const botao = document.createElement("button");
+                const botao =
+                    document.createElement("button");
+
                 botao.type = "button";
                 botao.className =
                     "btn btn-sm btn-outline-danger";
+
                 botao.textContent = "Remover";
 
                 botao.addEventListener("click", () =>
@@ -815,7 +1159,10 @@
                 item.append(nome, botao);
                 lista.appendChild(item);
 
-                const input = document.createElement("input");
+                // INPUT ENVIADO AO CONTROLLER
+                const input =
+                    document.createElement("input");
+
                 input.type = "hidden";
                 input.name = `MecanicoIds[${index}]`;
                 input.value = mecanico.id;
@@ -845,12 +1192,14 @@
             );
 
             if (!id) {
+
                 alert("Selecione uma peça.");
                 return;
             }
 
             if (!Number.isSafeInteger(quantidade) ||
                 quantidade < 1) {
+
                 alert("Informe uma quantidade válida.");
                 return;
             }
@@ -861,15 +1210,20 @@
             const preco = Number(opcao.dataset.preco);
 
             if (!Number.isFinite(preco) || preco < 0) {
+
                 alert("Preço inválido.");
                 return;
             }
 
-            const existente = pecas.find(p => p.id === id);
+            const existente =
+                pecas.find(p => p.id === id);
 
             if (existente) {
+
                 existente.quantidade += quantidade;
+
             } else {
+
                 pecas.push({
                     id: id,
                     nome: opcao.text.trim(),
@@ -878,7 +1232,7 @@
                 });
             }
 
-            select.value = "";
+            pesquisaPecas.limpar();
 
             document.getElementById("quantidadePeca")
                 .value = 1;
@@ -913,8 +1267,11 @@
 
             if (pecas.length === 0) {
 
-                const linha = document.createElement("tr");
-                const coluna = document.createElement("td");
+                const linha =
+                    document.createElement("tr");
+
+                const coluna =
+                    document.createElement("td");
 
                 coluna.colSpan = 5;
                 coluna.className = "repair-empty";
@@ -930,11 +1287,14 @@
                 const subtotal =
                     peca.preco * peca.quantidade;
 
-                const linha = document.createElement("tr");
+                const linha =
+                    document.createElement("tr");
 
                 function criarColuna(texto, classe = "") {
 
-                    const td = document.createElement("td");
+                    const td =
+                        document.createElement("td");
+
                     td.className = classe;
                     td.textContent = texto;
 
@@ -969,10 +1329,13 @@
                 const colunaAcao =
                     document.createElement("td");
 
-                const botao = document.createElement("button");
+                const botao =
+                    document.createElement("button");
+
                 botao.type = "button";
                 botao.className =
                     "btn btn-sm btn-outline-danger";
+
                 botao.textContent = "Remover";
 
                 botao.addEventListener("click", () =>
@@ -982,9 +1345,12 @@
                 linha.appendChild(colunaAcao);
                 tabela.appendChild(linha);
 
+                // INPUTS ENVIADOS AO CONTROLLER
                 function criarInput(nome, valor) {
 
-                    const input = document.createElement("input");
+                    const input =
+                        document.createElement("input");
+
                     input.type = "hidden";
                     input.name = nome;
                     input.value = valor;
@@ -1002,29 +1368,24 @@
         // ATUALIZAR RESUMO
         function atualizarResumo() {
 
-            // SOMAR O VALOR DAS PEÇAS
             const totalPecas = pecas.reduce(
                 (total, peca) =>
                     total + peca.preco * peca.quantidade,
                 0
             );
 
-            // CONTAR AS PEÇAS
             const quantidadePecas = pecas.reduce(
                 (total, peca) =>
                     total + peca.quantidade,
                 0
             );
 
-            // CALCULAR 45 € POR MECÂNICO
             const custoMaoDeObra =
                 mecanicos.length * CUSTO_POR_MECANICO;
 
-            // TOTAL DA REPARAÇÃO
             const custoTotal =
                 totalPecas + custoMaoDeObra;
 
-            // ATUALIZAR O RESUMO
             document.getElementById("totalQuantidadePecas")
                 .textContent = quantidadePecas;
 
@@ -1037,7 +1398,6 @@
             document.getElementById("totalVisual")
                 .textContent = formatarEuro(custoTotal);
 
-            // FORMATO DECIMAL PARA PT-PT
             document.getElementById("CustoTotal")
                 .value = custoTotal.toFixed(2).replace(".", ",");
         }
@@ -1046,7 +1406,16 @@
         document.getElementById("repairForm")
             .addEventListener("submit", function (event) {
 
-                // EXIGIR PELO MENOS UM MECÂNICO
+                // EXIGIR MARCAÇÃO
+                if (!marcacaoSelect.value) {
+
+                    event.preventDefault();
+
+                    alert("Selecione uma marcação.");
+                    return;
+                }
+
+                // EXIGIR MECÂNICO
                 if (mecanicos.length === 0) {
 
                     event.preventDefault();
@@ -1055,7 +1424,7 @@
                     return;
                 }
 
-                // EXIGIR PELO MENOS UMA PEÇA
+                // EXIGIR PEÇA
                 if (pecas.length === 0) {
 
                     event.preventDefault();
@@ -1064,11 +1433,17 @@
                     return;
                 }
 
-                const inicio = dataInicioInput.value;
-                const fim = dataFimInput.value;
+                // EXIGIR DATA DE INÍCIO
+                if (!dataInicioInput.value) {
+
+                    event.preventDefault();
+
+                    alert("Selecione uma marcação válida.");
+                    return;
+                }
 
                 // EXIGIR DATA DE FIM
-                if (!fim) {
+                if (!dataFimInput.value) {
 
                     event.preventDefault();
 
@@ -1077,13 +1452,14 @@
                 }
 
                 // VALIDAR AS DATAS
-                if (inicio && fim && fim < inicio) {
+                if (dataFimInput.value < dataInicioInput.value) {
 
                     event.preventDefault();
 
                     alert(
                         "A data de fim não pode ser anterior à data de início."
                     );
+
                     return;
                 }
             });
@@ -1092,10 +1468,11 @@
         atualizarMecanicos();
         atualizarPecas();
 
-        if (marcacaoSelect.value) {
-            marcacaoSelect.dispatchEvent(
-                new Event("change")
-            );
-        }
+        pesquisaMarcacoes.sincronizarTexto();
+
+        marcacaoSelect.dispatchEvent(
+            new Event("change")
+        );
+
     </script>
 }

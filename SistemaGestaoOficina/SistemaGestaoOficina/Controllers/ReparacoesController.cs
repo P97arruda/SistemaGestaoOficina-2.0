@@ -103,7 +103,10 @@ namespace SistemaGestaoOficina.Controllers
         // POST: Reparacoes/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ReparacaoViewModel model, List<int> pecaIds, List<int> quantidades)
+        public async Task<IActionResult> Create(
+            ReparacaoViewModel model,
+            List<int> pecaIds,
+            List<int> quantidades)
         {
             pecaIds ??= new List<int>();
             quantidades ??= new List<int>();
@@ -130,23 +133,27 @@ namespace SistemaGestaoOficina.Controllers
                 }
                 else
                 {
-                    if (marcacao.Estado != "Pendente" &&
-                        marcacao.Estado != "Agendada")
+                    // Apenas marcações agendadas
+                    if (marcacao.Estado != "Agendada")
                     {
                         ModelState.AddModelError(
                             nameof(model.MarcacaoId),
-                            "Apenas marcações pendentes ou agendadas podem receber reparações.");
+                            "Apenas marcações agendadas podem receber reparações.");
                     }
 
-                    bool jaExiste = await _reparacaoRepository
+                    // Impedir alterar uma reparação
+                    // concluída ou cancelada
+                    bool reparacaoBloqueada = await _reparacaoRepository
                         .GetAll()
-                        .AnyAsync(r => r.MarcacaoId == marcacao.Id);
+                        .AnyAsync(r =>
+                            r.MarcacaoId == marcacao.Id &&
+                            (r.Concluida || r.Cancelada));
 
-                    if (jaExiste)
+                    if (reparacaoBloqueada)
                     {
                         ModelState.AddModelError(
                             nameof(model.MarcacaoId),
-                            "Esta marcação já possui uma reparação.");
+                            "Esta marcação já possui uma reparação concluída ou cancelada.");
                     }
                 }
             }
@@ -287,7 +294,40 @@ namespace SistemaGestaoOficina.Controllers
                 return View(model);
             }
 
-            // 7. CRIAR A REPARAÇÃO
+            // 7. VERIFICAR SE A REPARAÇÃO JÁ EXISTE
+            var reparacaoExistente = await _reparacaoRepository
+                .GetAll()
+                .FirstOrDefaultAsync(r =>
+                    r.MarcacaoId == marcacao!.Id);
+
+            if (reparacaoExistente != null)
+            {
+                // Já existe uma reparação não concluída:
+                // atualizar e concluir o mesmo registo.
+                bool concluida = await _reparacaoRepository
+                    .ConcluirExistenteAsync(
+                        marcacao!.Id,
+                        model.DataInicio!.Value,
+                        model.DataFim!.Value,
+                        reparacaoPecas,
+                        mecanicoIds,
+                        ValorPorMecanico);
+
+                if (!concluida)
+                {
+                    TempData["ErrorMessage"] =
+                        "Não foi possível concluir a reparação existente.";
+
+                    return RedirectToAction(nameof(Index));
+                }
+
+                TempData["SuccessMessage"] =
+                    "Reparação concluída com sucesso!";
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            // 8. CRIAR UMA NOVA REPARAÇÃO
             var reparacao = new Reparacao
             {
                 MarcacaoId = marcacao!.Id,
@@ -311,10 +351,10 @@ namespace SistemaGestaoOficina.Controllers
                     .ToList()
             };
 
-            // 8. CONCLUIR A MARCAÇÃO
+            // 9. CONCLUIR A MARCAÇÃO
             marcacao.Estado = "Concluida";
 
-            // 9. GUARDAR OS DADOS
+            // 10. GUARDAR OS DADOS
             await _reparacaoRepository.CreateAsync(reparacao);
 
             await _marcacaoRepository.UpdateAsync(marcacao);

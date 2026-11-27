@@ -7,331 +7,545 @@
 
     var estado = Model.Estado ?? "";
 
-    var classeEstado = estado switch
-    {
-        "Agendada" => "bg-primary",
-        "Concluida" or "Concluída" => "bg-success",
-        "Cancelada" => "bg-danger",
-        _ => "bg-secondary"
-    };
+    var concluida = estado == "Concluida" || estado == "Concluída";
+    var cancelada = estado == "Cancelada";
 
-    var textoEstado = estado switch
-    {
-        "Concluida" => "Concluída",
-        _ => estado
-    };
+    var classeEstado = concluida
+        ? "bg-success"
+        : cancelada
+            ? "bg-danger"
+            : estado == "Agendada"
+                ? "bg-primary"
+                : "bg-secondary";
+
+    var textoEstado = concluida
+        ? "Concluída"
+        : estado == "Agendada"
+            ? "Em Curso"
+            : estado;
+
+    // Categoria para regressar à listagem
+    var filtroRetorno = concluida
+        ? "concluidas"
+        : cancelada
+            ? "canceladas"
+            : "emcurso";
 }
 
-<div class="container-fluid py-4">
+<style>
+    .marcacao-detalhes {
+        padding: 12px 4px 30px;
+    }
 
-    <!-- CABEÇALHO -->
+    .marcacao-detalhes h2 {
+        font-size: 23px;
+        font-weight: 700;
+    }
+
+    .md-card {
+        background: #fff;
+        border: 1px solid #e5eaf0;
+        border-radius: 12px;
+        box-shadow: 0 3px 12px rgba(16, 24, 40, .04);
+        overflow: hidden;
+        height: 100%;
+    }
+
+    .md-card-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 16px 19px;
+        border-bottom: 1px solid #edf0f4;
+    }
+
+    .md-card-header i {
+        color: #2563eb;
+        font-size: 18px;
+    }
+
+    .md-card-header h5 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .md-card-body {
+        padding: 20px;
+    }
+
+    .md-topo {
+        background: #fff;
+        border: 1px solid #e5eaf0;
+        border-radius: 12px;
+        padding: 19px 22px;
+        margin-bottom: 18px;
+        box-shadow: 0 3px 12px rgba(16, 24, 40, .04);
+    }
+
+    .md-numero {
+        font-size: 17px;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+
+    .md-subtitulo {
+        font-size: 13px;
+        color: #667085;
+    }
+
+    .md-badge {
+        font-size: 12px;
+        font-weight: 600;
+        padding: 9px 13px;
+        border-radius: 8px;
+    }
+
+    .md-cliente {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding-bottom: 18px;
+        margin-bottom: 18px;
+        border-bottom: 1px solid #edf0f4;
+    }
+
+    .md-avatar {
+        width: 62px;
+        height: 62px;
+        min-width: 62px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 1px solid #e5eaf0;
+    }
+
+    .md-avatar-vazio {
+        width: 62px;
+        height: 62px;
+        min-width: 62px;
+        border-radius: 50%;
+        background: #eff6ff;
+        color: #2563eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 27px;
+    }
+
+    .md-cliente-nome {
+        font-weight: 700;
+        font-size: 15px;
+        color: #101828;
+    }
+
+    .md-campo {
+        min-width: 0;
+    }
+
+    .md-campo-label {
+        display: block;
+        font-size: 11px;
+        color: #667085;
+        margin-bottom: 5px;
+    }
+
+    .md-campo-valor {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: #344054;
+        overflow-wrap: anywhere;
+    }
+
+    .md-info-vazia {
+        color: #98a2b3;
+        font-size: 13px;
+        margin: 0;
+    }
+
+    @@media (max-width: 767px) {
+        .marcacao-detalhes h2 {
+            font-size: 20px;
+        }
+
+        .md-card-body {
+            padding: 16px;
+        }
+
+        .md-topo {
+            padding: 16px;
+        }
+    }
+</style>
+
+<div class="container-fluid marcacao-detalhes">
+
+    <!-- CABEÇALHO DA PÁGINA -->
     <div class="d-flex justify-content-between
                 align-items-center flex-wrap gap-3 mb-4">
 
         <div>
-            <h2 class="fw-bold mb-1">
+            <h2 class="mb-1">
                 Detalhes da Marcação
             </h2>
 
-            <p class="text-muted mb-0">
-                Informações da marcação #@Model.Id
+            <p class="text-muted small mb-0">
+                Consulte as informações da marcação.
             </p>
         </div>
 
+        <!-- APENAS UM BOTÃO VOLTAR -->
         <a asp-controller="Marcacoes"
            asp-action="Index"
-           class="btn btn-secondary">
+           asp-route-filtro="@filtroRetorno"
+           id="voltarMarcacoes"
+           class="btn btn-outline-primary">
 
             <i class="bi bi-arrow-left me-1"></i>
-            Voltar
+            Voltar à Listagem
         </a>
 
     </div>
 
-    <!-- CARTÃO CENTRAL -->
-    <div class="card shadow-sm border-0 mx-auto"
-         style="max-width: 900px;">
+   
 
-        <!-- TOPO DO CARTÃO -->
-        <div class="card-header bg-white border-bottom
-                    d-flex justify-content-between
-                    align-items-center flex-wrap gap-2 py-3 px-4">
+    <div class="row g-3">
 
-            <div>
-                <h5 class="fw-bold mb-1">
-                    Marcação #@Model.Id
-                </h5>
-
-                <small class="text-muted">
-                    @Model.TipoServico
-                </small>
-            </div>
-
-            <span class="badge @classeEstado px-3 py-2">
-                @textoEstado
-            </span>
-
-        </div>
-
-        <div class="card-body p-4">
-
-            <!-- 1. CLIENTE -->
-            <h6 class="fw-bold text-dark mb-3">
-                <i class="bi bi-person-circle me-2"></i>
-                Dados do Cliente
-            </h6>
-
-            @if (Model.User != null)
-            {
-                <div class="d-flex align-items-center
-                            gap-3 mb-3">
-
-                    @if (Model.User.ImageId != Guid.Empty)
-                    {
-                        <img src="@Model.User.ImageFullPath"
-                             alt="Fotografia do cliente"
-                             class="rounded-circle border"
-                             style="width: 64px;
-                                    height: 64px;
-                                    object-fit: cover;" />
-                    }
-                    else
-                    {
-                        <div class="rounded-circle bg-light border
-                                    d-flex align-items-center
-                                    justify-content-center text-secondary"
-                             style="width: 64px;
-                                    height: 64px;
-                                    min-width: 64px;">
-
-                            <i class="bi bi-person fs-2"></i>
-
-                        </div>
-                    }
-
-                    <div>
-                        <div class="fw-bold">
-                            @Model.User.FullName
-                        </div>
-
-                        <small class="text-muted">
-                            Cliente
-                        </small>
-                    </div>
-
-                </div>
-
-                <div class="row g-3">
-
-                    <div class="col-md-6">
-                        <small class="text-muted d-block">
-                            Email
-                        </small>
-
-                        <span class="fw-semibold">
-                            @(Model.User.Email ?? "Não informado")
-                        </span>
-                    </div>
-
-                    <div class="col-md-6">
-                        <small class="text-muted d-block">
-                            Contacto
-                        </small>
-
-                        <span class="fw-semibold">
-                            @(Model.User.PhoneNumber ?? "Não informado")
-                        </span>
-                    </div>
-
-                    <div class="col-md-6">
-                        <small class="text-muted d-block">
-                            NIF
-                        </small>
-
-                        <span class="fw-semibold">
-                            @(Model.User.NIF ?? "Não informado")
-                        </span>
-                    </div>
-
-                </div>
-            }
-            else
-            {
-                <p class="text-muted mb-0">
-                    Cliente não identificado.
-                </p>
-            }
-
-            <hr class="my-4" />
-
-            <!-- 2. VEÍCULO -->
-            <h6 class="fw-bold text-primary mb-3">
-                <i class="bi bi-car-front me-2"></i>
-                Dados do Veículo
-            </h6>
-
-            @if (Model.Veiculo != null)
-            {
-                <div class="row g-3">
-
-                    <div class="col-md-6">
-                        <small class="text-muted d-block">
-                            Marca
-                        </small>
-
-                        <span class="fw-semibold">
-                            @Model.Veiculo.Marca
-                        </span>
-                    </div>
-
-                    <div class="col-md-6">
-                        <small class="text-muted d-block">
-                            Modelo
-                        </small>
-
-                        <span class="fw-semibold">
-                            @Model.Veiculo.Modelo
-                        </span>
-                    </div>
-
-                    <div class="col-md-6">
-                        <small class="text-muted d-block">
-                            Matrícula
-                        </small>
-
-                        <span class="fw-semibold">
-                            @Model.Veiculo.Matricula
-                        </span>
-                    </div>
-
-                    <div class="col-md-6">
-                        <small class="text-muted d-block">
-                            Ano
-                        </small>
-
-                        <span class="fw-semibold">
-                            @Model.Veiculo.Ano
-                        </span>
-                    </div>
-
-                </div>
-            }
-            else
-            {
-                <p class="text-muted mb-0">
-                    Veículo não identificado.
-                </p>
-            }
-
-            <hr class="my-4" />
-
-            <!-- 3. MARCAÇÃO -->
-            <h6 class="fw-bold text-primary mb-3">
-                <i class="bi bi-calendar-check me-2"></i>
-                Dados da Marcação
-            </h6>
+        <!-- COLUNA ESQUERDA -->
+        <div class="col-12 col-lg-7">
 
             <div class="row g-3">
 
-                <div class="col-md-6">
-                    <small class="text-muted d-block">
-                        Tipo de Serviço
-                    </small>
+                <!-- DADOS DO CLIENTE -->
+                <div class="col-12">
 
-                    <span class="fw-semibold">
-                        @Model.TipoServico
-                    </span>
+                    <div class="md-card">
+
+                        <div class="md-card-header">
+                            <i class="bi bi-person-circle"></i>
+                            <h5>Dados do Cliente</h5>
+                        </div>
+
+                        <div class="md-card-body">
+
+                            @if (Model.User != null)
+                            {
+                                <div class="md-cliente">
+
+                                    @if (Model.User.ImageId != Guid.Empty)
+                                    {
+                                        <img src="@Model.User.ImageFullPath"
+                                             alt="Fotografia do cliente"
+                                             class="md-avatar" />
+                                    }
+                                    else
+                                    {
+                                        <div class="md-avatar-vazio">
+                                            <i class="bi bi-person"></i>
+                                        </div>
+                                    }
+
+                                    <div>
+                                        <div class="md-cliente-nome">
+                                            @Model.User.FullName
+                                        </div>
+
+                                        <small class="text-muted">
+                                            Cliente da oficina
+                                        </small>
+                                    </div>
+
+                                </div>
+
+                                <div class="row g-3">
+
+                                    <div class="col-12 col-md-6">
+                                        <div class="md-campo">
+                                            <span class="md-campo-label">
+                                                Email
+                                            </span>
+
+                                            <span class="md-campo-valor">
+                                                @(Model.User.Email ?? "Não informado")
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 col-md-6">
+                                        <div class="md-campo">
+                                            <span class="md-campo-label">
+                                                Contacto
+                                            </span>
+
+                                            <span class="md-campo-valor">
+                                                @(Model.User.PhoneNumber ?? "Não informado")
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 col-md-6">
+                                        <div class="md-campo">
+                                            <span class="md-campo-label">
+                                                NIF
+                                            </span>
+
+                                            <span class="md-campo-valor">
+                                                @(Model.User.NIF ?? "Não informado")
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            }
+                            else
+                            {
+                                <p class="md-info-vazia">
+                                    Cliente não identificado.
+                                </p>
+                            }
+
+                        </div>
+                    </div>
+
                 </div>
 
-                <div class="col-md-6">
-                    <small class="text-muted d-block">
-                        Estado
-                    </small>
+                <!-- DADOS DO VEÍCULO -->
+                <div class="col-12">
 
-                    <span class="fw-semibold">
-                        @textoEstado
-                    </span>
-                </div>
+                    <div class="md-card">
 
-                <div class="col-md-6">
-                    <small class="text-muted d-block">
-                        Data
-                    </small>
+                        <div class="md-card-header">
+                            <i class="bi bi-car-front"></i>
+                            <h5>Dados do Veículo</h5>
+                        </div>
 
-                    <span class="fw-semibold">
-                        @Model.DataHora.ToString("dd/MM/yyyy")
-                    </span>
-                </div>
+                        <div class="md-card-body">
 
-                <div class="col-md-6">
-                    <small class="text-muted d-block">
-                        Hora
-                    </small>
+                            @if (Model.Veiculo != null)
+                            {
+                                <div class="row g-3">
 
-                    <span class="fw-semibold">
-                        @Model.DataHora.ToString("HH:mm")
-                    </span>
+                                    <div class="col-12 col-md-6">
+                                        <div class="md-campo">
+                                            <span class="md-campo-label">
+                                                Marca
+                                            </span>
+
+                                            <span class="md-campo-valor">
+                                                @Model.Veiculo.Marca
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 col-md-6">
+                                        <div class="md-campo">
+                                            <span class="md-campo-label">
+                                                Modelo
+                                            </span>
+
+                                            <span class="md-campo-valor">
+                                                @Model.Veiculo.Modelo
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 col-md-6">
+                                        <div class="md-campo">
+                                            <span class="md-campo-label">
+                                                Matrícula
+                                            </span>
+
+                                            <span class="md-campo-valor">
+                                                @Model.Veiculo.Matricula
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 col-md-6">
+                                        <div class="md-campo">
+                                            <span class="md-campo-label">
+                                                Ano
+                                            </span>
+
+                                            <span class="md-campo-valor">
+                                                @Model.Veiculo.Ano
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            }
+                            else
+                            {
+                                <p class="md-info-vazia">
+                                    Veículo não identificado.
+                                </p>
+                            }
+
+                        </div>
+                    </div>
+
                 </div>
 
             </div>
+        </div>
 
-            <hr class="my-4" />
+        <!-- COLUNA DIREITA -->
+        <div class="col-12 col-lg-5">
 
-            <!-- 4. MECÂNICO -->
-            <h6 class="fw-bold text-primary mb-3">
-                <i class="bi bi-tools me-2"></i>
-                Mecânico Responsável
-            </h6>
+            <div class="row g-3">
 
-            @if (Model.Mecanico != null)
-            {
-                <div class="row g-3">
+                <!-- DADOS DA MARCAÇÃO -->
+                <div class="col-12">
 
-                    <div class="col-md-6">
-                        <small class="text-muted d-block">
-                            Nome
-                        </small>
+                    <div class="md-card">
 
-                        <span class="fw-semibold">
-                            @Model.Mecanico.Nome
-                        </span>
-                    </div>
+                        <div class="md-card-header">
+                            <i class="bi bi-calendar-event"></i>
+                            <h5>Dados da Marcação</h5>
+                        </div>
 
-                    <div class="col-md-6">
-                        <small class="text-muted d-block">
-                            Especialidade
-                        </small>
+                        <div class="md-card-body">
 
-                        <span class="fw-semibold">
-                            @Model.Mecanico.Especialidade
-                        </span>
+                            <div class="row g-3">
+
+                                <div class="col-12">
+                                    <div class="md-campo">
+                                        <span class="md-campo-label">
+                                            Tipo de Serviço
+                                        </span>
+
+                                        <span class="md-campo-valor">
+                                            @Model.TipoServico
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-sm-6">
+                                    <div class="md-campo">
+                                        <span class="md-campo-label">
+                                            Data
+                                        </span>
+
+                                        <span class="md-campo-valor">
+                                            @Model.DataHora.ToString("dd/MM/yyyy")
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-sm-6">
+                                    <div class="md-campo">
+                                        <span class="md-campo-label">
+                                            Hora
+                                        </span>
+
+                                        <span class="md-campo-valor">
+                                            @Model.DataHora.ToString("HH:mm")
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="md-campo">
+                                        <span class="md-campo-label">
+                                            Estado
+                                        </span>
+
+                                        <span class="badge md-badge @classeEstado">
+                                            @textoEstado
+                                        </span>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
                     </div>
 
                 </div>
-            }
-            else
-            {
-                <p class="text-muted mb-0">
-                    Mecânico não atribuído.
-                </p>
-            }
 
-        </div>
+                <!-- MECÂNICO RESPONSÁVEL -->
+                <div class="col-12">
 
-        <!-- RODAPÉ -->
-        <div class="card-footer bg-white border-top
-                    text-end px-4 py-3">
+                    <div class="md-card">
 
-            <a asp-controller="Marcacoes"
-               asp-action="Index"
-               class="btn btn-secondary">
+                        <div class="md-card-header">
+                            <i class="bi bi-tools"></i>
+                            <h5>Mecânico Responsável</h5>
+                        </div>
 
-                <i class="bi bi-arrow-left me-1"></i>
-                Voltar
-            </a>
+                        <div class="md-card-body">
 
+                            @if (Model.Mecanico != null)
+                            {
+                                <div class="row g-3">
+
+                                    <div class="col-12">
+                                        <div class="md-campo">
+                                            <span class="md-campo-label">
+                                                Nome
+                                            </span>
+
+                                            <span class="md-campo-valor">
+                                                @Model.Mecanico.Nome
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div class="md-campo">
+                                            <span class="md-campo-label">
+                                                Especialidade
+                                            </span>
+
+                                            <span class="md-campo-valor">
+                                                @Model.Mecanico.Especialidade
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            }
+                            else
+                            {
+                                <p class="md-info-vazia">
+                                    Mecânico não atribuído.
+                                </p>
+                            }
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
         </div>
 
     </div>
 
 </div>
+
+<script>
+    // REGRESSAR À LISTAGEM ANTERIOR QUANDO POSSÍVEL.
+    // ISTO AJUDA A PRESERVAR O FILTRO QUE ESTAVA SELECIONADO.
+    document.getElementById("voltarMarcacoes")
+        .addEventListener("click", function (event) {
+
+            try {
+                const origem = new URL(document.referrer);
+
+                const veioDoIndex =
+                    origem.origin === window.location.origin &&
+                    /\/Marcacoes(?:\/Index)?\/?$/i.test(origem.pathname);
+
+                if (veioDoIndex && window.history.length > 1) {
+                    event.preventDefault();
+                    window.history.back();
+                }
+
+            } catch (erro) {
+                // Se não existir página anterior,
+                // usa o endereço normal do botão.
+            }
+        });
+</script>

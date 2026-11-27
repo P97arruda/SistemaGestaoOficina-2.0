@@ -3,154 +3,684 @@
 
 @{
     ViewData["Title"] = "Iniciar Sessão";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-12 col-sm-10 col-md-7 col-lg-5 col-xl-4">
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
 
-            <div class="card border-0 shadow-sm rounded-3">
+<style>
+    /* PÁGINA DE LOGIN */
 
-                <div class="card-body p-4 p-md-5">
+    .autocet-login {
+        padding: 55px 0 70px;
+    }
 
-                    <!-- TÍTULO -->
-                    <div class="text-center mb-4">
-                        <h2 class="fw-bold mb-2">
-                            Bem-vindo!
-                        </h2>
+    .autocet-login-container {
+        max-width: 930px;
+        margin: 0 auto;
+    }
 
-                        <p class="text-muted mb-0">
-                            Inicie sessão na sua conta OficinaCET107.
-                        </p>
+    .autocet-login-card {
+        display: grid;
+        grid-template-columns: 0.9fr 1.1fr;
+        background: white;
+        border: 1px solid #e5eaf0;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 15px 45px rgba(16, 24, 40, 0.08);
+    }
+
+    /* PAINEL ESQUERDO */
+
+    .autocet-login-brand {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 35px;
+        overflow: hidden;
+
+        background:
+            radial-gradient(
+                circle at 90% 15%,
+                rgba(13, 110, 253, 0.32),
+                transparent 45%
+            ),
+            linear-gradient(
+                145deg,
+                #111820 0%,
+                #142337 55%,
+                #103b72 100%
+            );
+
+        color: white;
+    }
+
+    .autocet-login-brand::before {
+        content: "";
+        position: absolute;
+        width: 260px;
+        height: 260px;
+        right: -120px;
+        bottom: -130px;
+        border-radius: 50%;
+        border: 1px solid rgba(255,255,255,0.12);
+        pointer-events: none;
+    }
+
+    .autocet-brand-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* IMAGEM BMW AUTOCET */
+
+    .autocet-brand-image-area {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .autocet-brand-bmw {
+        display: block;
+        width: 100%;
+        max-width: 270px;
+        max-height: 260px;
+        height: auto;
+        object-fit: contain;
+
+        filter: drop-shadow(
+            0 10px 24px rgba(0, 100, 255, 0.18)
+        );
+    }
+
+    /* TEXTO DE APRESENTAÇÃO */
+
+    .autocet-brand-title {
+        font-size: 23px;
+        font-weight: 700;
+        line-height: 1.35;
+        margin-bottom: 15px;
+        color: white;
+    }
+
+    .autocet-brand-description {
+        color: #c6d3e2;
+        font-size: 13px;
+        line-height: 1.9;
+        margin-bottom: 28px;
+    }
+
+    .autocet-brand-info {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        font-size: 12px;
+        color: #d3deeb;
+        margin-top: 12px;
+    }
+
+    .autocet-brand-info i {
+        color: #75b7ff;
+        font-size: 15px;
+    }
+
+    /* FORMULÁRIO */
+
+    .autocet-login-form-area {
+        padding: 44px 43px;
+    }
+
+    .autocet-login-title {
+        font-size: 26px;
+        font-weight: 800;
+        color: #172033;
+        margin-bottom: 9px;
+    }
+
+    .autocet-login-subtitle {
+        color: #667085;
+        font-size: 13px;
+        line-height: 1.7;
+        margin-bottom: 30px;
+    }
+
+    .autocet-login-label {
+        font-size: 12px;
+        font-weight: 700;
+        color: #344054;
+        margin-bottom: 8px;
+    }
+
+    .autocet-login-input {
+        height: 46px;
+        border: 1px solid #dce3ed;
+        border-radius: 9px;
+        padding: 11px 14px;
+        font-size: 13px;
+        color: #172033;
+        background-color: #fff;
+        transition: border-color .2s, box-shadow .2s;
+    }
+
+    .autocet-login-input:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 3px rgba(13,110,253,.12);
+    }
+
+    .autocet-login-input::placeholder {
+        color: #98a2b3;
+    }
+
+    /* PASSWORD */
+
+    .autocet-password-wrapper {
+        position: relative;
+    }
+
+    .autocet-password-wrapper .form-control {
+        padding-right: 48px;
+    }
+
+    .autocet-password-toggle {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        border: 0;
+        background: transparent;
+        color: #667085;
+        padding: 5px;
+        cursor: pointer;
+        font-size: 17px;
+    }
+
+    .autocet-password-toggle:hover {
+        color: #0d6efd;
+    }
+
+    /* OPÇÕES DO LOGIN */
+
+    .autocet-login-options {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 23px 0;
+    }
+
+    .autocet-login-options .form-check-label {
+        font-size: 12px;
+        color: #475467;
+    }
+
+    .autocet-login-options .form-check-input {
+        cursor: pointer;
+    }
+
+    .autocet-recover-link {
+        font-size: 12px;
+        font-weight: 600;
+        color: #0d6efd;
+        text-decoration: none;
+    }
+
+    .autocet-recover-link:hover {
+        text-decoration: underline;
+        color: #0756d5;
+    }
+
+    /* BOTÃO ENTRAR */
+
+    .autocet-login-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+
+        width: 100%;
+        min-height: 46px;
+        border: none;
+        border-radius: 9px;
+
+        background: #0d6efd;
+        color: white;
+        font-size: 13px;
+        font-weight: 700;
+
+        transition: background .2s, transform .2s;
+    }
+
+    .autocet-login-button:hover {
+        background: #0756d5;
+        transform: translateY(-1px);
+        color: white;
+    }
+
+    .autocet-login-button:focus-visible {
+        outline: 3px solid rgba(13,110,253,.35);
+        outline-offset: 3px;
+    }
+
+    /* VOLTAR À HOME */
+
+    .autocet-back-home {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 23px;
+        color: #667085;
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .autocet-back-home:hover {
+        color: #0d6efd;
+    }
+
+    /* MENSAGENS */
+
+    .autocet-login-alert {
+        border-radius: 9px;
+        font-size: 12px;
+        padding: 13px 15px;
+    }
+
+    .autocet-validation-summary {
+        font-size: 12px;
+    }
+
+    /* TABLETS E TELEMÓVEIS */
+
+    @@media (max-width: 767px) {
+
+        .autocet-login {
+            padding: 25px 0 45px;
+        }
+
+        .autocet-login-card {
+            grid-template-columns: 1fr;
+            border-radius: 14px;
+        }
+
+        .autocet-login-brand {
+            padding: 30px;
+        }
+
+        .autocet-brand-image-area {
+            margin-bottom: 15px;
+        }
+
+        .autocet-brand-bmw {
+            max-width: 190px;
+            max-height: 190px;
+        }
+
+        .autocet-brand-title {
+            font-size: 19px;
+        }
+
+        .autocet-brand-description {
+            margin-bottom: 0;
+        }
+
+        .autocet-brand-info {
+            display: none;
+        }
+
+        .autocet-login-form-area {
+            padding: 30px 24px;
+        }
+
+        .autocet-login-title {
+            font-size: 23px;
+        }
+    }
+
+    @@media (max-width: 400px) {
+
+        .autocet-login-brand {
+            padding: 24px;
+        }
+
+        .autocet-brand-bmw {
+            max-width: 160px;
+            max-height: 160px;
+        }
+
+        .autocet-login-form-area {
+            padding: 25px 18px;
+        }
+
+        .autocet-login-options {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+    }
+</style>
+
+<div class="container autocet-login">
+
+    <div class="autocet-login-container">
+
+        <div class="autocet-login-card">
+
+            <!-- LADO ESQUERDO: APRESENTAÇÃO -->
+
+            <div class="autocet-login-brand">
+
+                <div class="autocet-brand-content">
+
+                    <!-- IMAGEM BMW AZUL -->
+
+                    <div class="autocet-brand-image-area">
+
+                        <img src="~/images/autocet-bmw.png"
+                             asp-append-version="true"
+                             alt="BMW azul - AutoCET"
+                             class="autocet-brand-bmw" />
+
                     </div>
 
-                    <!-- MENSAGEM DE SUCESSO -->
-                    @if (TempData["SuccessMessage"] != null)
-                    {
-                        <div id="successAlert"
-                             class="alert alert-success alert-dismissible fade show"
-                             role="alert">
+                    <!-- SLOGAN -->
 
-                            @TempData["SuccessMessage"]
+                    <h2 class="autocet-brand-title">
+                        O seu automóvel
+                        em boas mãos.
+                    </h2>
 
-                            <button type="button"
-                                    class="btn-close"
-                                    data-bs-dismiss="alert"
-                                    aria-label="Fechar">
-                            </button>
-                        </div>
-                    }
+                    <!-- DESCRIÇÃO -->
 
-                    <!-- FORMULÁRIO -->
-                    <form asp-controller="Account"
-                          asp-action="Login"
-                          method="post">
+                    <p class="autocet-brand-description">
+                        Bem-vindo à AutoCET.
 
-                        @Html.AntiForgeryToken()
+                        Aceda à sua conta para consultar
+                        as informações e os serviços
+                        da nossa oficina.
+                    </p>
 
-                        <div asp-validation-summary="ModelOnly"
-                             class="text-danger mb-3">
-                        </div>
+                    <!-- FUNCIONALIDADES -->
 
-                        <!-- EMAIL -->
-                        <div class="mb-3">
+                    <div class="autocet-brand-info">
 
-                            <label asp-for="Username"
-                                   class="form-label fw-semibold">
-                                Email
-                            </label>
+                        <i class="bi bi-check-circle"></i>
 
-                            <input asp-for="Username"
-                                   type="email"
-                                   class="form-control"
-                                   placeholder="Introduza o seu email"
-                                   autocomplete="username" />
+                        Gestão de veículos
 
-                            <span asp-validation-for="Username"
-                                  class="text-danger small">
-                            </span>
+                    </div>
 
-                        </div>
+                    <div class="autocet-brand-info">
 
-                        <!-- PASSWORD -->
-                        <div class="mb-3">
+                        <i class="bi bi-check-circle"></i>
 
-                            <label asp-for="Password"
-                                   class="form-label fw-semibold">
-                                Password
-                            </label>
+                        Histórico de reparações
+
+                    </div>
+
+                    <div class="autocet-brand-info">
+
+                        <i class="bi bi-check-circle"></i>
+
+                        Acompanhamento de marcações
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- LADO DIREITO: LOGIN -->
+
+            <div class="autocet-login-form-area">
+
+                <!-- TÍTULO -->
+
+                <div>
+
+                    <h1 class="autocet-login-title">
+                        Iniciar Sessão
+                    </h1>
+
+                    <p class="autocet-login-subtitle">
+                        Introduza os seus dados para aceder
+                        à sua conta AutoCET.
+                    </p>
+
+                </div>
+
+                <!-- MENSAGEM DE SUCESSO -->
+
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div id="successAlert"
+                         class="alert alert-success alert-dismissible fade show autocet-login-alert"
+                         role="alert">
+
+                        <i class="bi bi-check-circle me-2"></i>
+
+                        @TempData["SuccessMessage"]
+
+                        <button type="button"
+                                class="btn-close"
+                                data-bs-dismiss="alert"
+                                aria-label="Fechar">
+                        </button>
+
+                    </div>
+                }
+
+                <!-- FORMULÁRIO DE LOGIN -->
+
+                <form asp-controller="Account"
+                      asp-action="Login"
+                      method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <!-- ERROS DE AUTENTICAÇÃO -->
+
+                    <div asp-validation-summary="ModelOnly"
+                         class="text-danger autocet-validation-summary mb-3">
+                    </div>
+
+                    <!-- EMAIL -->
+
+                    <div class="mb-3">
+
+                        <label asp-for="Username"
+                               class="form-label autocet-login-label">
+                            Email
+                        </label>
+
+                        <input asp-for="Username"
+                               type="email"
+                               class="form-control autocet-login-input"
+                               placeholder="Introduza o seu email"
+                               autocomplete="username"
+                               autofocus />
+
+                        <span asp-validation-for="Username"
+                              class="text-danger small">
+                        </span>
+
+                    </div>
+
+                    <!-- PASSWORD -->
+
+                    <div class="mb-3">
+
+                        <label asp-for="Password"
+                               class="form-label autocet-login-label">
+                            Password
+                        </label>
+
+                        <div class="autocet-password-wrapper">
 
                             <input asp-for="Password"
                                    type="password"
-                                   class="form-control"
+                                   id="Password"
+                                   class="form-control autocet-login-input"
                                    placeholder="Introduza a sua password"
                                    autocomplete="current-password" />
 
-                            <span asp-validation-for="Password"
-                                  class="text-danger small">
-                            </span>
+                            <!-- MOSTRAR / OCULTAR PASSWORD -->
+
+                            <button type="button"
+                                    id="togglePassword"
+                                    class="autocet-password-toggle"
+                                    aria-label="Mostrar password"
+                                    aria-pressed="false"
+                                    title="Mostrar password">
+
+                                <i id="passwordIcon"
+                                   class="bi bi-eye">
+                                </i>
+
+                            </button>
 
                         </div>
 
-                        <!-- LEMBRAR-ME E RECUPERAR PASSWORD -->
-                        <div class="d-flex justify-content-between
-                                    align-items-center flex-wrap gap-2 mb-4">
+                        <span asp-validation-for="Password"
+                              class="text-danger small">
+                        </span>
 
-                            <div class="form-check">
+                    </div>
 
-                                <input asp-for="RememberMe"
-                                       type="checkbox"
-                                       class="form-check-input" />
+                    <!-- LEMBRAR-ME E RECUPERAÇÃO -->
 
-                                <label asp-for="RememberMe"
-                                       class="form-check-label">
-                                    Lembrar-me
-                                </label>
+                    <div class="autocet-login-options">
 
-                            </div>
+                        <div class="form-check">
 
-                            <a asp-controller="Account"
-                               asp-action="RecoverPassword"
-                               class="text-decoration-none small fw-semibold">
-                                Esqueceu-se da password?
-                            </a>
+                            <input asp-for="RememberMe"
+                                   type="checkbox"
+                                   class="form-check-input" />
+
+                            <label asp-for="RememberMe"
+                                   class="form-check-label">
+                                Lembrar-me
+                            </label>
 
                         </div>
 
-                        <!-- BOTÃO ENTRAR -->
-                        <button type="submit"
-                                class="btn btn-primary w-100 py-2 fw-semibold">
-                            Entrar
-                        </button>
+                        <a asp-controller="Account"
+                           asp-action="RecoverPassword"
+                           class="autocet-recover-link">
 
-                    </form>
+                            Esqueceu-se da password?
 
-                </div>
+                        </a>
+
+                    </div>
+
+                    <!-- BOTÃO ENTRAR -->
+
+                    <button type="submit"
+                            class="autocet-login-button">
+
+                        <i class="bi bi-box-arrow-in-right"></i>
+
+                        Entrar na Minha Conta
+
+                    </button>
+
+                </form>
+
+                <!-- VOLTAR À HOME -->
+
+                <a asp-controller="Home"
+                   asp-action="Index"
+                   class="autocet-back-home">
+
+                    <i class="bi bi-arrow-left"></i>
+
+                    Voltar à Página Inicial
+
+                </a>
+
             </div>
 
-            <!-- RODAPÉ -->
-            <p class="text-center text-muted small mt-4">
-                OficinaCET107 — Sistema de Gestão de Oficina
-            </p>
-
         </div>
+
     </div>
+
 </div>
 
 @section Scripts
 {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <partial name="_ValidationScriptsPartial" />
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
 
-            const alert = document.getElementById("successAlert");
+            // MOSTRAR / OCULTAR PASSWORD
 
-            if (alert) {
+            const passwordInput =
+                document.getElementById("Password");
+
+            const togglePassword =
+                document.getElementById("togglePassword");
+
+            const passwordIcon =
+                document.getElementById("passwordIcon");
+
+            if (passwordInput && togglePassword && passwordIcon) {
+
+                togglePassword.addEventListener("click", function () {
+
+                    const mostrar =
+                        passwordInput.type === "password";
+
+                    passwordInput.type = mostrar
+                        ? "text"
+                        : "password";
+
+                    passwordIcon.className = mostrar
+                        ? "bi bi-eye-slash"
+                        : "bi bi-eye";
+
+                    togglePassword.setAttribute(
+                        "aria-label",
+                        mostrar
+                            ? "Ocultar password"
+                            : "Mostrar password"
+                    );
+
+                    togglePassword.setAttribute(
+                        "aria-pressed",
+                        mostrar ? "true" : "false"
+                    );
+
+                    togglePassword.title = mostrar
+                        ? "Ocultar password"
+                        : "Mostrar password";
+
+                });
+            }
+
+            // REMOVER MENSAGEM DE SUCESSO
+            // APÓS 4 SEGUNDOS
+
+            const successAlert =
+                document.getElementById("successAlert");
+
+            if (successAlert && typeof bootstrap !== "undefined") {
+
                 setTimeout(function () {
-                    alert.remove();
+
+                    const alertInstance =
+                        bootstrap.Alert.getOrCreateInstance(
+                            successAlert
+                        );
+
+                    alertInstance.close();
+
                 }, 4000);
             }
 

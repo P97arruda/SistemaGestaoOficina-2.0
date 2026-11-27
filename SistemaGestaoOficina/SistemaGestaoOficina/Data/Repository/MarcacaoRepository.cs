@@ -84,7 +84,8 @@ namespace SistemaGestaoOficina.Data.Repository
                 .Include(m => m.Veiculo)
                 .Where(m => m.Estado == "Agendada")
                 .Where(m => !_context.Set<Reparacao>()
-                    .Any(r => r.MarcacaoId == m.Id))
+                .Any(r => r.MarcacaoId == m.Id &&
+                 (r.Concluida || r.Cancelada)))
                 .OrderByDescending(m => m.DataHora)
                 .ToListAsync();
         }

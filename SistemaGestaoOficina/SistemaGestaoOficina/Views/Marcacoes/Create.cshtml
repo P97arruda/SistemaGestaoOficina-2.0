@@ -60,6 +60,43 @@
     .horario-btn {
         min-width: 85px;
     }
+
+    /* CAMPOS COM PESQUISA AUTOMÁTICA */
+    .campo-pesquisa {
+        position: relative;
+    }
+
+    .pesquisa-resultados {
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        right: 0;
+        z-index: 1050;
+        max-height: 220px;
+        overflow-y: auto;
+        background: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 10px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+    }
+
+    .pesquisa-resultado {
+        display: block;
+        width: 100%;
+        padding: 10px 12px;
+        border: 0;
+        border-bottom: 1px solid #f1f3f5;
+        background: #fff;
+        text-align: left;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .pesquisa-resultado:hover,
+    .pesquisa-resultado:focus {
+        background: #eff6ff;
+        color: #0d6efd;
+    }
 </style>
 
 <div class="container py-4">
@@ -90,15 +127,34 @@
                     <!-- CLIENTE -->
                     <div class="col-md-6 mb-3">
 
-                        <label asp-for="UserId"
+                        <label for="pesquisaCliente"
                                class="form-label">
                             Cliente
                         </label>
 
+                        <div class="campo-pesquisa"
+                             id="areaPesquisaCliente">
+
+                            <input type="text"
+                                   id="pesquisaCliente"
+                                   class="form-control"
+                                   placeholder="Escreva o nome do cliente..."
+                                   autocomplete="off"
+                                   aria-autocomplete="list"
+                                   aria-controls="resultadosCliente" />
+
+                            <div id="resultadosCliente"
+                                 class="pesquisa-resultados d-none"
+                                 role="listbox"></div>
+
+                        </div>
+
                         <select asp-for="UserId"
                                 asp-items="ViewBag.Clientes"
-                                class="form-select"
-                                id="UserId">
+                                id="UserId"
+                                class="d-none"
+                                tabindex="-1"
+                                aria-hidden="true">
 
                             <option value="">
                                 Selecione o cliente
@@ -113,19 +169,39 @@
                     <!-- VEÍCULO -->
                     <div class="col-md-6 mb-3">
 
-                        <label asp-for="VeiculoId"
+                        <label for="pesquisaVeiculo"
                                class="form-label">
                             Veículo
                         </label>
 
+                        <div class="campo-pesquisa"
+                             id="areaPesquisaVeiculo">
+
+                            <input type="text"
+                                   id="pesquisaVeiculo"
+                                   class="form-control"
+                                   placeholder="Selecione primeiro um cliente"
+                                   autocomplete="off"
+                                   aria-autocomplete="list"
+                                   aria-controls="resultadosVeiculo"
+                                   disabled />
+
+                            <div id="resultadosVeiculo"
+                                 class="pesquisa-resultados d-none"
+                                 role="listbox"></div>
+
+                        </div>
+
                         <select asp-for="VeiculoId"
-                                class="form-select"
                                 id="VeiculoId"
+                                class="d-none"
                                 data-selected="@Model?.VeiculoId"
+                                tabindex="-1"
+                                aria-hidden="true"
                                 disabled>
 
                             <option value="">
-                                Selecione primeiro um cliente
+                                Selecione o veículo
                             </option>
 
                         </select>
@@ -137,14 +213,34 @@
                     <!-- MECÂNICO -->
                     <div class="col-md-6 mb-3">
 
-                        <label asp-for="MecanicoId"
+                        <label for="pesquisaMecanico"
                                class="form-label">
                             Mecânico
                         </label>
 
+                        <div class="campo-pesquisa"
+                             id="areaPesquisaMecanico">
+
+                            <input type="text"
+                                   id="pesquisaMecanico"
+                                   class="form-control"
+                                   placeholder="Escreva o nome do mecânico..."
+                                   autocomplete="off"
+                                   aria-autocomplete="list"
+                                   aria-controls="resultadosMecanico" />
+
+                            <div id="resultadosMecanico"
+                                 class="pesquisa-resultados d-none"
+                                 role="listbox"></div>
+
+                        </div>
+
                         <select asp-for="MecanicoId"
                                 asp-items="ViewBag.Mecanicos"
-                                class="form-select">
+                                id="MecanicoId"
+                                class="d-none"
+                                tabindex="-1"
+                                aria-hidden="true">
 
                             <option value="">
                                 Selecione o mecânico
@@ -159,14 +255,34 @@
                     <!-- TIPO DE SERVIÇO -->
                     <div class="col-md-6 mb-3">
 
-                        <label asp-for="TipoServico"
+                        <label for="pesquisaTipoServico"
                                class="form-label">
                             Tipo de Serviço
                         </label>
 
+                        <div class="campo-pesquisa"
+                             id="areaPesquisaTipoServico">
+
+                            <input type="text"
+                                   id="pesquisaTipoServico"
+                                   class="form-control"
+                                   placeholder="Escreva o tipo de serviço..."
+                                   autocomplete="off"
+                                   aria-autocomplete="list"
+                                   aria-controls="resultadosTipoServico" />
+
+                            <div id="resultadosTipoServico"
+                                 class="pesquisa-resultados d-none"
+                                 role="listbox"></div>
+
+                        </div>
+
                         <select asp-for="TipoServico"
                                 asp-items="ViewBag.TiposServico"
-                                class="form-select">
+                                id="TipoServico"
+                                class="d-none"
+                                tabindex="-1"
+                                aria-hidden="true">
 
                             <option value="">
                                 Selecione o tipo de serviço
@@ -255,9 +371,10 @@
 
                             </div>
                         </div>
+
                     </div>
 
-                    <!-- CAMPO ENVIADO AO CONTROLLER -->
+                    <!-- DATA ENVIADA AO CONTROLLER -->
                     <input asp-for="DataHora"
                            type="hidden"
                            id="DataHora" />
@@ -267,6 +384,7 @@
 
                 </div>
 
+                <!-- BOTÕES -->
                 <div class="d-flex gap-2 mt-3">
 
                     <button type="submit"
@@ -283,6 +401,7 @@
                 </div>
 
             </form>
+
         </div>
     </div>
 </div>
@@ -297,32 +416,282 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
 
-            // CLIENTE E VEÍCULOS
+            // CAMPOS DO FORMULÁRIO
             const clienteSelect =
                 document.getElementById("UserId");
 
             const veiculoSelect =
                 document.getElementById("VeiculoId");
 
+            const mecanicoSelect =
+                document.getElementById("MecanicoId");
+
+            const tipoServicoSelect =
+                document.getElementById("TipoServico");
+
+            const pesquisaVeiculo =
+                document.getElementById("pesquisaVeiculo");
+
             const veiculoInicial =
                 veiculoSelect.dataset.selected;
 
             let pedidoVeiculos = 0;
 
-            async function carregarVeiculos(clienteId, veiculoSelecionado = "") {
+            // NORMALIZAR TEXTO PARA PESQUISAR
+            // IGNORANDO MAIÚSCULAS E ACENTOS
+            function normalizar(texto) {
+                return texto.normalize("NFD")
+                    .replace(/[\u0300-\u036f]/g, "")
+                    .toLowerCase();
+            }
 
+            // PESQUISA AUTOMÁTICA PARA QUALQUER SELECT
+            function configurarPesquisa(
+                inputId,
+                selectId,
+                resultadosId,
+                areaId,
+                mensagemVazia
+            ) {
+                const input =
+                    document.getElementById(inputId);
+
+                const select =
+                    document.getElementById(selectId);
+
+                const resultados =
+                    document.getElementById(resultadosId);
+
+                const area =
+                    document.getElementById(areaId);
+
+                // FECHAR LISTA
+                function fecharResultados() {
+                    resultados.classList.add("d-none");
+                    resultados.replaceChildren();
+                    input.setAttribute("aria-expanded", "false");
+                }
+
+                // MOSTRAR O TEXTO DA OPÇÃO SELECIONADA
+                function sincronizarTexto() {
+
+                    const opcao =
+                        select.options[select.selectedIndex];
+
+                    if (select.value && opcao) {
+                        input.value = opcao.textContent.trim();
+                    } else {
+                        input.value = "";
+                    }
+                }
+
+                // APRESENTAR RESULTADOS FILTRADOS
+                function mostrarResultados() {
+
+                    resultados.replaceChildren();
+
+                    const busca =
+                        normalizar(input.value.trim());
+
+                    // NÃO MOSTRAR NADA COM O CAMPO VAZIO
+                    if (busca.length === 0) {
+                        fecharResultados();
+                        return;
+                    }
+
+                    // OBTER OPÇÕES ATUAIS DO SELECT
+                    const opcoes = Array.from(select.options)
+                        .filter(opcao => opcao.value);
+
+                    // PESQUISAR EM QUALQUER PARTE DO NOME
+                    const encontrados = opcoes
+                        .filter(opcao =>
+                            normalizar(
+                                opcao.textContent.trim()
+                            ).includes(busca))
+                        .slice(0, 8);
+
+                    if (encontrados.length === 0) {
+
+                        const aviso =
+                            document.createElement("div");
+
+                        aviso.className =
+                            "text-muted small p-3";
+
+                        aviso.textContent =
+                            mensagemVazia;
+
+                        resultados.appendChild(aviso);
+                    }
+
+                    encontrados.forEach(opcao => {
+
+                        const botao =
+                            document.createElement("button");
+
+                        botao.type = "button";
+                        botao.className = "pesquisa-resultado";
+                        botao.setAttribute("role", "option");
+                        botao.textContent =
+                            opcao.textContent.trim();
+
+                        botao.addEventListener("click", function () {
+
+                            // SELECIONAR O VALOR REAL
+                            select.value = opcao.value;
+
+                            // MOSTRAR O TEXTO SELECIONADO
+                            input.value = opcao.textContent.trim();
+
+                            fecharResultados();
+
+                            // DISPARAR A ALTERAÇÃO
+                            select.dispatchEvent(
+                                new Event("change", {
+                                    bubbles: true
+                                })
+                            );
+                        });
+
+                        resultados.appendChild(botao);
+                    });
+
+                    resultados.classList.remove("d-none");
+                    input.setAttribute("aria-expanded", "true");
+                }
+
+                // PESQUISAR ENQUANTO ESCREVE
+                input.addEventListener("input", function () {
+
+                    // LIMPAR SELEÇÃO ANTERIOR
+                    if (select.value) {
+
+                        select.value = "";
+
+                        select.dispatchEvent(
+                            new Event("change", {
+                                bubbles: true
+                            })
+                        );
+                    }
+
+                    mostrarResultados();
+                });
+
+                // NÃO MOSTRAR LISTA NO CAMPO VAZIO
+                input.addEventListener("focus", function () {
+
+                    if (input.value.trim().length === 0) {
+                        fecharResultados();
+                        return;
+                    }
+
+                    if (!select.value) {
+                        mostrarResultados();
+                    }
+                });
+
+                // TECLAS ENTER E ESCAPE
+                input.addEventListener("keydown", function (event) {
+
+                    if (event.key === "Escape") {
+                        fecharResultados();
+                    }
+
+                    if (event.key === "Enter") {
+
+                        event.preventDefault();
+
+                        const primeiro =
+                            resultados.querySelector("button");
+
+                        if (primeiro &&
+                            !resultados.classList.contains("d-none")) {
+                            primeiro.click();
+                        }
+                    }
+                });
+
+                // FECHAR AO CLICAR FORA DO CAMPO
+                document.addEventListener("click", function (event) {
+
+                    if (!area.contains(event.target)) {
+                        fecharResultados();
+                    }
+                });
+
+                return {
+                    sincronizarTexto,
+                    fecharResultados
+                };
+            }
+
+            // CONFIGURAR PESQUISA DE CLIENTES
+            const pesquisaClientes = configurarPesquisa(
+                "pesquisaCliente",
+                "UserId",
+                "resultadosCliente",
+                "areaPesquisaCliente",
+                "Nenhum cliente encontrado."
+            );
+
+            // CONFIGURAR PESQUISA DE VEÍCULOS
+            const pesquisaVeiculos = configurarPesquisa(
+                "pesquisaVeiculo",
+                "VeiculoId",
+                "resultadosVeiculo",
+                "areaPesquisaVeiculo",
+                "Nenhum veículo encontrado."
+            );
+
+            // CONFIGURAR PESQUISA DE MECÂNICOS
+            const pesquisaMecanicos = configurarPesquisa(
+                "pesquisaMecanico",
+                "MecanicoId",
+                "resultadosMecanico",
+                "areaPesquisaMecanico",
+                "Nenhum mecânico encontrado."
+            );
+
+            // CONFIGURAR PESQUISA DE SERVIÇOS
+            const pesquisaServicos = configurarPesquisa(
+                "pesquisaTipoServico",
+                "TipoServico",
+                "resultadosTipoServico",
+                "areaPesquisaTipoServico",
+                "Nenhum serviço encontrado."
+            );
+
+            // CARREGAR VEÍCULOS DO CLIENTE
+            async function carregarVeiculos(
+                clienteId,
+                veiculoSelecionado = ""
+            ) {
                 const pedidoAtual = ++pedidoVeiculos;
 
+                // LIMPAR VEÍCULO ANTERIOR
                 veiculoSelect.disabled = true;
-                veiculoSelect.innerHTML = "";
+                pesquisaVeiculo.disabled = true;
+                pesquisaVeiculo.value = "";
+                pesquisaVeiculos.fecharResultados();
 
-                const opcao = document.createElement("option");
+                veiculoSelect.replaceChildren();
+
+                const opcao =
+                    document.createElement("option");
+
                 opcao.value = "";
+
                 opcao.textContent = clienteId
                     ? "A carregar veículos..."
                     : "Selecione primeiro um cliente";
 
                 veiculoSelect.appendChild(opcao);
+
+                pesquisaVeiculo.placeholder = clienteId
+                    ? "A carregar veículos..."
+                    : "Selecione primeiro um cliente";
 
                 if (!clienteId) {
                     return;
@@ -341,36 +710,61 @@
 
                     const veiculos = await response.json();
 
+                    // IGNORAR RESPOSTAS DE CLIENTES ANTERIORES
                     if (pedidoAtual !== pedidoVeiculos) {
                         return;
                     }
 
-                    veiculoSelect.innerHTML = "";
+                    veiculoSelect.replaceChildren();
 
-                    const primeiraOpcao = document.createElement("option");
+                    const primeiraOpcao =
+                        document.createElement("option");
+
                     primeiraOpcao.value = "";
 
-                    primeiraOpcao.textContent = veiculos.length > 0
-                        ? "Selecione o veículo"
-                        : "Este cliente não possui veículos registados";
+                    primeiraOpcao.textContent =
+                        veiculos.length > 0
+                            ? "Selecione o veículo"
+                            : "Este cliente não possui veículos registados";
 
                     veiculoSelect.appendChild(primeiraOpcao);
 
                     veiculos.forEach(function (veiculo) {
 
-                        const option = document.createElement("option");
+                        const option =
+                            document.createElement("option");
 
                         option.value = veiculo.id;
                         option.textContent = veiculo.texto;
 
-                        if (String(veiculo.id) === String(veiculoSelecionado)) {
-                            option.selected = true;
-                        }
-
                         veiculoSelect.appendChild(option);
                     });
 
-                    veiculoSelect.disabled = veiculos.length === 0;
+                    const possuiVeiculos =
+                        veiculos.length > 0;
+
+                    veiculoSelect.disabled = !possuiVeiculos;
+                    pesquisaVeiculo.disabled = !possuiVeiculos;
+
+                    pesquisaVeiculo.placeholder = possuiVeiculos
+                        ? "Pesquisar matrícula, marca ou modelo..."
+                        : "Este cliente não possui veículos registados";
+
+                    // RECUPERAR VEÍCULO APÓS ERRO DE VALIDAÇÃO
+                    if (veiculoSelecionado) {
+
+                        const existe = veiculos.some(
+                            v => String(v.id) ===
+                                 String(veiculoSelecionado)
+                        );
+
+                        if (existe) {
+                            veiculoSelect.value =
+                                String(veiculoSelecionado);
+
+                            pesquisaVeiculos.sincronizarTexto();
+                        }
+                    }
 
                 } catch (error) {
 
@@ -378,21 +772,44 @@
                         return;
                     }
 
-                    veiculoSelect.innerHTML =
-                        '<option value="">Erro ao carregar veículos</option>';
+                    veiculoSelect.replaceChildren();
+
+                    const opcaoErro =
+                        document.createElement("option");
+
+                    opcaoErro.value = "";
+                    opcaoErro.textContent =
+                        "Erro ao carregar veículos";
+
+                    veiculoSelect.appendChild(opcaoErro);
 
                     veiculoSelect.disabled = true;
+                    pesquisaVeiculo.disabled = true;
+
+                    pesquisaVeiculo.placeholder =
+                        "Erro ao carregar veículos";
 
                     console.error(error);
                 }
             }
 
+            // ALTERAÇÃO DO CLIENTE
             clienteSelect.addEventListener("change", function () {
+
                 carregarVeiculos(this.value);
             });
 
+            // RECUPERAR SELEÇÕES APÓS ERROS
+            pesquisaClientes.sincronizarTexto();
+            pesquisaMecanicos.sincronizarTexto();
+            pesquisaServicos.sincronizarTexto();
+
             if (clienteSelect.value) {
-                carregarVeiculos(clienteSelect.value, veiculoInicial);
+
+                carregarVeiculos(
+                    clienteSelect.value,
+                    veiculoInicial
+                );
             }
 
             // CALENDÁRIO
@@ -436,6 +853,7 @@
                 calendario.open();
             });
 
+            // MOSTRAR HORÁRIOS
             function mostrarHorarios() {
 
                 horariosContainer.innerHTML = "";
@@ -463,8 +881,8 @@
                     return;
                 }
 
-                // Segunda a sexta: 09:00 às 18:00
-                // Sábado: 09:00 às 13:00
+                // SEGUNDA A SEXTA: 09:00 ÀS 18:00
+                // SÁBADO: 09:00 ÀS 13:00
                 const horaFinal = diaSemana === 6 ? 13 : 18;
 
                 let horariosAdicionados = 0;
@@ -482,7 +900,8 @@
                         continue;
                     }
 
-                    const botao = document.createElement("button");
+                    const botao =
+                        document.createElement("button");
 
                     botao.type = "button";
 
@@ -500,7 +919,6 @@
 
                             btn.classList.remove("btn-primary");
                             btn.classList.add("btn-outline-primary");
-
                         });
 
                         botao.classList.remove("btn-outline-primary");
@@ -521,13 +939,20 @@
                 }
             }
 
+            // VALIDAÇÃO DO FORMULÁRIO
             formulario.addEventListener("submit", function (event) {
 
-                if (!clienteSelect.value || !veiculoSelect.value) {
+                // VERIFICAR TODAS AS SELEÇÕES
+                if (!clienteSelect.value ||
+                    !veiculoSelect.value ||
+                    !mecanicoSelect.value ||
+                    !tipoServicoSelect.value) {
 
                     event.preventDefault();
 
-                    alert("Selecione um cliente e um veículo.");
+                    alert(
+                        "Selecione o cliente, veículo, mecânico e tipo de serviço."
+                    );
 
                     return;
                 }
