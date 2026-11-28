@@ -10,16 +10,36 @@
         ? await UserHelper.GetUserByEmailAsync(userEmail)
         : null;
 
-    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
-    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+    var currentController =
+        ViewContext.RouteData.Values["controller"]?.ToString();
+
+    var currentAction =
+        ViewContext.RouteData.Values["action"]?.ToString();
 
     var isCliente = User.IsInRole("Cliente");
+    var isAdmin = User.IsInRole("Admin");
+    var isRececionista = User.IsInRole("Rececionista");
+    var isMecanico = User.IsInRole("Mecanico");
+
+    var perfil = isAdmin
+        ? "Administrador"
+        : isRececionista
+            ? "Rececionista"
+            : isMecanico
+                ? "Mecânico"
+                : isCliente
+                    ? "Cliente"
+                    : "Utilizador";
+
+    var nomeUtilizador =
+        user?.FullName ?? User.Identity?.Name ?? "Utilizador";
 }
 
 <!DOCTYPE html>
 <html lang="pt">
 <head>
     <meta charset="utf-8" />
+
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0" />
 
@@ -37,8 +57,15 @@
           asp-append-version="true" />
 
     <style>
+        /* CONFIGURAÇÕES GERAIS */
+
+        html {
+            min-height: 100%;
+        }
+
         body {
             margin: 0;
+            min-height: 100vh;
             background-color: #edf3fa;
             font-family: Arial, sans-serif;
         }
@@ -48,21 +75,40 @@
         .sidebar {
             width: 260px;
             height: 100vh;
+            height: 100dvh;
             position: fixed;
             top: 0;
             left: 0;
-            background-color: #111820;
+
+            background: linear-gradient(
+                180deg,
+                #0d1724 0%,
+                #111820 100%
+            );
+
             color: white;
             display: flex;
             flex-direction: column;
+            z-index: 100;
+
+            border-right: 1px solid rgba(150, 180, 215, 0.12);
+
+            box-shadow:
+                4px 0 18px rgba(0, 0, 0, 0.10);
         }
 
+        /* LOGÓTIPO */
+
         .sidebar-logo {
-            padding: 25px 20px;
-            font-size: 22px;
-            font-weight: bold;
+            display: block;
+            padding: 24px 20px;
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: 0.3px;
             text-decoration: none;
             color: white;
+
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
         }
 
         .sidebar-logo:hover {
@@ -73,31 +119,42 @@
             color: #1683ff;
         }
 
+        /* CONTEÚDO DO MENU */
+
         .sidebar-menu {
-            padding: 10px;
+            padding: 12px 10px 20px;
             flex: 1;
             overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #344154 transparent;
         }
 
         .sidebar-title {
-            padding: 14px 12px 6px;
+            padding: 16px 12px 8px;
             color: #8fa3bf;
             font-size: 11px;
-            font-weight: bold;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.2px;
         }
+
+        /* LINKS DO MENU */
 
         .sidebar-link {
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 9px 12px;
-            margin-bottom: 2px;
-            border-radius: 8px;
+            padding: 10px 12px;
+            margin-bottom: 4px;
+            border-radius: 10px;
             color: #cbd5e1;
             text-decoration: none;
             font-size: 14px;
+
+            transition:
+                background-color .2s ease,
+                color .2s ease,
+                box-shadow .2s ease;
         }
 
         .sidebar-icon {
@@ -112,41 +169,104 @@
         }
 
         .sidebar-link:hover {
-            background-color: #253449;
+            background-color: rgba(255, 255, 255, 0.07);
             color: white;
         }
+
+        /* MENU ATIVO */
 
         .sidebar-link.active {
-            background-color: #1683ff;
+            background: linear-gradient(
+                90deg,
+                #1683ff 0%,
+                #2d8fff 100%
+            );
+
+            color: white;
+
+            box-shadow:
+                0 4px 10px rgba(22, 131, 255, 0.22);
+        }
+
+        .sidebar-link.active:hover {
             color: white;
         }
 
-        .sidebar-link.disabled {
-            color: #718096;
-            cursor: not-allowed;
+        .sidebar-link:focus-visible,
+        .sidebar-logo:focus-visible {
+            outline: 2px solid #1683ff;
+            outline-offset: 2px;
         }
 
-        .sidebar-link.disabled:hover {
-            background-color: transparent;
-            color: #718096;
+        /* ÁREA PRINCIPAL */
+
+        .main-area {
+            margin-left: 260px;
+            min-height: 100vh;
+            min-width: 0;
+            background-color: #edf3fa;
         }
 
-        .sidebar-user {
-            border-top: 1px solid #344154;
-            padding: 15px;
+        /* BARRA SUPERIOR */
+
+        .topbar {
+            min-height: 76px;
+            background: #0d1724;
+
+            border-bottom:
+                1px solid rgba(150, 180, 215, 0.12);
+
+            padding: 15px 30px;
+
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 15px;
+
+            box-shadow:
+                0 3px 14px rgba(10, 25, 45, 0.10);
+        }
+
+        /* UTILIZADOR NO TOPO */
+
+        .topbar-user {
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: flex-end;
+            gap: 14px;
+            min-width: 0;
         }
 
-        .sidebar-avatar {
+        .topbar-user-info {
+            text-align: right;
+            min-width: 0;
+        }
+
+        .topbar-user-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: white;
+            line-height: 1.5;
+        }
+
+        .topbar-user-role {
+            font-size: 12px;
+            color: #aebdd0;
+            line-height: 1.5;
+        }
+
+        /* FOTOGRAFIA DO UTILIZADOR */
+
+        .topbar-avatar {
             width: 42px;
             height: 42px;
             border-radius: 50%;
             object-fit: cover;
+            flex-shrink: 0;
+            border: 2px solid #344154;
         }
 
-        .sidebar-avatar-default {
+        .topbar-avatar-default {
             width: 42px;
             height: 42px;
             border-radius: 50%;
@@ -155,80 +275,31 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
+            font-size: 16px;
+            font-weight: 700;
+            flex-shrink: 0;
         }
 
-        .sidebar-user-name {
-            color: white;
-            font-size: 13px;
-            font-weight: bold;
-        }
-
-        .sidebar-user-role {
-            color: #aeb7c0;
-            font-size: 12px;
-        }
-
-        /* CONTEÚDO PRINCIPAL */
-
-        .main-area {
-            margin-left: 260px;
-            min-height: 100vh;
-        }
-
-        .topbar {
-            background-color: white;
-            border-bottom: 1px solid #dce5f0;
-            padding: 18px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .topbar-title {
-            font-size: 22px;
-            font-weight: bold;
-            color: #172033;
-            margin: 0;
-        }
-
-        .topbar-subtitle {
-            color: #64748b;
-            font-size: 13px;
-            margin: 4px 0 0;
-        }
-
-        .topbar-user {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .topbar-user-info {
-            text-align: right;
-        }
-
-        .topbar-user-name {
-            font-size: 13px;
-            font-weight: bold;
-            color: #172033;
-        }
-
-        .topbar-user-role {
-            font-size: 12px;
-            color: #64748b;
-        }
+        /* BOTÃO SAIR */
 
         .topbar-logout {
-            color: #64748b;
+            display: inline-flex;
+            align-items: center;
+            color: #d6e0ec;
             text-decoration: none;
             font-size: 13px;
-            font-weight: bold;
+            font-weight: 700;
+            padding-left: 14px;
+            margin-left: 5px;
+            border-left: 1px solid #344154;
+            transition: color .2s ease;
         }
 
         .topbar-logout:hover {
-            color: #dc3545;
+            color: #66adff;
         }
+
+        /* CONTEÚDO DAS PÁGINAS */
 
         .main-content {
             padding: 30px;
@@ -243,12 +314,6 @@
             border-radius: 12px;
         }
 
-        .sidebar-link:focus-visible,
-        .sidebar-logo:focus-visible {
-            outline: 2px solid #1683ff;
-            outline-offset: 2px;
-        }
-
         /* RESPONSIVIDADE */
 
         @@media (max-width: 768px) {
@@ -257,10 +322,16 @@
                 position: relative;
                 width: 100%;
                 height: auto;
+                min-height: auto;
             }
 
-            .sidebar-user {
-                display: none;
+            .sidebar-logo {
+                padding: 20px;
+                font-size: 22px;
+            }
+
+            .sidebar-menu {
+                overflow-y: visible;
             }
 
             .main-area {
@@ -268,13 +339,43 @@
             }
 
             .topbar {
-                padding: 15px;
-                flex-wrap: wrap;
-                gap: 15px;
+                min-height: 65px;
+                padding: 14px 18px;
             }
 
             .main-content {
                 padding: 15px;
+            }
+        }
+
+        @@media (max-width: 480px) {
+
+            .topbar {
+                padding: 12px;
+            }
+
+            .topbar-user {
+                gap: 9px;
+            }
+
+            .topbar-user-name {
+                font-size: 12px;
+            }
+
+            .topbar-user-role {
+                font-size: 11px;
+            }
+
+            .topbar-avatar,
+            .topbar-avatar-default {
+                width: 36px;
+                height: 36px;
+            }
+
+            .topbar-logout {
+                padding-left: 10px;
+                margin-left: 0;
+                font-size: 12px;
             }
         }
     </style>
@@ -300,11 +401,13 @@
 
             <!-- ADMINISTRADOR -->
 
-            @if (User.IsInRole("Admin"))
+            @if (isAdmin)
             {
                 <div class="sidebar-title">
                     Administração
                 </div>
+
+                <!-- PAINEL DO ADMINISTRADOR -->
 
                 <a asp-controller="Admin"
                    asp-action="Index"
@@ -340,6 +443,7 @@
                          aria-hidden="true">
 
                         <circle cx="9" cy="7" r="3" />
+
                         <path d="M3 21v-2a6 6 0 0 1 12 0v2M19 8v6m-3-3h6" />
 
                     </svg>
@@ -359,6 +463,7 @@
                          aria-hidden="true">
 
                         <circle cx="9" cy="7" r="3" />
+
                         <path d="M3 21v-2a6 6 0 0 1 12 0v2M16 4a3 3 0 0 1 0 6m2 5a5 5 0 0 1 3 4v2" />
 
                     </svg>
@@ -426,10 +531,9 @@
                 </a>
             }
 
-            <!-- FUNCIONÁRIO -->
+            <!-- FUNCIONÁRIOS -->
 
-            @if (User.IsInRole("Rececionista") ||
-                 User.IsInRole("Mecanico"))
+            @if (isRececionista || isMecanico)
             {
                 <div class="sidebar-title">
                     Gestão da Oficina
@@ -460,13 +564,14 @@
 
                 <a asp-controller="RececionistaArea"
                    asp-action="Clientes"
-                   class="sidebar-link @(currentController == "RececionistaArea" && currentAction != "Index" ? "active" : "")">
+                   class="sidebar-link @(currentController == "RececionistaArea" && currentAction == "Clientes" ? "active" : "")">
 
                     <svg class="sidebar-icon"
                          viewBox="0 0 24 24"
                          aria-hidden="true">
 
                         <circle cx="9" cy="7" r="3" />
+
                         <path d="M3 21v-2a6 6 0 0 1 12 0v2M16 4a3 3 0 0 1 0 6m2 5a5 5 0 0 1 3 4v2" />
 
                     </svg>
@@ -474,6 +579,28 @@
                     Clientes
 
                 </a>
+
+                <!-- TODOS OS VEÍCULOS -->
+                <!-- APENAS RECECIONISTA -->
+
+                @if (isRececionista)
+                {
+                    <a asp-controller="Veiculos"
+                       asp-action="TodosVeiculos"
+                       class="sidebar-link @(currentController == "Veiculos" && currentAction == "TodosVeiculos" ? "active" : "")">
+
+                        <svg class="sidebar-icon"
+                             viewBox="0 0 24 24"
+                             aria-hidden="true">
+
+                            <path d="m5 7 2-4h10l2 4 2 3v9H3v-9l2-3ZM5 7h14M3 14h18M6 18v3m12-3v3M6 11h2m8 0h2" />
+
+                        </svg>
+
+                        Todos os Veículos
+
+                    </a>
+                }
 
                 <!-- MARCAÇÕES -->
 
@@ -486,6 +613,7 @@
                          aria-hidden="true">
 
                         <rect x="3" y="5" width="18" height="16" rx="2" />
+
                         <path d="M7 3v4m10-4v4M3 11h18m-13 5h2m4 0h2" />
 
                     </svg>
@@ -494,7 +622,7 @@
 
                 </a>
 
-                <!-- REPARAÇÕES -->
+                <!-- REPARAÇÕES E FATURAÇÃO -->
 
                 <a asp-controller="Reparacoes"
                    asp-action="Create"
@@ -546,7 +674,7 @@
 
                 <a asp-controller="ClienteArea"
                    asp-action="MeusVeiculos"
-                   class="sidebar-link @(currentController == "ClienteArea" && (currentAction == "MeusVeiculos" || currentAction == "EditarVeiculo") ? "active" : "")">
+                   class="sidebar-link @(currentController == "ClienteArea" && (currentAction == "MeusVeiculos" || currentAction == "DetalhesVeiculo" || currentAction == "EditarVeiculo") ? "active" : "")">
 
                     <svg class="sidebar-icon"
                          viewBox="0 0 24 24"
@@ -571,11 +699,44 @@
                          aria-hidden="true">
 
                         <circle cx="12" cy="12" r="9" />
+
                         <path d="M12 7v5l3 2" />
 
                     </svg>
 
                     Histórico de Reparações
+
+                </a>
+            }
+
+            <!-- COMUNICAÇÕES -->
+            <!-- ADMINISTRADOR, RECECIONISTA E MECÂNICO -->
+
+            @if (isAdmin || isRececionista || isMecanico)
+            {
+                <div class="sidebar-title">
+                    Comunicação
+                </div>
+
+                <a asp-controller="Comunicacoes"
+                   asp-action="Index"
+                   class="sidebar-link @(currentController == "Comunicacoes" ? "active" : "")">
+
+                    <svg class="sidebar-icon"
+                         viewBox="0 0 24 24"
+                         aria-hidden="true">
+
+                        <rect x="3"
+                              y="5"
+                              width="18"
+                              height="14"
+                              rx="2" />
+
+                        <path d="m3 7 9 6 9-6" />
+
+                    </svg>
+
+                    Comunicações
 
                 </a>
             }
@@ -599,6 +760,7 @@
                          aria-hidden="true">
 
                         <circle cx="12" cy="8" r="4" />
+
                         <path d="M4 21v-1a8 8 0 0 1 16 0v1" />
 
                     </svg>
@@ -618,6 +780,7 @@
                          aria-hidden="true">
 
                         <circle cx="12" cy="8" r="4" />
+
                         <path d="M4 21v-1a8 8 0 0 1 16 0v1" />
 
                     </svg>
@@ -631,7 +794,7 @@
 
             <a asp-controller="Home"
                asp-action="Index"
-               class="sidebar-link">
+               class="sidebar-link @(currentController == "Home" ? "active" : "")">
 
                 <svg class="sidebar-icon"
                      viewBox="0 0 24 24"
@@ -647,123 +810,56 @@
 
         </nav>
 
-        <!-- UTILIZADOR NO RODAPÉ DA SIDEBAR -->
-
-        <div class="sidebar-user">
-
-            @if (user != null && user.ImageId != Guid.Empty)
-            {
-                <img src="@user.ImageFullPath"
-                     class="sidebar-avatar"
-                     alt="Fotografia do utilizador" />
-            }
-            else
-            {
-                <div class="sidebar-avatar-default">
-                    U
-                </div>
-            }
-
-            <div>
-
-                <div class="sidebar-user-name">
-                    @user?.FirstName @user?.LastName
-                </div>
-
-                <div class="sidebar-user-role">
-
-                    @if (User.IsInRole("Admin"))
-                    {
-                        <span>Administrador</span>
-                    }
-                    else if (User.IsInRole("Rececionista"))
-                    {
-                        <span>Rececionista</span>
-                    }
-                    else if (User.IsInRole("Mecanico"))
-                    {
-                        <span>Mecânico</span>
-                    }
-                    else if (isCliente)
-                    {
-                        <span>Cliente</span>
-                    }
-
-                </div>
-
-            </div>
-
-        </div>
-
     </aside>
 
     <!-- ÁREA PRINCIPAL -->
 
     <div class="main-area">
 
-        <!-- CABEÇALHO INTERNO -->
+        <!-- BARRA SUPERIOR -->
 
         <header class="topbar">
 
-            <div>
-
-                <h1 class="topbar-title">
-                    AutoCET
-                </h1>
-
-                <p class="topbar-subtitle">
-                    Gestão da AutoCET
-                </p>
-
-            </div>
-
             <div class="topbar-user">
+
+                <!-- NOME E FUNÇÃO -->
 
                 <div class="topbar-user-info">
 
                     <div class="topbar-user-name">
-                        @user?.FirstName @user?.LastName
+                        @nomeUtilizador
                     </div>
 
                     <div class="topbar-user-role">
-
-                        @if (User.IsInRole("Admin"))
-                        {
-                            <span>Administrador</span>
-                        }
-                        else if (User.IsInRole("Rececionista"))
-                        {
-                            <span>Rececionista</span>
-                        }
-                        else if (User.IsInRole("Mecanico"))
-                        {
-                            <span>Mecânico</span>
-                        }
-                        else if (isCliente)
-                        {
-                            <span>Cliente</span>
-                        }
-
+                        @perfil
                     </div>
 
                 </div>
 
+                <!-- FOTOGRAFIA DO PERFIL -->
+
                 @if (user != null && user.ImageId != Guid.Empty)
                 {
                     <img src="@user.ImageFullPath"
-                         class="sidebar-avatar"
-                         alt="Fotografia de perfil" />
+                         alt="Fotografia de @nomeUtilizador"
+                         class="topbar-avatar" />
                 }
                 else
                 {
-                    <div class="sidebar-avatar-default">
-                        U
+                    <div class="topbar-avatar-default">
+
+                        @(string.IsNullOrWhiteSpace(nomeUtilizador)
+                            ? "U"
+                            : nomeUtilizador.Substring(0, 1).ToUpper())
+
                     </div>
                 }
 
+                <!-- LOGOUT -->
+
                 <a asp-controller="Account"
                    asp-action="Logout"
-                   class="topbar-logout ms-2">
+                   class="topbar-logout">
 
                     Sair
 
@@ -773,7 +869,7 @@
 
         </header>
 
-        <!-- CONTEÚDO INTERNO -->
+        <!-- CONTEÚDO DAS PÁGINAS -->
 
         <main class="main-content">
             @RenderBody()

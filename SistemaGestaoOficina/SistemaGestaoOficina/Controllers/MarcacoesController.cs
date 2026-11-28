@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using SistemaGestaoOficina.Data.Entities;
 using SistemaGestaoOficina.Data.Repository;
 using SistemaGestaoOficina.Models;
+using SistemaGestaoOficina.Services;
 
 namespace SistemaGestaoOficina.Controllers
 {
@@ -15,10 +16,13 @@ namespace SistemaGestaoOficina.Controllers
         private readonly IMarcacaoRepository _marcacaoRepository;
         private readonly IReparacaoRepository _reparacaoRepository;
 
-        public MarcacoesController(IMarcacaoRepository marcacaoRepository, IReparacaoRepository reparacaoRepository)
+        private readonly NotificacoesMarcacaoService _notificacoesMarcacaoService;
+
+        public MarcacoesController(IMarcacaoRepository marcacaoRepository, IReparacaoRepository reparacaoRepository, NotificacoesMarcacaoService notificacoesMarcacaoService)
         {
             _marcacaoRepository = marcacaoRepository;
             _reparacaoRepository = reparacaoRepository;
+            _notificacoesMarcacaoService = notificacoesMarcacaoService;
         }
 
         // GET: Marcacoes
@@ -236,8 +240,6 @@ namespace SistemaGestaoOficina.Controllers
             return View(model);
         }
 
-
-
         // POST: Marcacoes/Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -251,6 +253,8 @@ namespace SistemaGestaoOficina.Controllers
                 return NotFound();
             }
 
+            // APENAS MARCAÇÕES AGENDADAS PODEM SER EDITADAS
+
             if (marcacaoExistente.Estado != "Agendada")
             {
                 TempData["ErrorMessage"] =
@@ -260,6 +264,7 @@ namespace SistemaGestaoOficina.Controllers
             }
 
             model.UserId = marcacaoExistente.UserId;
+
             ModelState.Remove(nameof(MarcacaoViewModel.UserId));
 
             if (ModelState.IsValid)
@@ -275,6 +280,8 @@ namespace SistemaGestaoOficina.Controllers
                     Estado = marcacaoExistente.Estado
                 };
 
+                // VALIDAR REGRAS DE NEGÓCIO
+
                 var erros = await _marcacaoRepository
                     .ValidarMarcacaoAsync(dados);
 
@@ -285,12 +292,83 @@ namespace SistemaGestaoOficina.Controllers
 
                 if (ModelState.IsValid)
                 {
+                    // VERIFICAR SE ALGUM DADO FOI ALTERADO
+
+                    bool houveAlteracao =
+                        marcacaoExistente.VeiculoId != dados.VeiculoId ||
+                        marcacaoExistente.MecanicoId != dados.MecanicoId ||
+                        marcacaoExistente.TipoServico != dados.TipoServico ||
+                        marcacaoExistente.DataHora != dados.DataHora;
+
+                    // ATUALIZAR MARCAÇÃO
+
                     marcacaoExistente.VeiculoId = dados.VeiculoId;
                     marcacaoExistente.MecanicoId = dados.MecanicoId;
                     marcacaoExistente.TipoServico = dados.TipoServico;
                     marcacaoExistente.DataHora = dados.DataHora;
 
-                    await _marcacaoRepository.UpdateAsync(marcacaoExistente);
+                    await _marcacaoRepository.UpdateAsync(
+                        marcacaoExistente);
+
+                    // ENVIAR EMAIL SE HOUVE ALTERAÇÃO
+                    // E FOI REALIZADA POR UM FUNCIONÁRIO
+
+                    bool alteradoPorFuncionario =
+                        User.IsInRole("Admin") ||
+                        User.IsInRole("Rececionista") ||
+                        User.IsInRole("Mecanico");
+
+                    if (houveAlteracao && alteradoPorFuncionario)
+                    {
+                        try
+                        {
+                            var detalhes = await _marcacaoRepository
+                                .GetAll()
+                                .Include(m => m.User)
+                                .Include(m => m.Veiculo)
+                                .FirstOrDefaultAsync(
+                                    m => m.Id == marcacaoExistente.Id);
+
+                            if (detalhes?.User?.Email != null &&
+                                detalhes.Veiculo != null)
+                            {
+                                bool emailEnviado =
+                                    _notificacoesMarcacaoService
+                                        .EnviarAlteracao(
+                                            detalhes.User.Email,
+                                            detalhes.DataHora,
+                                            detalhes.Veiculo.Marca,
+                                            detalhes.Veiculo.Modelo,
+                                            detalhes.Veiculo.Matricula,
+                                            detalhes.TipoServico
+                                        );
+
+                                if (!emailEnviado)
+                                {
+                                    TempData["WarningMessage"] =
+                                        "A marcação foi atualizada, " +
+                                        "mas não foi possível enviar " +
+                                        "o email ao cliente.";
+                                }
+                            }
+                            else
+                            {
+                                TempData["WarningMessage"] =
+                                    "A marcação foi atualizada, mas " +
+                                    "não foi possível obter o email " +
+                                    "ou os dados do veículo do cliente.";
+                            }
+                        }
+                        catch
+                        {
+                            // FALHAR O EMAIL NÃO DESFAZ A ALTERAÇÃO
+
+                            TempData["WarningMessage"] =
+                                "A marcação foi atualizada, " +
+                                "mas ocorreu um erro ao " +
+                                "enviar a notificação.";
+                        }
+                    }
 
                     TempData["SuccessMessage"] =
                         "Marcação atualizada com sucesso!";
@@ -299,43 +377,68 @@ namespace SistemaGestaoOficina.Controllers
                 }
             }
 
+            // RECARREGAR LISTAS SE HOUVER ERROS
+
             var clientes = await _marcacaoRepository.GetClientesAsync();
+
             var veiculos = await _marcacaoRepository
                 .GetVeiculosPorClienteAsync(model.UserId);
+
             var mecanicos = await _marcacaoRepository.GetMecanicosAsync();
-            var tipos = await _marcacaoRepository.GetTiposReparacaoAsync();
+
+            var tipos = await _marcacaoRepository
+                .GetTiposReparacaoAsync();
 
             ViewBag.Clientes = new SelectList(
-                clientes, "Id", "FullName", model.UserId);
+                clientes,
+                "Id",
+                "FullName",
+                model.UserId);
 
             ViewBag.Veiculos = new SelectList(
                 veiculos.Select(v => new
                 {
                     v.Id,
-                    Descricao = $"{v.Marca} - {v.Modelo} - {v.Matricula}"
+                    Descricao =
+                        $"{v.Marca} - {v.Modelo} - {v.Matricula}"
                 }),
-                "Id", "Descricao", model.VeiculoId);
+                "Id",
+                "Descricao",
+                model.VeiculoId);
 
             ViewBag.Mecanicos = new SelectList(
-                mecanicos, "Id", "Nome", model.MecanicoId);
+                mecanicos,
+                "Id",
+                "Nome",
+                model.MecanicoId);
 
             ViewBag.TiposServico = new SelectList(
-                tipos, "Nome", "Nome", model.TipoServico);
+                tipos,
+                "Nome",
+                "Nome",
+                model.TipoServico);
 
             return View(model);
         }
+
+
+
 
         // POST: Marcacoes/Cancelar/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Cancelar(int id)
         {
+            // PROCURAR A MARCAÇÃO
+
             var marcacao = await _marcacaoRepository.GetByIdAsync(id);
 
             if (marcacao == null)
             {
                 return NotFound();
             }
+
+            // VERIFICAR SE PODE SER CANCELADA
 
             if (marcacao.Estado != "Agendada")
             {
@@ -345,9 +448,46 @@ namespace SistemaGestaoOficina.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            // CARREGAR DADOS DO CLIENTE E DO VEÍCULO
+
+            var detalhes = await _marcacaoRepository.GetAll()
+                .Include(m => m.User)
+                .Include(m => m.Veiculo)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            // CANCELAR MARCAÇÃO
+
             marcacao.Estado = "Cancelada";
 
             await _marcacaoRepository.UpdateAsync(marcacao);
+
+            // ENVIAR EMAIL APENAS QUANDO UM FUNCIONÁRIO CANCELA
+
+            bool canceladoPorFuncionario =
+                User.IsInRole("Admin") ||
+                User.IsInRole("Rececionista") ||
+                User.IsInRole("Mecanico");
+
+            if (canceladoPorFuncionario &&
+                detalhes?.User?.Email != null &&
+                detalhes.Veiculo != null)
+            {
+                bool emailEnviado =
+                    _notificacoesMarcacaoService.EnviarCancelamento(
+                        detalhes.User.Email,
+                        detalhes.DataHora,
+                        detalhes.Veiculo.Marca,
+                        detalhes.Veiculo.Modelo,
+                        detalhes.Veiculo.Matricula
+                    );
+
+                if (!emailEnviado)
+                {
+                    TempData["WarningMessage"] =
+                        "Marcação cancelada, mas não foi possível " +
+                        "enviar o email ao cliente.";
+                }
+            }
 
             TempData["SuccessMessage"] =
                 "Marcação cancelada com sucesso!";

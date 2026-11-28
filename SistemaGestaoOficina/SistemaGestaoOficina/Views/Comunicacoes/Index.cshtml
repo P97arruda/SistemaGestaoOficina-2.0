@@ -1,0 +1,1239 @@
+﻿
+@model SistemaGestaoOficina.Models.EnviarComunicadoViewModel
+
+@using SistemaGestaoOficina.Data.Entities
+@using System.Linq
+@using System.Collections.Generic
+
+@{
+    Layout = "~/Views/Shared/_InternalLayout.cshtml";
+    ViewData["Title"] = "Comunicações";
+
+    var isAdmin = User.IsInRole("Admin");
+
+    var destinatarios =
+        (ViewBag.Destinatarios as IEnumerable<User>
+         ?? Enumerable.Empty<User>())
+        .Where(u => !string.IsNullOrWhiteSpace(u.Email))
+        .GroupBy(u => u.Id)
+        .Select(g => g.First())
+        .OrderBy(u => u.FirstName)
+        .ThenBy(u => u.LastName)
+        .ToList();
+
+    var mecanicosIds = new HashSet<string>(
+        ViewBag.MecanicosIds as IEnumerable<string>
+            ?? Enumerable.Empty<string>(),
+        StringComparer.OrdinalIgnoreCase
+    );
+
+    var rececionistasIds = new HashSet<string>(
+        ViewBag.RececionistasIds as IEnumerable<string>
+            ?? Enumerable.Empty<string>(),
+        StringComparer.OrdinalIgnoreCase
+    );
+
+    var selecionadosIds = new HashSet<string>(
+        Model?.DestinatariosIds ?? new List<string>(),
+        StringComparer.OrdinalIgnoreCase
+    );
+
+    var totalMecanicos = destinatarios.Count(
+        u => mecanicosIds.Contains(u.Id)
+    );
+
+    var totalRececionistas = destinatarios.Count(
+        u => rececionistasIds.Contains(u.Id)
+    );
+
+    var tituloDestinatarios = isAdmin
+        ? "Funcionários"
+        : "Clientes";
+}
+
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+<style>
+    /* PÁGINA */
+
+    .com-page {
+        color: #172033;
+        padding: 8px 0 30px;
+    }
+
+    .com-page-header {
+        margin-bottom: 25px;
+    }
+
+    .com-page-header h1 {
+        font-size: 26px;
+        font-weight: 800;
+        margin-bottom: 7px;
+    }
+
+    .com-page-header p {
+        font-size: 13px;
+        color: #667085;
+        margin-bottom: 0;
+    }
+
+    /* DUAS COLUNAS */
+
+    .com-layout {
+        display: grid;
+        grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+        gap: 22px;
+        align-items: start;
+    }
+
+    .com-card {
+        background: white;
+        border: 1px solid #e5eaf0;
+        border-radius: 15px;
+        padding: 24px;
+        box-shadow: 0 5px 20px rgba(16, 24, 40, .05);
+        min-width: 0;
+    }
+
+    .com-card-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+
+    .com-card-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 11px;
+        background: #eff6ff;
+        color: #0d6efd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        flex-shrink: 0;
+    }
+
+    .com-card-header h2 {
+        font-size: 17px;
+        font-weight: 800;
+        margin-bottom: 5px;
+    }
+
+    .com-card-header p {
+        font-size: 12px;
+        color: #667085;
+        margin-bottom: 0;
+    }
+
+    /* FILTRO */
+
+    .com-filter {
+        margin-bottom: 15px;
+    }
+
+    .com-label {
+        display: block;
+        font-size: 13px;
+        font-weight: 700;
+        color: #344054;
+        margin-bottom: 8px;
+    }
+
+    .com-filter-select {
+        height: 44px;
+        border: 1px solid #dce3ed;
+        border-radius: 9px;
+        padding: 10px 12px;
+        font-size: 13px;
+        background-color: white;
+    }
+
+    .com-filter-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, .12);
+    }
+
+    /* PESQUISA */
+
+    .com-search {
+        position: relative;
+        margin-bottom: 17px;
+    }
+
+    .com-search i {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #98a2b3;
+    }
+
+    .com-search input {
+        width: 100%;
+        height: 44px;
+        border: 1px solid #dce3ed;
+        border-radius: 9px;
+        padding: 10px 12px 10px 40px;
+        outline: none;
+        font-size: 13px;
+    }
+
+    .com-search input:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, .12);
+    }
+
+    /* SELECIONAR TODOS */
+
+    .com-select-all {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        padding: 12px;
+        background: #eff6ff;
+        border: 1px solid #dbeafe;
+        border-radius: 9px;
+        margin-bottom: 14px;
+    }
+
+    .com-select-all label {
+        font-size: 13px;
+        font-weight: 700;
+        color: #1d4ed8;
+        cursor: pointer;
+    }
+
+    .com-select-all small {
+        color: #667085;
+        font-size: 11px;
+        white-space: nowrap;
+    }
+
+    /* LISTA DE DESTINATÁRIOS */
+
+    .com-list {
+        max-height: 430px;
+        overflow-y: auto;
+        padding-right: 5px;
+    }
+
+    .com-person {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 13px 10px;
+        border: 1px solid #edf0f4;
+        border-radius: 9px;
+        margin-bottom: 9px;
+        cursor: pointer;
+        transition: .2s;
+    }
+
+    .com-person:hover {
+        background: #f8fbff;
+        border-color: #c9defe;
+    }
+
+    .com-person.selected {
+        background: #eff6ff;
+        border-color: #93c5fd;
+    }
+
+    .com-person input {
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    .com-person-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+
+    .com-person-avatar-default {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #dbeafe;
+        color: #0d6efd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        font-weight: 800;
+        flex-shrink: 0;
+    }
+
+    .com-person-info {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .com-person-name {
+        font-size: 13px;
+        font-weight: 700;
+        color: #172033;
+        overflow-wrap: anywhere;
+    }
+
+    .com-person-email {
+        font-size: 11px;
+        color: #667085;
+        margin-top: 3px;
+        overflow-wrap: anywhere;
+    }
+
+    .com-person-role {
+        display: inline-block;
+        font-size: 10px;
+        color: #2563eb;
+        background: #eff6ff;
+        border-radius: 5px;
+        padding: 3px 7px;
+        margin-top: 6px;
+    }
+
+    /* LISTA VAZIA */
+
+    .com-empty {
+        padding: 30px 15px;
+        text-align: center;
+        color: #667085;
+        font-size: 13px;
+    }
+
+    .com-empty i {
+        display: block;
+        font-size: 30px;
+        margin-bottom: 12px;
+    }
+
+    /* RODAPÉ DA LISTA */
+
+    .com-selection-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        border-top: 1px solid #edf0f4;
+        margin-top: 16px;
+        padding-top: 17px;
+        font-size: 12px;
+    }
+
+    .com-selection-footer strong {
+        color: #0d6efd;
+    }
+
+    .com-clear {
+        background: transparent;
+        border: none;
+        color: #667085;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .com-clear:hover {
+        color: #0d6efd;
+    }
+
+    /* FORMULÁRIO */
+
+    .com-input {
+        width: 100%;
+        border: 1px solid #dce3ed;
+        border-radius: 9px;
+        padding: 12px 14px;
+        font-size: 13px;
+    }
+
+    .com-input:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, .12);
+    }
+
+    .com-textarea {
+        min-height: 260px;
+        resize: vertical;
+        line-height: 1.7;
+    }
+
+    .com-message-count {
+        display: block;
+        color: #98a2b3;
+        font-size: 11px;
+        text-align: right;
+        margin-top: 7px;
+    }
+
+    /* RESUMO DO ENVIO */
+
+    .com-preview-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 15px;
+        border-radius: 9px;
+        background: #f8fafc;
+        border: 1px solid #e5eaf0;
+        color: #475467;
+        font-size: 12px;
+        margin-top: 20px;
+    }
+
+    .com-preview-info i {
+        font-size: 19px;
+        color: #0d6efd;
+    }
+
+    /* BOTÃO ENVIAR */
+
+    .com-actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 25px;
+    }
+
+    .com-send-btn {
+        padding: 12px 22px;
+        border-radius: 9px;
+        font-size: 13px;
+        font-weight: 700;
+        transition: .2s;
+    }
+
+    .com-send-btn:hover {
+        background-color: #095bd6;
+        transform: translateY(-1px);
+    }
+
+    .com-send-btn:disabled {
+        transform: none;
+        cursor: not-allowed;
+    }
+
+    /* RESPONSIVIDADE */
+
+    @@media (max-width: 991px) {
+
+        .com-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media (max-width: 576px) {
+
+        .com-card {
+            padding: 18px;
+        }
+
+        .com-page-header h1 {
+            font-size: 22px;
+        }
+
+        .com-actions .btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="container-fluid com-page">
+
+    <!-- CABEÇALHO -->
+
+    <div class="com-page-header">
+
+        <h1>Comunicações</h1>
+
+        <p>
+            Selecione os destinatários e escreva a sua mensagem.
+        </p>
+
+    </div>
+
+    <!-- MENSAGENS DE RESULTADO -->
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show"
+             role="alert">
+
+            <i class="bi bi-check-circle-fill me-2"></i>
+
+            @TempData["SuccessMessage"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Fechar">
+            </button>
+
+        </div>
+    }
+
+    @if (TempData["WarningMessage"] != null)
+    {
+        <div class="alert alert-warning alert-dismissible fade show"
+             role="alert">
+
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+
+            @TempData["WarningMessage"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Fechar">
+            </button>
+
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show"
+             role="alert">
+
+            <i class="bi bi-x-circle-fill me-2"></i>
+
+            @TempData["ErrorMessage"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Fechar">
+            </button>
+
+        </div>
+    }
+
+    <!-- FORMULÁRIO DE ENVIO -->
+
+    <form id="formComunicacao"
+          asp-controller="Comunicacoes"
+          asp-action="EnviarGeral"
+          method="post"
+          asp-antiforgery="true"
+          class="com-layout">
+
+        <!-- COLUNA ESQUERDA: DESTINATÁRIOS -->
+
+        <section class="com-card">
+
+            <div class="com-card-header">
+
+                <div class="com-card-icon">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+
+                <div>
+                    <h2>@tituloDestinatarios</h2>
+
+                    <p>
+                        Escolha quem vai receber a mensagem.
+                    </p>
+                </div>
+
+            </div>
+
+            <!-- FILTRO DE FUNCIONÁRIOS -->
+
+            @if (isAdmin)
+            {
+                <div class="com-filter">
+
+                    <label for="filtroGrupo"
+                           class="com-label">
+
+                        Filtrar funcionários
+
+                    </label>
+
+                    <select id="filtroGrupo"
+                            class="form-select com-filter-select">
+
+                        <option value="todos">
+                            Todos os Funcionários (@destinatarios.Count)
+                        </option>
+
+                        <option value="mecanicos">
+                            Mecânicos (@totalMecanicos)
+                        </option>
+
+                        <option value="rececionistas">
+                            Rececionistas (@totalRececionistas)
+                        </option>
+
+                    </select>
+
+                </div>
+            }
+
+            <!-- PESQUISAR -->
+
+            <div class="com-search">
+
+                <i class="bi bi-search"></i>
+
+                <input type="search"
+                       id="pesquisaDestinatarios"
+                       placeholder="Pesquisar nome ou email..."
+                       autocomplete="off"
+                       aria-label="Pesquisar destinatários" />
+
+            </div>
+
+            <!-- SELECIONAR TODOS -->
+
+            <div class="com-select-all">
+
+                <div class="form-check mb-0">
+
+                    <input type="checkbox"
+                           id="selecionarTodos"
+                           class="form-check-input" />
+
+                    <label for="selecionarTodos"
+                           class="form-check-label">
+
+                        Selecionar todos os resultados
+
+                    </label>
+
+                </div>
+
+                <small id="quantidadeResultados">
+                    @destinatarios.Count disponível(is)
+                </small>
+
+            </div>
+
+            <!-- LISTA DOS DESTINATÁRIOS -->
+
+            <div class="com-list" id="listaDestinatarios">
+
+                @foreach (var pessoa in destinatarios)
+                {
+                    var nome = string.IsNullOrWhiteSpace(pessoa.FullName)
+                        ? pessoa.Email!
+                        : pessoa.FullName.Trim();
+
+                    var inicial = nome.Substring(0, 1)
+                        .ToUpperInvariant();
+
+                    var pessoaMecanico =
+                        mecanicosIds.Contains(pessoa.Id);
+
+                    var pessoaRececionista =
+                        rececionistasIds.Contains(pessoa.Id);
+
+                    var nomePerfil = pessoaMecanico && pessoaRececionista
+                        ? "Mecânico / Rececionista"
+                        : pessoaMecanico
+                            ? "Mecânico"
+                            : pessoaRececionista
+                                ? "Rececionista"
+                                : "Cliente";
+
+                    <label class="com-person"
+                           data-pesquisa="@nome @pessoa.Email"
+                           data-mecanico="@(pessoaMecanico ? "true" : "false")"
+                           data-rececionista="@(pessoaRececionista ? "true" : "false")">
+
+                        <!-- CHECKBOX -->
+
+                        <input type="checkbox"
+                               name="DestinatariosIds"
+                               value="@pessoa.Id"
+                               checked="@(selecionadosIds.Contains(pessoa.Id) ? "checked" : null)"
+                               class="form-check-input com-destinatario" />
+
+                        <!-- FOTOGRAFIA -->
+
+                        @if (pessoa.ImageId != Guid.Empty)
+                        {
+                            <img src="@pessoa.ImageFullPath"
+                                 alt=""
+                                 class="com-person-avatar"
+                                 loading="lazy"
+                                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+
+                            <span class="com-person-avatar-default"
+                                  style="display:none;">
+
+                                @inicial
+
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="com-person-avatar-default">
+                                @inicial
+                            </span>
+                        }
+
+                        <!-- DADOS -->
+
+                        <span class="com-person-info">
+
+                            <span class="com-person-name d-block">
+                                @nome
+                            </span>
+
+                            <span class="com-person-email d-block">
+                                @pessoa.Email
+                            </span>
+
+                            @if (isAdmin)
+                            {
+                                <span class="com-person-role">
+                                    @nomePerfil
+                                </span>
+                            }
+
+                        </span>
+
+                    </label>
+                }
+
+                @if (!destinatarios.Any())
+                {
+                    <div class="com-empty">
+
+                        <i class="bi bi-person-x"></i>
+
+                        Nenhum destinatário disponível.
+
+                    </div>
+                }
+
+            </div>
+
+            <!-- SEM RESULTADOS -->
+
+            <div id="semResultados"
+                 class="com-empty d-none">
+
+                <i class="bi bi-search"></i>
+
+                Nenhum destinatário encontrado.
+
+            </div>
+
+            <!-- TOTAL SELECIONADO -->
+
+            <div class="com-selection-footer">
+
+                <span>
+                    <strong id="quantidadeSelecionados">0</strong>
+                    destinatário(s) selecionado(s)
+                </span>
+
+                <button type="button"
+                        id="limparSelecao"
+                        class="com-clear">
+
+                    Limpar seleção
+
+                </button>
+
+            </div>
+
+        </section>
+
+        <!-- COLUNA DIREITA: MENSAGEM -->
+
+        <section class="com-card">
+
+            <div class="com-card-header">
+
+                <div class="com-card-icon">
+                    <i class="bi bi-envelope-paper-fill"></i>
+                </div>
+
+                <div>
+                    <h2>Nova Mensagem</h2>
+
+                    <p>
+                        Escreva o assunto e o conteúdo do email.
+                    </p>
+                </div>
+
+            </div>
+
+            <!-- ERROS DE VALIDAÇÃO GERAIS -->
+
+            <div asp-validation-summary="ModelOnly"
+                 class="text-danger small mb-3">
+            </div>
+
+            <!-- ASSUNTO -->
+
+            <div class="mb-4">
+
+                <label asp-for="Assunto"
+                       class="com-label">
+
+                    Assunto
+
+                </label>
+
+                <input asp-for="Assunto"
+                       class="form-control com-input"
+                       maxlength="120"
+                       placeholder="Introduza o assunto do email..."
+                       required />
+
+                <span asp-validation-for="Assunto"
+                      class="text-danger small">
+                </span>
+
+            </div>
+
+            <!-- MENSAGEM -->
+
+            <div class="mb-3">
+
+                <label asp-for="Mensagem"
+                       class="com-label">
+
+                    Mensagem
+
+                </label>
+
+                <textarea asp-for="Mensagem"
+                          class="form-control com-input com-textarea"
+                          maxlength="3000"
+                          required
+                          placeholder="Escreva aqui a sua mensagem..."></textarea>
+
+                <span asp-validation-for="Mensagem"
+                      class="text-danger small">
+                </span>
+
+                <!-- CONTADOR -->
+
+                <small id="contadorCaracteres"
+                       class="com-message-count">
+
+                    0 / 3000 caracteres
+
+                </small>
+
+            </div>
+
+            <!-- RESUMO -->
+
+            <div class="com-preview-info">
+
+                <i class="bi bi-envelope-check"></i>
+
+                <span>
+                    A mensagem será enviada individualmente
+                    para os
+                    <strong id="resumoSelecionados">0</strong>
+                    destinatários selecionados.
+                </span>
+
+            </div>
+
+            <!-- BOTÃO DE ENVIO -->
+
+            <div class="com-actions">
+
+                <button type="submit"
+                        id="btnEnviarEmail"
+                        class="btn btn-primary com-send-btn">
+
+                    <i class="bi bi-send me-2"></i>
+
+                    Enviar Email
+
+                </button>
+
+            </div>
+
+        </section>
+
+    </form>
+
+</div>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const form =
+                document.getElementById("formComunicacao");
+
+            const filtro =
+                document.getElementById("filtroGrupo");
+
+            const pesquisa =
+                document.getElementById("pesquisaDestinatarios");
+
+            const selecionarTodos =
+                document.getElementById("selecionarTodos");
+
+            const pessoas = Array.from(
+                document.querySelectorAll(".com-person")
+            );
+
+            const quantidade =
+                document.getElementById("quantidadeSelecionados");
+
+            const resumo =
+                document.getElementById("resumoSelecionados");
+
+            const quantidadeResultados =
+                document.getElementById("quantidadeResultados");
+
+            const limpar =
+                document.getElementById("limparSelecao");
+
+            const semResultados =
+                document.getElementById("semResultados");
+
+            const mensagem =
+                document.getElementById("Mensagem");
+
+            const contador =
+                document.getElementById("contadorCaracteres");
+
+            const btnEnviar =
+                document.getElementById("btnEnviarEmail");
+
+            // NORMALIZAR TEXTO DE PESQUISA
+
+            function normalizar(texto) {
+                return (texto || "")
+                    .normalize("NFD")
+                    .replace(/[\u0300-\u036f]/g, "")
+                    .toLowerCase();
+            }
+
+            // IDENTIFICAR PESSOAS VISÍVEIS
+
+            function pessoasVisiveis() {
+
+                return pessoas.filter(pessoa =>
+                    !pessoa.classList.contains("d-none")
+                );
+            }
+
+            // IDENTIFICAR PESSOAS SELECIONADAS
+
+            function pessoasSelecionadas() {
+
+                return pessoas.filter(pessoa =>
+                    pessoa.querySelector(
+                        ".com-destinatario"
+                    ).checked
+                );
+            }
+
+            // ATUALIZAR SELEÇÃO
+
+            function atualizarSelecao() {
+
+                const selecionados =
+                    pessoasSelecionadas();
+
+                pessoas.forEach(function (pessoa) {
+
+                    const checkbox =
+                        pessoa.querySelector(".com-destinatario");
+
+                    pessoa.classList.toggle(
+                        "selected",
+                        checkbox.checked
+                    );
+                });
+
+                quantidade.textContent =
+                    selecionados.length;
+
+                resumo.textContent =
+                    selecionados.length;
+
+                // VERIFICAR APENAS OS RESULTADOS VISÍVEIS
+
+                const visiveis =
+                    pessoasVisiveis();
+
+                const marcadosVisiveis =
+                    visiveis.filter(pessoa =>
+                        pessoa.querySelector(
+                            ".com-destinatario"
+                        ).checked
+                    ).length;
+
+                selecionarTodos.disabled =
+                    visiveis.length === 0;
+
+                // MARCAR SOMENTE QUANDO TODOS
+                // OS RESULTADOS VISÍVEIS ESTÃO MARCADOS
+
+                selecionarTodos.checked =
+                    visiveis.length > 0 &&
+                    marcadosVisiveis === visiveis.length;
+
+                // NÃO MOSTRAR SELEÇÃO PARCIAL
+
+                selecionarTodos.indeterminate = false;
+
+                quantidadeResultados.textContent =
+                    `${visiveis.length} disponível(is)`;
+            }
+
+            // FILTRAR POR PERFIL E PESQUISA
+
+            function atualizarVisibilidade() {
+
+                const grupo =
+                    filtro ? filtro.value : "todos";
+
+                const termo =
+                    normalizar(pesquisa.value);
+
+                let encontrados = 0;
+
+                pessoas.forEach(function (pessoa) {
+
+                    const nomeEmail =
+                        normalizar(
+                            pessoa.dataset.pesquisa
+                        );
+
+                    let pertenceAoGrupo = true;
+
+                    if (grupo === "mecanicos") {
+
+                        pertenceAoGrupo =
+                            pessoa.dataset.mecanico === "true";
+                    }
+
+                    if (grupo === "rececionistas") {
+
+                        pertenceAoGrupo =
+                            pessoa.dataset.rececionista === "true";
+                    }
+
+                    const correspondePesquisa =
+                        nomeEmail.includes(termo);
+
+                    const mostrar =
+                        pertenceAoGrupo &&
+                        correspondePesquisa;
+
+                    pessoa.classList.toggle(
+                        "d-none",
+                        !mostrar
+                    );
+
+                    if (mostrar) {
+                        encontrados++;
+                    }
+                });
+
+                semResultados.classList.toggle(
+                    "d-none",
+                    encontrados > 0 ||
+                    pessoas.length === 0
+                );
+
+                atualizarSelecao();
+            }
+
+            // ALTERAR FILTRO
+
+            if (filtro) {
+
+                filtro.addEventListener(
+                    "change",
+                    atualizarVisibilidade
+                );
+            }
+
+            // PESQUISAR UTILIZADORES
+
+            pesquisa.addEventListener(
+                "input",
+                atualizarVisibilidade
+            );
+
+            // SELECIONAR TODOS OS RESULTADOS VISÍVEIS
+
+            selecionarTodos.addEventListener(
+                "change",
+                function () {
+
+                    const marcar =
+                        selecionarTodos.checked;
+
+                    pessoasVisiveis().forEach(
+                        function (pessoa) {
+
+                            pessoa.querySelector(
+                                ".com-destinatario"
+                            ).checked = marcar;
+                        }
+                    );
+
+                    atualizarSelecao();
+                }
+            );
+
+            // SELECIONAR INDIVIDUALMENTE
+
+            pessoas.forEach(function (pessoa) {
+
+                const checkbox =
+                    pessoa.querySelector(".com-destinatario");
+
+                checkbox.addEventListener(
+                    "change",
+                    atualizarSelecao
+                );
+            });
+
+            // LIMPAR SELEÇÃO
+
+            limpar.addEventListener("click", function () {
+
+                pessoas.forEach(function (pessoa) {
+
+                    pessoa.querySelector(
+                        ".com-destinatario"
+                    ).checked = false;
+                });
+
+                atualizarSelecao();
+            });
+
+            // CONTADOR DE CARACTERES
+
+            function atualizarCaracteres() {
+
+                contador.textContent =
+                    `${mensagem.value.length} / 3000 caracteres`;
+            }
+
+            mensagem.addEventListener(
+                "input",
+                atualizarCaracteres
+            );
+
+            // CONFIRMAR O ENVIO REAL
+
+            form.addEventListener("submit", function (event) {
+
+                const selecionados =
+                    pessoasSelecionadas().length;
+
+                // VERIFICAR DESTINATÁRIOS
+
+                if (selecionados === 0) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Selecione pelo menos um destinatário."
+                    );
+
+                    return;
+                }
+
+                // VERIFICAR ASSUNTO E MENSAGEM
+
+                const assunto =
+                    document.getElementById("Assunto");
+
+                if (!assunto.value.trim()) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Introduza o assunto do email."
+                    );
+
+                    assunto.focus();
+                    return;
+                }
+
+                if (!mensagem.value.trim()) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "Escreva a mensagem que pretende enviar."
+                    );
+
+                    mensagem.focus();
+                    return;
+                }
+
+                // RESPEITAR VALIDAÇÕES DO FORMULÁRIO
+
+                if (
+                    typeof window.jQuery !== "undefined" &&
+                    typeof window.jQuery.fn.valid === "function" &&
+                    !window.jQuery(form).valid()
+                ) {
+                    event.preventDefault();
+                    return;
+                }
+
+                // PEDIR CONFIRMAÇÃO
+
+                const confirmar = confirm(
+                    `Confirma o envio do email para ` +
+                    `${selecionados} destinatário(s)?`
+                );
+
+                if (!confirmar) {
+
+                    event.preventDefault();
+                    return;
+                }
+
+                // EVITAR DUPLO CLIQUE
+
+                btnEnviar.disabled = true;
+
+                btnEnviar.innerHTML =
+                    '<span class="spinner-border ' +
+                    'spinner-border-sm me-2" ' +
+                    'aria-hidden="true"></span>' +
+                    'A enviar...';
+            });
+
+            // RESTAURAR BOTÃO AO VOLTAR À PÁGINA
+
+            window.addEventListener("pageshow", function () {
+
+                btnEnviar.disabled = false;
+
+                btnEnviar.innerHTML =
+                    '<i class="bi bi-send me-2"></i>' +
+                    'Enviar Email';
+            });
+
+            // INICIALIZAR
+
+            atualizarVisibilidade();
+            atualizarCaracteres();
+
+        });
+    </script>
+}

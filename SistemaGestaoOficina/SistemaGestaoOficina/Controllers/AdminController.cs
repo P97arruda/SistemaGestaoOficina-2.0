@@ -19,40 +19,74 @@ namespace SistemaGestaoOficina.Controllers
         private readonly IMecanicoRepository _mecanicoRepository;
         private readonly ITipoReparacaoRepository _tipoReparacaoRepository;
 
+        private readonly IReparacaoRepository _reparacaoRepository;
+
         public AdminController(
             IUserHelper userHelper,
             IMailHelper mailHelper,
             IBlobHelper blobHelper,
             ITipoReparacaoRepository tipoReparacaoRepository,
-            IMecanicoRepository mecanicoRepository)
+            IMecanicoRepository mecanicoRepository,
+            IReparacaoRepository reparacaoRepository)
         {
             _userHelper = userHelper;
             _mailHelper = mailHelper;
             _blobHelper = blobHelper;
             _tipoReparacaoRepository = tipoReparacaoRepository;
             _mecanicoRepository = mecanicoRepository;
+            _reparacaoRepository = reparacaoRepository;
         }
 
         public async Task<IActionResult> Index()
         {
-            var rececionistas =
-                await _userHelper.GetUsersInRoleAsync("Rececionista");
+            // Últimos 12 meses, incluindo o mês atual
+            var mesAtual = new DateTime(
+                DateTime.Today.Year,
+                DateTime.Today.Month,
+                1);
 
-            ViewBag.TotalRececionistas = rececionistas.Count();
-            ViewBag.Rececionistas = rececionistas;
+            var inicio = mesAtual.AddMonths(-11);
+            var fim = mesAtual.AddMonths(1);
 
-            ViewBag.TotalUtilizadores = _userHelper.GetUsers().Count();
-
-            var mecanicos = await _mecanicoRepository
+            // Somar os valores das reparações concluídas
+            var valoresPorMes = await _reparacaoRepository
                 .GetAll()
-                .Include(m => m.User)
+                .Where(r =>
+                    r.Concluida &&
+                    !r.Cancelada &&
+                    r.DataFim.HasValue &&
+                    r.DataFim.Value >= inicio &&
+                    r.DataFim.Value < fim)
+                .GroupBy(r => new
+                {
+                    Ano = r.DataFim!.Value.Year,
+                    Mes = r.DataFim.Value.Month
+                })
+                .Select(grupo => new
+                {
+                    grupo.Key.Ano,
+                    grupo.Key.Mes,
+                    Total = grupo.Sum(r => r.CustoTotal)
+                })
                 .ToListAsync();
 
-            ViewBag.TotalMecanicos = mecanicos.Count;
-            ViewBag.Mecanicos = mecanicos;
+            var meses = Enumerable.Range(0, 12)
+                .Select(i => inicio.AddMonths(i))
+                .ToArray();
 
-            ViewBag.TotalTiposReparacoes =
-                _tipoReparacaoRepository.GetAll().Count();
+            var cultura =
+                System.Globalization.CultureInfo.GetCultureInfo("pt-PT");
+
+            ViewBag.MesesLabels = meses
+                .Select(m => m.ToString("MMM/yy", cultura))
+                .ToArray();
+
+            ViewBag.GanhosMensais = meses
+                .Select(m =>
+                    valoresPorMes.FirstOrDefault(v =>
+                        v.Ano == m.Year &&
+                        v.Mes == m.Month)?.Total ?? 0m)
+                .ToArray();
 
             return View();
         }

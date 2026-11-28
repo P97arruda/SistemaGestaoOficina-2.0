@@ -4,6 +4,7 @@ using SistemaGestaoOficina.Data;
 using SistemaGestaoOficina.Data.Entities;
 using SistemaGestaoOficina.Data.Repository;
 using SistemaGestaoOficina.Helpers;
+using SistemaGestaoOficina.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,6 +53,7 @@ builder.Services.AddScoped<ITipoReparacaoRepository, TipoReparacaoRepository>();
 builder.Services.AddScoped<IMarcacaoRepository, MarcacaoRepository>();
 builder.Services.AddScoped<IPecaRepository, PecaRepository>();
 builder.Services.AddScoped<IReparacaoRepository, ReparacaoRepository>();
+builder.Services.AddScoped<NotificacoesMarcacaoService>();
 
 
 // Add services to the container.
